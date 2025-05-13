@@ -566,6 +566,22 @@ export const DELETE_CATEGORY = gql`
     }
 `;
 
+export const UPDATE_CHANNEL = gql`
+    mutation updateChannel($id: ID!, $input: ChannelUpdateInput!) {
+        channelUpdate(id: $id, input: $input) {
+            channel {
+                id
+                name
+                slug
+            }
+            errors {
+                field
+                message
+            }
+        }
+    }
+`;
+
 export const FINISH_LIST = gql`
     query GetProductFinished {
         productFinishes(first: 100) {
@@ -4290,29 +4306,27 @@ export const CREATE_SHIPPING = gql`
     }
 `;
 
-
 export const USER_INFO = gql`
     query {
-    me {
-      id
-      email
-      firstName
-      lastName
-      
+        me {
+            id
+            email
+            firstName
+            lastName
+        }
     }
-  }
 `;
 
 export const LOGOUT = gql`
     mutation {
         tokensDeactivateAll {
-          errors {
-            field
-            message
-            code
-          }
+            errors {
+                field
+                message
+                code
+            }
         }
-      }
+    }
 `;
 
 export const UPDATE_SHIPPING_COST = gql`
@@ -19859,3 +19873,4 @@ export const MEDIA_PAGINATION = gql`
         }
     }
 `;
+

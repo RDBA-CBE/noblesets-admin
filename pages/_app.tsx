@@ -26,7 +26,7 @@ type AppPropsWithLayout = AppProps & {
 
 const App = ({ Component, pageProps }: AppPropsWithLayout) => {
     const httpLink = createHttpLink({
-        uri: 'https://file.prade.in/graphql/',
+        uri: 'http://121.200.52.133:8000/graphql/',
     });
 
     const authLink = new ApolloLink((operation, forward) => {

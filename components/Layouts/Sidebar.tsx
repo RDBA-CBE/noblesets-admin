@@ -237,6 +237,14 @@ const Sidebar = () => {
                                                 <li>
                                                     <Link href="/product/attributes">{t('Attributes')}</Link>
                                                 </li>
+
+                                                <li>
+                                                    <Link href="/product/brand">{t('Brands')}</Link>
+                                                </li>
+
+                                                {/* <li>
+                                                    <Link href="/product/channel">{t('Channels')}</Link>
+                                                </li> */}
                                                 {/* <li>
                                                     <button type="button" onClick={() => setMenuOpen(!menuOpen)}>
                                                         <div className="flex items-center">

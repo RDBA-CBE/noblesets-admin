@@ -17,7 +17,7 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import CommonLoader from '../elements/commonLoader';
-import { Failure, Success, formatCurrency, roundOff } from '@/utils/functions';
+import { CHANNEL_USD, Failure, Success, WAREHOUSE_ID, formatCurrency, roundOff } from '@/utils/functions';
 import Dropdown from '../../components/Dropdown';
 import IconCaretDown from '@/components/Icon/IconCaretDown';
 import Swal from 'sweetalert2';
@@ -446,7 +446,7 @@ export default function LowStock() {
                         updateChannels: [
                             {
                                 availableForPurchaseDate: null,
-                                channelId: 'Q2hhbm5lbDoy',
+                                channelId: CHANNEL_USD,
                                 isAvailableForPurchase: true,
                                 isPublished: row?.channelListings[0]?.isPublished,
                                 publicationDate: null,
@@ -483,14 +483,14 @@ export default function LowStock() {
                     trackInventory: item.trackInventory,
                     channelListings: [
                         {
-                            channelId: 'Q2hhbm5lbDoy',
+                            channelId: CHANNEL_USD,
                             price: item.channelListings[0]?.price?.amount ? item.channelListings[0]?.price?.amount : '',
                             costPrice: item.channelListings[0]?.costPrice?.amount ? item.channelListings[0]?.costPrice?.amount : '',
                         },
                     ],
                     stocks: [
                         {
-                            warehouse: 'V2FyZWhvdXNlOmRmODMzODUzLTQyMGYtNGRkZi04YzQzLTVkMzdjMzI4MDRlYQ==',
+                            warehouse: WAREHOUSE_ID,
                             quantity: item?.stocks?.length > 0 ? item?.stocks[0]?.quantity : 1,
                         },
                     ],
@@ -548,7 +548,7 @@ export default function LowStock() {
                     id: variantId,
                     input: [
                         {
-                            channelId: 'Q2hhbm5lbDoy',
+                            channelId: CHANNEL_USD,
                             price: price,
                             costPrice: price,
                         },

@@ -3,11 +3,14 @@ import { apiSlice } from './api/apiSlice';
 import themeConfigSlice from './themeConfigSlice';
 import authConfigSlice from './authConfigSlice';
 import categoryConfigSlice from './categoryConfigSlice';
+import channelSlice from './channelSlice';
+
 
 const rootReducer = combineReducers({
     themeConfig: themeConfigSlice,
     authConfig: authConfigSlice,
     categoryConfig: categoryConfigSlice,
+    channelConfig:channelSlice,
     [apiSlice.reducerPath]: apiSlice.reducer,
 });
 

@@ -1,4 +1,4 @@
-import { Failure, useSetState } from '@/utils/functions';
+import { CHANNEL_USD, Failure, useSetState, WAREHOUSE_ID } from '@/utils/functions';
 import React, { useEffect } from 'react';
 import IconTrashLines from './Icon/IconTrashLines';
 import {
@@ -326,7 +326,7 @@ export default function QuickEdit(props: any) {
                         updateChannels: [
                             {
                                 availableForPurchaseDate: null,
-                                channelId: 'Q2hhbm5lbDoy',
+                                channelId: CHANNEL_USD,
                                 isAvailableForPurchase: true,
                                 isPublished: state.publish == 'draft' ? false : true,
                                 publicationDate: null,
@@ -439,14 +439,14 @@ export default function QuickEdit(props: any) {
                 trackInventory: item.stackMgmt,
                 channelListings: [
                     {
-                        channelId: 'Q2hhbm5lbDoy',
+                        channelId: CHANNEL_USD,
                         price: item.regularPrice,
                         costPrice: item.regularPrice,
                     },
                 ],
                 stocks: [
                     {
-                        warehouse: 'V2FyZWhvdXNlOmRmODMzODUzLTQyMGYtNGRkZi04YzQzLTVkMzdjMzI4MDRlYQ==',
+                        warehouse: WAREHOUSE_ID,
                         quantity: item.quantity,
                     },
                 ],
@@ -487,7 +487,7 @@ export default function QuickEdit(props: any) {
     const variantChannelListUpdate = async (variantId: any, NewAddedVariant: any) => {
         try {
             const variantArr = NewAddedVariant?.map((item: any) => ({
-                channelId: 'Q2hhbm5lbDoy',
+                channelId: CHANNEL_USD,
                 price: item.regularPrice,
                 costPrice: item.regularPrice,
             }));

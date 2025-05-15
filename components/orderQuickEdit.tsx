@@ -41,6 +41,7 @@ import {
     Failure,
     NotesMsg,
     Success,
+    WAREHOUSE_ID,
     addCommasToNumber,
     channels,
     formatCurrency,
@@ -456,7 +457,7 @@ const OrderQuickEdit = (props: any) => {
                     variables: {
                         id: fulfillId,
                         input: {
-                            warehouseId: 'V2FyZWhvdXNlOmRmODMzODUzLTQyMGYtNGRkZi04YzQzLTVkMzdjMzI4MDRlYQ==',
+                            warehouseId: WAREHOUSE_ID,
                         },
                     },
                 });

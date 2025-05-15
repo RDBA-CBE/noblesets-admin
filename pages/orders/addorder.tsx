@@ -21,7 +21,7 @@ import {
 import { Loader } from '@mantine/core';
 import * as Yup from 'yup';
 import { useMutation } from '@apollo/client';
-import { isEmptyObject, sampleParams, showDeleteAlert } from '@/utils/functions';
+import { CHANNEL_USD, isEmptyObject, sampleParams, showDeleteAlert } from '@/utils/functions';
 import Swal from 'sweetalert2';
 import IconPencil from '@/components/Icon/IconPencil';
 import IconX from '@/components/Icon/IconX';
@@ -326,7 +326,7 @@ const AddOrder = () => {
             const { data } = await draftOrder({
                 variables: {
                     input: {
-                        channelId: 'Q2hhbm5lbDoy',
+                        channelId: CHANNEL_USD,
                     },
                 },
             });

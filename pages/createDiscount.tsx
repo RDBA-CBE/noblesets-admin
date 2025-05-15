@@ -1,4 +1,4 @@
-import { DateToStringFormat, Failure, Success, USDAmt, dropdown, generateRandomCode, useSetState } from '@/utils/functions';
+import { CHANNEL_INR, CHANNEL_USD, DateToStringFormat, Failure, Success, USDAmt, dropdown, generateRandomCode, useSetState } from '@/utils/functions';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import { Menu, Dropdown, Button } from 'antd';
@@ -40,7 +40,6 @@ const CreateDiscount = () => {
     useEffect(() => {
         codeType();
     }, []);
-
 
     const handleStartDateChange = (e) => {
         setState({
@@ -110,22 +109,21 @@ const CreateDiscount = () => {
                     input: {
                         addChannels: [
                             {
-                                channelId: 'Q2hhbm5lbDox',
+                                channelId: CHANNEL_INR,
                                 // discountValue: state.couponValue,
                                 discountValue:
-                                state.codeType?.value == 'Free Shipping'
-                                    ? '100'
-                                    : state.codeType?.value == 'Fixed Amount'
-                                    ? Number((Number(state.couponValue) * USDAmt).toFixed(2))
-                                    : state.codeType?.value == 'Percentage'
-                                    ? state.couponValue
-                                    : null,
+                                    state.codeType?.value == 'Free Shipping'
+                                        ? '100'
+                                        : state.codeType?.value == 'Fixed Amount'
+                                        ? Number((Number(state.couponValue) * USDAmt).toFixed(2))
+                                        : state.codeType?.value == 'Percentage'
+                                        ? state.couponValue
+                                        : null,
                             },
                             {
-                                channelId: 'Q2hhbm5lbDoy',
+                                channelId: CHANNEL_USD,
                                 // discountValue: state.couponValue,
                                 discountValue: state.codeType?.value == 'Free Shipping' ? '100' : Number(state.couponValue),
-
                             },
                         ],
                         removeChannels: [],

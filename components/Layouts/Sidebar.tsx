@@ -241,10 +241,16 @@ const Sidebar = () => {
                                                 <li>
                                                     <Link href="/product/brand">{t('Brands')}</Link>
                                                 </li>
+                                                <li>
+                                                    <Link href="/apps/sizeGuide/sizeGuide">{t('Size Guide')}</Link>
+                                                </li>
+                                                 <li>
+                                                    <Link href="/product/warehouse">{t('Warehouse')}</Link>
+                                                </li>
 
-                                                {/* <li>
+                                                <li>
                                                     <Link href="/product/channel">{t('Channels')}</Link>
-                                                </li> */}
+                                                </li>
                                                 {/* <li>
                                                     <button type="button" onClick={() => setMenuOpen(!menuOpen)}>
                                                         <div className="flex items-center">
@@ -461,6 +467,32 @@ const Sidebar = () => {
                                                 <span className="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{t('Drop Shipping Import')}</span>
                                             </div>
                                         </Link>
+                                    </li>
+                                    <li className="menu nav-item">
+                                        <button type="button" className={`${currentMenu === 'master' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('master')}>
+                                            <div className="flex items-center">
+                                                <Link href="#" className="flex items-center">
+                                                    {/* <IconMenuMailbox className="shrink-0 group-hover:!text-primary" /> */}
+                                                    <Image src={productImage.src} alt="Product" className="h-5 w-5 shrink-0 object-cover group-hover:!text-primary rtl:mr-3" width={20} height={20} />
+                                                    <span className="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{t('Master')}</span>
+                                                </Link>
+                                            </div>
+
+                                            <div className={currentMenu !== 'product' ? '-rotate-90 rtl:rotate-90' : ''} onClick={() => toggleMenu('master')}>
+                                                <IconCaretDown />
+                                            </div>
+                                        </button>
+
+                                        <AnimateHeight duration={300} height={currentMenu === 'master' ? 'auto' : 0}>
+                                            <ul className="sub-menu text-gray-500">
+                                               
+                                                <li>
+                                                    <Link href="/apps/pincode" target='_blank'>{t('Pincode')}</Link>
+                                                </li>
+                                                
+                                               
+                                            </ul>
+                                        </AnimateHeight>
                                     </li>
 
                                     {/* <li className="nav-item">

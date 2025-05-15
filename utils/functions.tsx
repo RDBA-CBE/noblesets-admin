@@ -11,6 +11,12 @@ import Resizer from 'react-image-file-resizer';
 export const accessKeyId = 'DO00MUC2HWP9YVLPXKXT';
 export const secretAccessKey = 'W9N9b51nxVBvpS59Er9aB6Ht7xx2ZXMrbf3vjBBR8OA';
 
+export const WAREHOUSE_ID = 'V2FyZWhvdXNlOmU2OGQyODIwLWI2MDItNGIyYS1hYTZhLWEyYmFjYmFhZGU2Yg==';
+
+export const CHANNEL_INR = 'Q2hhbm5lbDox';
+
+export const CHANNEL_USD = 'Q2hhbm5lbDoy';
+
 export const capitalizeFLetter = (string = '') => {
     if (string.length > 0) {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -381,9 +387,9 @@ export const profilePic = (profile: any) => {
     if (profile) {
         profiles = profile;
     } else if (profile == undefined) {
-        profiles = "/assets/images/placeholder.png";
+        profiles = '/assets/images/placeholder.png';
     } else {
-        profiles = "/assets/images/placeholder.png";
+        profiles = '/assets/images/placeholder.png';
     }
     return profiles;
 };

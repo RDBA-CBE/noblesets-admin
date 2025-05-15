@@ -12,19 +12,19 @@ import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import Swal from 'sweetalert2';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { BRAND_LIST, CREATE_BRAND, UPDATE_BRAND, DELETE_BRAND } from '@/query/brand';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
-import { Success } from '@/utils/functions';
+import { Failure, Success } from '@/utils/functions';
 import IconLoader from '@/components/Icon/IconLoader';
 import IconArrowBackward from '@/components/Icon/IconArrowBackward';
 import IconArrowForward from '@/components/Icon/IconArrowForward';
 import CommonLoader from '../elements/commonLoader';
+import { CREATE_PINCODE, DELETE_PINCODE, PINCODE_LIST, UPDATE_PINCODE } from '@/query/pincode';
 
-const Brands = () => {
-    const [addTag, { loading: addLoading }] = useMutation(CREATE_BRAND);
-    const [updateTag, { loading: updateLoading }] = useMutation(UPDATE_BRAND);
-    const [deleteCategory] = useMutation(DELETE_BRAND);
-    const [bulkDelete] = useMutation(DELETE_BRAND);
+const Pincode = () => {
+    const [addTag, { loading: addLoading }] = useMutation(CREATE_PINCODE);
+    const [updateTag, { loading: updateLoading }] = useMutation(UPDATE_PINCODE);
+    const [deleteCategory] = useMutation(DELETE_PINCODE);
+    const [bulkDelete] = useMutation(DELETE_PINCODE);
 
     const PAGE_SIZE = 10;
 
@@ -49,7 +49,7 @@ const Brands = () => {
         data: customerData,
         loading: getLoading,
         refetch: categoryListRefetch,
-    } = useQuery(BRAND_LIST, {
+    } = useQuery(PINCODE_LIST, {
         variables: {
             channel: 'india-channel',
             first: PAGE_SIZE,
@@ -59,11 +59,12 @@ const Brands = () => {
             },
         },
         onCompleted: (data) => {
+            console.log('✌️data --->', data);
             commonPagination(data);
         },
     });
 
-    const {} = useQuery(BRAND_LIST, {
+    const {} = useQuery(PINCODE_LIST, {
         variables: {
             channel: 'india-channel',
             first: PAGE_SIZE,
@@ -73,11 +74,11 @@ const Brands = () => {
             },
         },
         onCompleted: (data) => {
-            setTotalCount(data?.brands?.totalCount);
+            setTotalCount(data?.pincodes?.totalCount);
         },
     });
 
-    const { data, refetch: refetch } = useQuery(BRAND_LIST, {
+    const { data, refetch: refetch } = useQuery(PINCODE_LIST, {
         variables: {
             channel: 'india-channel',
             first: PAGE_SIZE,
@@ -88,26 +89,27 @@ const Brands = () => {
         },
     });
 
-    const [fetchNextPage] = useLazyQuery(BRAND_LIST, {
+    const [fetchNextPage] = useLazyQuery(PINCODE_LIST, {
         onCompleted: (data) => {
             commonPagination(data);
         },
     });
 
-    const [fetchPreviousPage] = useLazyQuery(BRAND_LIST, {
+    const [fetchPreviousPage] = useLazyQuery(PINCODE_LIST, {
         onCompleted: (data) => {
             commonPagination(data);
         },
     });
 
     const commonPagination = (data) => {
-        const customers = data.brands.edges;
-        const pageInfo = data.brands?.pageInfo;
+        const customers = data.pincodes.edges;
+        const pageInfo = data.pincodes?.pageInfo;
 
         const newData = customers?.map((item: any) => {
             return {
                 name: item.node?.name,
                 id: item.node?.id,
+                code: item.node?.code,
             };
         });
         setRecordsData(newData);
@@ -155,7 +157,6 @@ const Brands = () => {
                     search: '',
                 },
             });
-            setTotalCount(data?.brands?.totalCount);
             commonPagination(data);
         } catch (error) {
             console.log('error: ', error);
@@ -183,6 +184,7 @@ const Brands = () => {
 
     const SubmittedForm = Yup.object().shape({
         name: Yup.string().required('Please fill the Name'),
+        pincode: Yup.number().required('Please fill the Name'),
     });
 
     // form submit
@@ -191,18 +193,32 @@ const Brands = () => {
             const variables = {
                 input: {
                     name: record.name,
+                    code: record.pincode,
                 },
             };
 
-            await (modalTitle ? updateTag({ variables: { ...variables, id: modalContant.id } }) : addTag({ variables }));
+            const res = await (modalTitle ? updateTag({ variables: { ...variables, id: modalContant.id } }) : addTag({ variables }));
             if (modalTitle) {
-                Success('Brand updated successfully');
+                if (res?.data?.pincodeUpdate?.errors?.length > 0) {
+                    Failure(res?.data?.pincodeUpdate?.errors[0]?.message);
+                    return;
+                } else {
+                    Success('Pincode updated successfully');
+                    refresh();
+                    setModal1(false);
+                    resetForm();
+                }
             } else {
-                Success('Brand created successfully');
+                if (res?.data?.pincodeCreate?.errors?.length > 0) {
+                    Failure(res?.data?.pincodeCreate?.errors[0]?.message);
+                    return;
+                } else {
+                    Success('Pincode created successfully');
+                    refresh();
+                    setModal1(false);
+                    resetForm();
+                }
             }
-            refresh();
-            setModal1(false);
-            resetForm();
         } catch (error) {
             console.log('error: ', error);
         }
@@ -299,32 +315,11 @@ const Brands = () => {
             ) : ( */}
             <div className="panel mt-6">
                 <div className="mb-5 flex flex-col gap-5 md:flex-row md:items-center">
-                    <h5 className="text-lg font-semibold dark:text-white-light">Brands ({totalCount})</h5>
+                    <h5 className="text-lg font-semibold dark:text-white-light">Pincodes ({totalCount})</h5>
 
                     <div className="flex ltr:ml-auto rtl:mr-auto">
                         <input type="text" className="form-input mr-2 w-auto" placeholder="Search..." value={search} onChange={(e) => handleSearchChange(e.target.value)} />
-                        {/* <div className="dropdown  mr-2 ">
-                                <Dropdown
-                                    placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                    btnClassName="btn btn-outline-primary dropdown-toggle"
-                                    button={
-                                        <>
-                                            Bulk Actions
-                                            <span>
-                                                <IconCaretDown className="inline-block ltr:ml-1 rtl:mr-1" />
-                                            </span>
-                                        </>
-                                    }
-                                >
-                                    <ul className="!min-w-[170px]">
-                                        <li>
-                                            <button type="button" onClick={() => BulkDeleteCategory()}>
-                                                Delete
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </Dropdown>
-                            </div> */}
+
                         <button type="button" className="btn btn-primary" onClick={() => CreateTags()}>
                             + Create
                         </button>
@@ -339,6 +334,8 @@ const Brands = () => {
                             records={recordsData}
                             columns={[
                                 { accessor: 'name', sortable: true },
+                                { accessor: 'code', sortable: true },
+
                                 {
                                     accessor: 'actions',
                                     title: 'Actions',
@@ -405,14 +402,14 @@ const Brands = () => {
                             >
                                 <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
                                     <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                        <div className="text-lg font-bold">{modalTitle === null ? 'Create Brand' : 'Edit Brand'}</div>
+                                        <div className="text-lg font-bold">{modalTitle === null ? 'Add New Pincode' : 'Edit Pincode'}</div>
                                         <button type="button" className="text-white-dark hover:text-dark" onClick={() => setModal1(false)}>
                                             <IconX />
                                         </button>
                                     </div>
                                     <div className="mb-5 p-5">
                                         <Formik
-                                            initialValues={modalContant === null ? { name: '' } : { name: modalContant?.name }}
+                                            initialValues={modalContant === null ? { name: '', pincode: '' } : { name: modalContant?.name, pincode: modalContant?.code }}
                                             validationSchema={SubmittedForm}
                                             onSubmit={(values, { resetForm }) => {
                                                 onSubmit(values, { resetForm }); // Call the onSubmit function with form values and resetForm method
@@ -424,6 +421,12 @@ const Brands = () => {
                                                         <label htmlFor="fullName">Name</label>
                                                         <Field name="name" type="text" id="fullName" placeholder="Enter Name" className="form-input" />
                                                         {submitCount ? errors.name ? <div className="mt-1 text-danger">{errors.name}</div> : <div className="mt-1 text-success"></div> : ''}
+                                                    </div>
+
+                                                    <div className={submitCount ? (errors.name ? 'has-error' : 'has-success') : ''}>
+                                                        <label htmlFor="pincode">Pincode</label>
+                                                        <Field name="pincode" type="number" id="pincode" placeholder="Enter Pincode" className="form-input" />
+                                                        {submitCount ? errors.pincode ? <div className="mt-1 text-danger">{errors.pincode}</div> : <div className="mt-1 text-success"></div> : ''}
                                                     </div>
 
                                                     <button type="submit" className="btn btn-primary !mt-6">
@@ -443,4 +446,4 @@ const Brands = () => {
     );
 };
 
-export default PrivateRouter(Brands);
+export default PrivateRouter(Pincode);

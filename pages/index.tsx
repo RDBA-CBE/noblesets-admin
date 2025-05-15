@@ -21,7 +21,7 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState, Fragment } from 'react';
 import CommonLoader from './elements/commonLoader';
-import { Failure, Success, formatCurrency, formatOptions, roundOff } from '@/utils/functions';
+import { CHANNEL_USD, Failure, Success, WAREHOUSE_ID, formatCurrency, formatOptions, roundOff } from '@/utils/functions';
 import Dropdown from '../components/Dropdown';
 import IconCaretDown from '@/components/Icon/IconCaretDown';
 import Swal from 'sweetalert2';
@@ -689,7 +689,7 @@ const Index = () => {
                         updateChannels: [
                             {
                                 availableForPurchaseDate: null,
-                                channelId: 'Q2hhbm5lbDoy',
+                                channelId: CHANNEL_USD,
                                 isAvailableForPurchase: true,
                                 isPublished: false,
                                 publicationDate: null,
@@ -724,14 +724,14 @@ const Index = () => {
                     trackInventory: item.trackInventory,
                     channelListings: [
                         {
-                            channelId: 'Q2hhbm5lbDoy',
+                            channelId: CHANNEL_USD,
                             price: item.channelListings[0]?.price?.amount ? item.channelListings[0]?.price?.amount : 0,
                             costPrice: item.channelListings[0]?.costPrice?.amount ? item.channelListings[0]?.costPrice?.amount : 0,
                         },
                     ],
                     stocks: [
                         {
-                            warehouse: 'V2FyZWhvdXNlOmRmODMzODUzLTQyMGYtNGRkZi04YzQzLTVkMzdjMzI4MDRlYQ==',
+                            warehouse: WAREHOUSE_ID,
                             quantity: item?.stocks?.length > 0 ? item?.stocks[0]?.quantity : 0,
                         },
                     ],
@@ -789,7 +789,7 @@ const Index = () => {
                     id: variantId,
                     input: [
                         {
-                            channelId: 'Q2hhbm5lbDoy',
+                            channelId: CHANNEL_USD,
                             price: price,
                             costPrice: price,
                         },
@@ -1003,7 +1003,7 @@ const Index = () => {
                         updateChannels: [
                             {
                                 availableForPurchaseDate: null,
-                                channelId: 'Q2hhbm5lbDoy',
+                                channelId: CHANNEL_USD,
                                 isAvailableForPurchase: true,
                                 isPublished: variantStatus == 'no_changes' ? (res?.channelListings[0]?.isPublished == true ? 'published' : 'draft') : variantStatus == 'draft' ? false : true,
                                 publicationDate: null,

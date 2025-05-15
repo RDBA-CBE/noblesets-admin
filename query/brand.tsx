@@ -68,3 +68,20 @@ export const DELETE_BRAND = gql`
         }
     }
 `;
+
+export const WAREHOUSE_LIST = gql`
+    query MyQuery {
+        warehouses(first: 10) {
+            totalCount
+            edges {
+                cursor
+                node {
+                    id
+                    name
+                    slug
+                    email
+                }
+            }
+        }
+    }
+`;

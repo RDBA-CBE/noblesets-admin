@@ -12,19 +12,21 @@ import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import Swal from 'sweetalert2';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { BRAND_LIST, CREATE_BRAND, UPDATE_BRAND, DELETE_BRAND } from '@/query/brand';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import { Success } from '@/utils/functions';
 import IconLoader from '@/components/Icon/IconLoader';
 import IconArrowBackward from '@/components/Icon/IconArrowBackward';
 import IconArrowForward from '@/components/Icon/IconArrowForward';
-import CommonLoader from '../elements/commonLoader';
+import CommonLoader from '../../elements/commonLoader';
+import DynamicSizeTable from '@/components/Layouts/DynamicTable';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { DELETE_SIZEGUIDE, SIZEGUIDE_LIST } from '@/query/sizeGuide';
 
-const Brands = () => {
-    const [addTag, { loading: addLoading }] = useMutation(CREATE_BRAND);
-    const [updateTag, { loading: updateLoading }] = useMutation(UPDATE_BRAND);
-    const [deleteCategory] = useMutation(DELETE_BRAND);
-    const [bulkDelete] = useMutation(DELETE_BRAND);
+const SizeGuide = () => {
+    const router = useRouter();
+
+    const [deleteCategory] = useMutation(DELETE_SIZEGUIDE);
 
     const PAGE_SIZE = 10;
 
@@ -40,16 +42,14 @@ const Brands = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const [modal1, setModal1] = useState(false);
-    const [modalTitle, setModalTitle] = useState(null);
-    const [modalContant, setModalContant] = useState<any>(null);
+
     const [totalCount, setTotalCount] = useState(0);
 
     const {
         data: customerData,
         loading: getLoading,
         refetch: categoryListRefetch,
-    } = useQuery(BRAND_LIST, {
+    } = useQuery(SIZEGUIDE_LIST, {
         variables: {
             channel: 'india-channel',
             first: PAGE_SIZE,
@@ -63,7 +63,7 @@ const Brands = () => {
         },
     });
 
-    const {} = useQuery(BRAND_LIST, {
+    const {} = useQuery(SIZEGUIDE_LIST, {
         variables: {
             channel: 'india-channel',
             first: PAGE_SIZE,
@@ -73,11 +73,11 @@ const Brands = () => {
             },
         },
         onCompleted: (data) => {
-            setTotalCount(data?.brands?.totalCount);
+            setTotalCount(data?.sizeGuids?.totalCount);
         },
     });
 
-    const { data, refetch: refetch } = useQuery(BRAND_LIST, {
+    const { data, refetch: refetch } = useQuery(SIZEGUIDE_LIST, {
         variables: {
             channel: 'india-channel',
             first: PAGE_SIZE,
@@ -88,21 +88,21 @@ const Brands = () => {
         },
     });
 
-    const [fetchNextPage] = useLazyQuery(BRAND_LIST, {
+    const [fetchNextPage] = useLazyQuery(SIZEGUIDE_LIST, {
         onCompleted: (data) => {
             commonPagination(data);
         },
     });
 
-    const [fetchPreviousPage] = useLazyQuery(BRAND_LIST, {
+    const [fetchPreviousPage] = useLazyQuery(SIZEGUIDE_LIST, {
         onCompleted: (data) => {
             commonPagination(data);
         },
     });
 
     const commonPagination = (data) => {
-        const customers = data.brands.edges;
-        const pageInfo = data.brands?.pageInfo;
+        const customers = data.sizeGuids.edges;
+        const pageInfo = data.sizeGuids?.pageInfo;
 
         const newData = customers?.map((item: any) => {
             return {
@@ -115,6 +115,7 @@ const Brands = () => {
         setEndCursor(pageInfo?.endCursor || null);
         setHasNextPage(pageInfo?.hasNextPage || false);
         setHasPreviousPage(pageInfo?.hasPreviousPage || false);
+
     };
 
     const handleNextPage = () => {
@@ -155,7 +156,7 @@ const Brands = () => {
                     search: '',
                 },
             });
-            setTotalCount(data?.brands?.totalCount);
+            setTotalCount(data?.sizeGuids?.totalCount);
             commonPagination(data);
         } catch (error) {
             console.log('error: ', error);
@@ -181,53 +182,6 @@ const Brands = () => {
         }
     };
 
-    const SubmittedForm = Yup.object().shape({
-        name: Yup.string().required('Please fill the Name'),
-    });
-
-    // form submit
-    const onSubmit = async (record: any, { resetForm }: any) => {
-        try {
-            const variables = {
-                input: {
-                    name: record.name,
-                },
-            };
-
-            await (modalTitle ? updateTag({ variables: { ...variables, id: modalContant.id } }) : addTag({ variables }));
-            if (modalTitle) {
-                Success('Brand updated successfully');
-            } else {
-                Success('Brand created successfully');
-            }
-            refresh();
-            setModal1(false);
-            resetForm();
-        } catch (error) {
-            console.log('error: ', error);
-        }
-    };
-
-    // category table edit
-    const EditCategory = (record: any) => {
-        setModal1(true);
-        setModalTitle(record);
-        setModalContant(record);
-    };
-
-    // category table create
-    const CreateTags = () => {
-        setModal1(true);
-        setModalTitle(null);
-        setModalContant(null);
-    };
-
-    // view categotry
-    // const ViewCategory = (record: any) => {
-    //     setViewModal(true);
-    // };
-
-    // delete Alert Message
     const showDeleteAlert = (onConfirm: () => void, onCancel: () => void) => {
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
@@ -258,26 +212,6 @@ const Brands = () => {
             });
     };
 
-    const BulkDeleteCategory = async () => {
-        showDeleteAlert(
-            async () => {
-                if (selectedRecords.length === 0) {
-                    Swal.fire('Cancelled', 'Please select at least one record!', 'error');
-                    return;
-                }
-                selectedRecords?.map(async (item: any) => {
-                    await bulkDelete({ variables: { id: item.id } });
-                });
-                Swal.fire('Deleted!', 'Your files have been deleted.', 'success');
-                refresh();
-                setSelectedRecords([]);
-            },
-            () => {
-                Swal.fire('Cancelled', 'Your List is safe :)', 'error');
-            }
-        );
-    };
-
     const DeleteCategory = (record: any) => {
         showDeleteAlert(
             async () => {
@@ -299,35 +233,14 @@ const Brands = () => {
             ) : ( */}
             <div className="panel mt-6">
                 <div className="mb-5 flex flex-col gap-5 md:flex-row md:items-center">
-                    <h5 className="text-lg font-semibold dark:text-white-light">Brands ({totalCount})</h5>
+                    <h5 className="text-lg font-semibold dark:text-white-light">Size Guide ({totalCount})</h5>
 
                     <div className="flex ltr:ml-auto rtl:mr-auto">
                         <input type="text" className="form-input mr-2 w-auto" placeholder="Search..." value={search} onChange={(e) => handleSearchChange(e.target.value)} />
-                        {/* <div className="dropdown  mr-2 ">
-                                <Dropdown
-                                    placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                    btnClassName="btn btn-outline-primary dropdown-toggle"
-                                    button={
-                                        <>
-                                            Bulk Actions
-                                            <span>
-                                                <IconCaretDown className="inline-block ltr:ml-1 rtl:mr-1" />
-                                            </span>
-                                        </>
-                                    }
-                                >
-                                    <ul className="!min-w-[170px]">
-                                        <li>
-                                            <button type="button" onClick={() => BulkDeleteCategory()}>
-                                                Delete
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </Dropdown>
-                            </div> */}
-                        <button type="button" className="btn btn-primary" onClick={() => CreateTags()}>
+
+                        <Link href="/apps/sizeGuide/createSizeGuide" target="_blank" className="btn btn-primary">
                             + Create
-                        </button>
+                        </Link>
                     </div>
                 </div>
                 {getLoading ? (
@@ -345,7 +258,7 @@ const Brands = () => {
                                     render: (row: any) => (
                                         <>
                                             <Tippy content="Edit">
-                                                <button type="button" onClick={() => EditCategory(row)}>
+                                                <button type="button" onClick={() => router.push(`/apps/sizeGuide/editSizeGuide/?id=${row.id}`)}>
                                                     <IconPencil className="ltr:mr-2 rtl:ml-2" />
                                                 </button>
                                             </Tippy>
@@ -384,63 +297,8 @@ const Brands = () => {
                     </button>
                 </div>
             </div>
-            {/* )} */}
-
-            {/* CREATE AND EDIT Tags FORM */}
-            <Transition appear show={modal1} as={Fragment}>
-                <Dialog as="div" open={modal1} onClose={() => setModal1(false)}>
-                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
-                        <div className="fixed inset-0" />
-                    </Transition.Child>
-                    <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
-                        <div className="flex min-h-screen items-start justify-center px-4">
-                            <Transition.Child
-                                as={Fragment}
-                                enter="ease-out duration-300"
-                                enterFrom="opacity-0 scale-95"
-                                enterTo="opacity-100 scale-100"
-                                leave="ease-in duration-200"
-                                leaveFrom="opacity-100 scale-100"
-                                leaveTo="opacity-0 scale-95"
-                            >
-                                <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
-                                    <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                        <div className="text-lg font-bold">{modalTitle === null ? 'Create Brand' : 'Edit Brand'}</div>
-                                        <button type="button" className="text-white-dark hover:text-dark" onClick={() => setModal1(false)}>
-                                            <IconX />
-                                        </button>
-                                    </div>
-                                    <div className="mb-5 p-5">
-                                        <Formik
-                                            initialValues={modalContant === null ? { name: '' } : { name: modalContant?.name }}
-                                            validationSchema={SubmittedForm}
-                                            onSubmit={(values, { resetForm }) => {
-                                                onSubmit(values, { resetForm }); // Call the onSubmit function with form values and resetForm method
-                                            }}
-                                        >
-                                            {({ errors, submitCount, touched, setFieldValue, values }: any) => (
-                                                <Form className="space-y-5">
-                                                    <div className={submitCount ? (errors.name ? 'has-error' : 'has-success') : ''}>
-                                                        <label htmlFor="fullName">Name</label>
-                                                        <Field name="name" type="text" id="fullName" placeholder="Enter Name" className="form-input" />
-                                                        {submitCount ? errors.name ? <div className="mt-1 text-danger">{errors.name}</div> : <div className="mt-1 text-success"></div> : ''}
-                                                    </div>
-
-                                                    <button type="submit" className="btn btn-primary !mt-6">
-                                                        {addLoading || updateLoading ? <IconLoader /> : 'Submit'}
-                                                    </button>
-                                                </Form>
-                                            )}
-                                        </Formik>
-                                    </div>
-                                </Dialog.Panel>
-                            </Transition.Child>
-                        </div>
-                    </div>
-                </Dialog>
-            </Transition>
         </div>
     );
 };
 
-export default PrivateRouter(Brands);
+export default PrivateRouter(SizeGuide);

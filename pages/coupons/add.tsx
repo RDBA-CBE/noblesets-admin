@@ -51,7 +51,7 @@ import {
     UPDATE_PRODUCT_CHANNEL,
     UPDATE_VARIANT_LIST,
 } from '@/query/product';
-import { sampleParams } from '@/utils/functions';
+import { CHANNEL_USD, sampleParams } from '@/utils/functions';
 import IconRestore from '@/components/Icon/IconRestore';
 import { cA } from '@fullcalendar/core/internal-common';
 const AddCoupon = () => {
@@ -427,7 +427,7 @@ const AddCoupon = () => {
                         updateChannels: [
                             {
                                 availableForPurchaseDate: null,
-                                channelId: 'Q2hhbm5lbDoy',
+                                channelId: CHANNEL_USD,
                                 isAvailableForPurchase: true,
                                 isPublished: publish == 'draft' ? false : true,
                                 publicationDate: null,
@@ -482,7 +482,7 @@ const AddCoupon = () => {
                     id: variantId,
                     input: [
                         {
-                            channelId: 'Q2hhbm5lbDoy',
+                            channelId: CHANNEL_USD,
                             costPrice: regularPrice,
                             price: salePrice,
                         },

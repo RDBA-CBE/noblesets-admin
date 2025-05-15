@@ -56,8 +56,10 @@ import {
     NEW_PARENT_CATEGORY_LIST,
 } from '@/query/product';
 import {
+    CHANNEL_USD,
     Failure,
     Success,
+    WAREHOUSE_ID,
     addCommasToNumber,
     addNewFile,
     addNewMediaFile,
@@ -1114,7 +1116,7 @@ const ProductEdit = (props: any) => {
                         updateChannels: [
                             {
                                 availableForPurchaseDate: null,
-                                channelId: 'Q2hhbm5lbDoy',
+                                channelId: CHANNEL_USD,
                                 isAvailableForPurchase: true,
                                 isPublished: publish == 'draft' ? false : true,
                                 publicationDate: null,
@@ -1284,14 +1286,14 @@ const ProductEdit = (props: any) => {
                 trackInventory: item.stackMgmt,
                 channelListings: [
                     {
-                        channelId: 'Q2hhbm5lbDoy',
+                        channelId: CHANNEL_USD,
                         price: item.regularPrice,
                         costPrice: item.regularPrice,
                     },
                 ],
                 stocks: [
                     {
-                        warehouse: 'V2FyZWhvdXNlOmRmODMzODUzLTQyMGYtNGRkZi04YzQzLTVkMzdjMzI4MDRlYQ==',
+                        warehouse: WAREHOUSE_ID,
                         quantity: item.quantity,
                     },
                 ],
@@ -1331,7 +1333,7 @@ const ProductEdit = (props: any) => {
 
                 const variantArr = [
                     {
-                        channelId: 'Q2hhbm5lbDoy', // Fixed or dynamic channelId
+                        channelId: CHANNEL_USD, // Fixed or dynamic channelId
                         price: newVariantData.regularPrice,
                         costPrice: newVariantData.regularPrice,
                     },

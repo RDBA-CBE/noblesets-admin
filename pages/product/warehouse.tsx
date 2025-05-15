@@ -12,7 +12,7 @@ import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import Swal from 'sweetalert2';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { BRAND_LIST, CREATE_BRAND, UPDATE_BRAND, DELETE_BRAND } from '@/query/brand';
+import { BRAND_LIST, CREATE_BRAND, UPDATE_BRAND, DELETE_BRAND, WAREHOUSE_LIST } from '@/query/brand';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import { Success } from '@/utils/functions';
 import IconLoader from '@/components/Icon/IconLoader';
@@ -20,7 +20,7 @@ import IconArrowBackward from '@/components/Icon/IconArrowBackward';
 import IconArrowForward from '@/components/Icon/IconArrowForward';
 import CommonLoader from '../elements/commonLoader';
 
-const Brands = () => {
+const Warehouse = () => {
     const [addTag, { loading: addLoading }] = useMutation(CREATE_BRAND);
     const [updateTag, { loading: updateLoading }] = useMutation(UPDATE_BRAND);
     const [deleteCategory] = useMutation(DELETE_BRAND);
@@ -49,7 +49,7 @@ const Brands = () => {
         data: customerData,
         loading: getLoading,
         refetch: categoryListRefetch,
-    } = useQuery(BRAND_LIST, {
+    } = useQuery(WAREHOUSE_LIST, {
         variables: {
             channel: 'india-channel',
             first: PAGE_SIZE,
@@ -63,7 +63,7 @@ const Brands = () => {
         },
     });
 
-    const {} = useQuery(BRAND_LIST, {
+    const {} = useQuery(WAREHOUSE_LIST, {
         variables: {
             channel: 'india-channel',
             first: PAGE_SIZE,
@@ -77,7 +77,7 @@ const Brands = () => {
         },
     });
 
-    const { data, refetch: refetch } = useQuery(BRAND_LIST, {
+    const { data, refetch: refetch } = useQuery(WAREHOUSE_LIST, {
         variables: {
             channel: 'india-channel',
             first: PAGE_SIZE,
@@ -88,21 +88,21 @@ const Brands = () => {
         },
     });
 
-    const [fetchNextPage] = useLazyQuery(BRAND_LIST, {
+    const [fetchNextPage] = useLazyQuery(WAREHOUSE_LIST, {
         onCompleted: (data) => {
             commonPagination(data);
         },
     });
 
-    const [fetchPreviousPage] = useLazyQuery(BRAND_LIST, {
+    const [fetchPreviousPage] = useLazyQuery(WAREHOUSE_LIST, {
         onCompleted: (data) => {
             commonPagination(data);
         },
     });
 
     const commonPagination = (data) => {
-        const customers = data.brands.edges;
-        const pageInfo = data.brands?.pageInfo;
+        const customers = data.warehouses.edges;
+        const pageInfo = data.warehouses?.pageInfo;
 
         const newData = customers?.map((item: any) => {
             return {
@@ -155,7 +155,6 @@ const Brands = () => {
                     search: '',
                 },
             });
-            setTotalCount(data?.brands?.totalCount);
             commonPagination(data);
         } catch (error) {
             console.log('error: ', error);
@@ -299,7 +298,7 @@ const Brands = () => {
             ) : ( */}
             <div className="panel mt-6">
                 <div className="mb-5 flex flex-col gap-5 md:flex-row md:items-center">
-                    <h5 className="text-lg font-semibold dark:text-white-light">Brands ({totalCount})</h5>
+                    <h5 className="text-lg font-semibold dark:text-white-light">Warehouses ({totalCount})</h5>
 
                     <div className="flex ltr:ml-auto rtl:mr-auto">
                         <input type="text" className="form-input mr-2 w-auto" placeholder="Search..." value={search} onChange={(e) => handleSearchChange(e.target.value)} />
@@ -339,6 +338,8 @@ const Brands = () => {
                             records={recordsData}
                             columns={[
                                 { accessor: 'name', sortable: true },
+                                { accessor: 'id', sortable: true },
+
                                 {
                                     accessor: 'actions',
                                     title: 'Actions',
@@ -443,4 +444,4 @@ const Brands = () => {
     );
 };
 
-export default PrivateRouter(Brands);
+export default PrivateRouter(Warehouse);

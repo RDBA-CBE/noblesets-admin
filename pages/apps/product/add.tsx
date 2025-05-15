@@ -56,8 +56,10 @@ import {
     NEW_PARENT_CATEGORY_LIST,
 } from '@/query/product';
 import {
+    CHANNEL_USD,
     Failure,
     Success,
+    WAREHOUSE_ID,
     addCommasToNumber,
     addNewMediaFile,
     capitalizeFLetter,
@@ -85,6 +87,10 @@ import IconArrowBackward from '@/components/Icon/IconArrowBackward';
 import IconArrowForward from '@/components/Icon/IconArrowForward';
 import CategorySelect from '@/components/CategorySelect';
 import TagSelect from '@/components/TagSelect';
+import { BRAND_LIST, CREATE_BRAND } from '@/query/brand';
+import BrandSelect from '@/components/Layouts/BrandSelect';
+import { SIZEGUIDE_LIST } from '@/query/sizeGuide';
+import SizeGuideSelect from '@/components/Layouts/SizeGuideSelect';
 
 const ProductAdd = () => {
     const router = useRouter();
@@ -260,6 +266,8 @@ const ProductAdd = () => {
     });
 
     const [addCategory] = useMutation(CREATE_CATEGORY);
+    const [addBrand] = useMutation(CREATE_BRAND);
+
     const [addTag] = useMutation(CREATE_TAG);
 
     const {
@@ -270,12 +278,36 @@ const ProductAdd = () => {
         variables: { channel: 'india-channel' },
     });
 
+    const {
+        data: brandList,
+        error: brandListError,
+        refetch: brandListRefetch,
+    } = useQuery(BRAND_LIST, {
+        variables: { channel: 'india-channel' },
+    });
+
     const { refetch: categorySearchRefetch } = useQuery(NEW_PARENT_CATEGORY_LIST, {
+        variables: { channel: 'india-channel' },
+    });
+
+    const { refetch: brandRefetch } = useQuery(BRAND_LIST, {
+        variables: { channel: 'india-channel' },
+    });
+
+    const { refetch: sizeGuideRefetch } = useQuery(SIZEGUIDE_LIST, {
         variables: { channel: 'india-channel' },
     });
 
     const fetchCategories = async (variables) => {
         return await categorySearchRefetch(variables);
+    };
+
+    const fetchBrands = async (variables) => {
+        return await brandRefetch(variables);
+    };
+
+    const fetchSizeGuide = async (variables) => {
+        return await sizeGuideRefetch(variables);
     };
 
     const fetchTag = async (variables) => {
@@ -412,7 +444,14 @@ const ProductAdd = () => {
 
     const [productType, setProductType] = useState([]);
     const [selectedCat, setselectedCat] = useState<any>([]);
+    const [selectedBrand, setselectedBrand] = useState<any>([]);
+    const [selectedSizeGuide, setSelectedSizeGuide] = useState<any>([]);
+
     const [isOpenCat, setIsOpenCat] = useState(false);
+    const [createBrandLoader, setCreateBrandLoader] = useState(false);
+
+    const [isOpenBrand, setIsOpenBrand] = useState(false);
+
     const [isOpenTag, setIsOpenTag] = useState(false);
     const [tagLoader, setTagLoader] = useState(false);
     const [productListUpsell, setProductListUpsell] = useState([]);
@@ -575,34 +614,6 @@ const ProductAdd = () => {
     const previewClick = async () => {
         setPreviewLoading(true);
         const savedContent = await editorInstance.save();
-
-        // const styleRes = await styleRefetch({
-        //     sampleParams,
-        // });
-
-        // const designRes = await designRefetch({
-        //     sampleParams,
-        // });
-
-        // const finishRes = await finishRefetch({
-        //     sampleParams,
-        // });
-
-        // const stoneTypeRes = await stoneRefetch({
-        //     sampleParams,
-        // });
-
-        // const stoneColorRes = await stoneColorRefetch({
-        //     sampleParams,
-        // });
-
-        // const typeRes = await typeRefetch({
-        //     sampleParams,
-        // });
-
-        // const sizeRes = await sizeRefetch({
-        //     sampleParams,
-        // });
         let youMayLike = [];
 
         if (selectedCrosssell?.length > 0) {
@@ -621,17 +632,6 @@ const ProductAdd = () => {
             }
         }
 
-        // const arr1 = {
-        //     design: designRes?.data?.productDesigns,
-        //     style: styleRes?.data?.productStyles,
-        //     finish: finishRes?.data?.productFinishes,
-        //     stoneType: stoneTypeRes?.data?.productStoneTypes,
-        //     stoneColor: stoneColorRes?.data?.stoneColors,
-        //     type: typeRes?.data?.itemTypes,
-        //     size: sizeRes?.data?.sizes,
-        // };
-        // const attributes = getFullDetails(selectedValues, arr1);
-
         const att = attributesData
             .map((attr) => {
                 const selectedValues = selectedAttributes[attr?.id] || [];
@@ -644,8 +644,6 @@ const ProductAdd = () => {
                     : null;
             })
             .filter(Boolean);
-
-        console.log('att: ', att);
 
         const attributes = att;
 
@@ -955,7 +953,7 @@ const ProductAdd = () => {
                         updateChannels: [
                             {
                                 availableForPurchaseDate: null,
-                                channelId: 'Q2hhbm5lbDoy',
+                                channelId: CHANNEL_USD,
                                 isAvailableForPurchase: true,
                                 isPublished: publish == 'draft' ? false : true,
                                 publicationDate: null,
@@ -987,14 +985,14 @@ const ProductAdd = () => {
                 trackInventory: item.stackMgmt,
                 channelListings: [
                     {
-                        channelId: 'Q2hhbm5lbDoy',
+                        channelId: CHANNEL_USD,
                         price: item.regularPrice,
                         costPrice: item.regularPrice,
                     },
                 ],
                 stocks: [
                     {
-                        warehouse: 'V2FyZWhvdXNlOmRmODMzODUzLTQyMGYtNGRkZi04YzQzLTVkMzdjMzI4MDRlYQ==',
+                        warehouse: WAREHOUSE_ID,
                         quantity: item.quantity,
                     },
                 ],
@@ -1044,7 +1042,7 @@ const ProductAdd = () => {
                     id: variantId,
                     input: [
                         {
-                            channelId: 'Q2hhbm5lbDoy',
+                            channelId: CHANNEL_USD,
                             price: price,
                             costPrice: price,
                         },
@@ -1171,37 +1169,41 @@ const ProductAdd = () => {
         }
     };
 
-    // const handleAddAccordion = () => {
-    //     if (chooseType == '') {
-    //         setAttDropDownError('Please select a type');
-    //     } else {
-    //         const selectedType = arr.find((item) => item?.type === chooseType);
-    //         setSelectedArr([chooseType, ...selectedArr]);
-    //         setAccordions([selectedType, ...accordions]);
-    //         setOpenAccordion(chooseType);
-    //         setSelectedValues({ ...selectedValues, [chooseType]: [] }); // Clear selected values for the chosen type
-    //         setChooseType('');
-    //         setAttDropDownError('');
-    //     }
-    // };
+    const createNewBrand = async () => {
+        try {
+            if (formData.name == '') {
+                Failure('Brand name is required');
+                return;
+            }
+            setCreateBrandLoader(true);
 
-    // const handleRemoveAccordion = (type: any) => {
-    //     setSelectedArr(selectedArr.filter((item: any) => item !== type));
-    //     setAccordions(accordions.filter((item: any) => item.type !== type));
-    //     setOpenAccordion('');
-    //     const updatedSelectedValues: any = { ...selectedValues };
-    //     delete updatedSelectedValues[type];
-    //     setSelectedValues(updatedSelectedValues);
-    // };
+            const variables = {
+                input: {
+                    name: formData.name,
+                },
+            };
 
-    // const handleDropdownChange = (event: any, type: any) => {
-    //     setChooseType(type);
-    // };
-
-    // const handleMultiSelectChange = (selectedOptions: any, type: any) => {
-    //     const selectedValuesForType = selectedOptions.map((option: any) => option.value);
-    //     setSelectedValues({ ...selectedValues, [type]: selectedValuesForType });
-    // };
+            const { data } = await addBrand({ variables });
+            if (data?.brandCreate?.errors?.length > 0) {
+                Failure(data?.brandCreate?.errors[0].message);
+                setCreateBrandLoader(false);
+            } else {
+                brandListRefetch();
+                setIsOpenBrand(false);
+                setCreateBrandLoader(false);
+                Success('Brand created successfully');
+                setselectedBrand({ label: data?.brandCreate?.brand?.name, value: data?.brand?.category?.id });
+                setFormData({
+                    name: '',
+                    description: '',
+                    parentCategory: '',
+                });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            setCreateBrandLoader(false);
+        }
+    };
 
     const handleChange = (index: any, fieldName: any, fieldValue: any) => {
         setVariants((prevItems) => {
@@ -2171,6 +2173,46 @@ const ProductAdd = () => {
                             </p>
                         </div>
 
+                        <div className="panel order-4  mt-5 md:order-3">
+                            <div className="mb-5 border-b border-gray-200 pb-2">
+                                <h5 className=" block text-lg font-medium text-gray-700">Product Brands</h5>
+                            </div>
+                            <div className="mb-5">
+                                <BrandSelect
+                                    queryFunc={fetchBrands} // Pass the function to fetch categories
+                                    selectedCategory={selectedBrand} // Use 'selectedCategory' instead of 'value'
+                                    onCategoryChange={(data) => setselectedBrand(data)} // Use 'onCategoryChange' instead of 'onChange'
+                                    placeholder="Select brands"
+                                />
+                                {/* <Select isMulti value={selectedCat} onChange={(e) => setselectedCat(e)} options={parentLists} placeholder="Select categories..." className="form-select" /> */}
+
+                                {categoryErrMsg && <p className="error-message mt-1 text-red-500 ">{categoryErrMsg}</p>}
+                            </div>
+                            <p className="mt-5 cursor-pointer text-primary underline" onClick={() => setIsOpenBrand(true)}>
+                                Add a new brand
+                            </p>
+                        </div>
+
+                        <div className="panel order-4  mt-5 md:order-3">
+                            <div className="mb-5 border-b border-gray-200 pb-2">
+                                <h5 className=" block text-lg font-medium text-gray-700">Product Size Guide</h5>
+                            </div>
+                            <div className="mb-5">
+                                <SizeGuideSelect
+                                    queryFunc={fetchSizeGuide} // Pass the function to fetch categories
+                                    selectedCategory={selectedSizeGuide} // Use 'selectedCategory' instead of 'value'
+                                    onCategoryChange={(data) => setSelectedSizeGuide(data)} // Use 'onCategoryChange' instead of 'onChange'
+                                    placeholder="Select brands"
+                                />
+                                {/* <Select isMulti value={selectedCat} onChange={(e) => setselectedCat(e)} options={parentLists} placeholder="Select categories..." className="form-select" /> */}
+
+                                {categoryErrMsg && <p className="error-message mt-1 text-red-500 ">{categoryErrMsg}</p>}
+                            </div>
+                            <p className="mt-5 cursor-pointer text-primary underline" onClick={() => setIsOpenBrand(true)}>
+                                Add a new brand
+                            </p>
+                        </div>
+
                         <div className="panel order-1  mt-5 md:order-4">
                             <div className="mb-5 border-b border-gray-200 pb-2">
                                 <h5 className=" block text-lg font-medium text-gray-700">Product Tags</h5>
@@ -2599,6 +2641,28 @@ const ProductAdd = () => {
                     </div>
                 </Dialog>
             </Transition>
+
+            <Modal
+                addHeader={'Create Brand'}
+                open={isOpenBrand}
+                close={() => setIsOpenBrand(false)}
+                renderComponent={() => (
+                    <div>
+                        <div className="mb-5 p-5">
+                            <form>
+                                <div>
+                                    <label htmlFor="name">Name </label>
+                                    <input name="name" type="text" id="name" placeholder="Enter Name" className="form-input" value={formData.name} onChange={handleCatChange} />
+                                </div>
+
+                                <button type="button" onClick={() => createNewBrand()} className="btn btn-primary !mt-6">
+                                    {createBrandLoader ? <IconLoader className="mr-2 h-4 w-4 animate-spin" /> : 'Submit'}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                )}
+            />
 
             <Modal
                 addHeader={'Create Category'}

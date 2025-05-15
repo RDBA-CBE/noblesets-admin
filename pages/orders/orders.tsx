@@ -11,7 +11,7 @@ import IconArrowForward from '@/components/Icon/IconArrowForward';
 import { useRouter } from 'next/router';
 import IconEdit from '@/components/Icon/IconEdit';
 import dayjs from 'dayjs';
-import { OrderStatus, PaymentStatus, addCommasToNumber, getCurrentDateTime, handleExportByChange, mintDateTime } from '@/utils/functions';
+import { CHANNEL_INR, CHANNEL_USD, OrderStatus, PaymentStatus, addCommasToNumber, getCurrentDateTime, handleExportByChange, mintDateTime } from '@/utils/functions';
 import Tippy from '@tippyjs/react';
 import IconPencil from '@/components/Icon/IconPencil';
 import Link from 'next/link';
@@ -269,7 +269,7 @@ const AbandonedCarts = () => {
             const { data } = await draftOrder({
                 variables: {
                     input: {
-                        channelId: selectedCurrency == 'USD' ? 'Q2hhbm5lbDox' : 'Q2hhbm5lbDoy',
+                        channelId: selectedCurrency == 'USD' ? CHANNEL_INR : CHANNEL_USD,
                     },
                 },
             });

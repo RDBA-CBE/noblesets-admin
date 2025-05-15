@@ -1,4 +1,4 @@
-import { DateToStringFormat, Failure, Success, USDAmt, dropdown, generateRandomCode, useSetState } from '@/utils/functions';
+import { CHANNEL_INR, CHANNEL_USD, DateToStringFormat, Failure, Success, USDAmt, dropdown, generateRandomCode, useSetState } from '@/utils/functions';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import { Menu, Dropdown, Button } from 'antd';
@@ -201,7 +201,7 @@ const CreateCoupon = () => {
                     input: {
                         addChannels: [
                             {
-                                channelId: 'Q2hhbm5lbDox',
+                                channelId: CHANNEL_INR,
                                 discountValue:
                                     state.codeType?.value == 'Free Shipping'
                                         ? '100'
@@ -214,7 +214,7 @@ const CreateCoupon = () => {
                                 maxAmountSpent: state.maxReq.value == 'None' ? null : state.maxReqValue,
                             },
                             {
-                                channelId: 'Q2hhbm5lbDoy',
+                                channelId: CHANNEL_USD,
                                 discountValue: state.codeType?.value == 'Free Shipping' ? '100' : Number(state.couponValue),
 
                                 minAmountSpent: state.minimumReq?.value == 'Minimal order value' ? state.minimumReqValue : state.minimumReq?.value == 'None' ? null : 0, // min order value  minimumReq

@@ -40,6 +40,8 @@ import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useMutation } from '@apollo/client';
 import {
+    CHANNEL_INR,
+    CHANNEL_USD,
     DraftFullfillQuantity,
     DraftQuantity,
     Failure,
@@ -47,6 +49,7 @@ import {
     NotesMsg,
     Quantity,
     Success,
+    WAREHOUSE_ID,
     addCommasToNumber,
     channels,
     formatCurrency,
@@ -786,7 +789,7 @@ const Editorder = () => {
             const { data } = await draftOrder({
                 variables: {
                     input: {
-                        channelId: selectedCurrency == 'USD' ? 'Q2hhbm5lbDox' : 'Q2hhbm5lbDoy',
+                        channelId: selectedCurrency == 'USD' ? CHANNEL_INR : CHANNEL_USD,
                     },
                 },
             });
@@ -932,7 +935,7 @@ const Editorder = () => {
                     variables: {
                         id: fulfillId,
                         input: {
-                            warehouseId: 'V2FyZWhvdXNlOmRmODMzODUzLTQyMGYtNGRkZi04YzQzLTVkMzdjMzI4MDRlYQ==',
+                            warehouseId: WAREHOUSE_ID,
                         },
                     },
                 });

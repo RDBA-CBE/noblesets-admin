@@ -57,16 +57,12 @@ export const UPDATE_PINCODE = gql`
 `;
 
 export const DELETE_PINCODE = gql`
-    mutation DeleteBrand($id: ID!) {
-        brandDelete(id: $id) {
-            brand {
-                id
-                name
-                slug
-            }
+    mutation DeletePincode($id: ID!) {
+        pincodeDelete(id: $id) {
             errors {
-                field
                 message
+                values
+                code
             }
         }
     }

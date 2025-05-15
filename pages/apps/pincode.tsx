@@ -157,6 +157,7 @@ const Pincode = () => {
                     search: '',
                 },
             });
+            setTotalCount(data?.pincodes?.totalCount);
             commonPagination(data);
         } catch (error) {
             console.log('error: ', error);

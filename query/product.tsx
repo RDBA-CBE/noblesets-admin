@@ -12028,6 +12028,10 @@ export const PRODUCT_FULL_DETAILS = gql`
             name
             __typename
         }
+        priceBreakup {
+            breakupDetails
+            id
+        }
     }
 
     fragment ProductVariantAttributes on Product {
@@ -12071,6 +12075,22 @@ export const PRODUCT_FULL_DETAILS = gql`
             url
             alt
             __typename
+        }
+        priceBreakup {
+            breakupDetails
+            id
+        }
+        sizeGuide {
+            id
+            name
+            sizeimg
+            slug
+        }
+        brand {
+            id
+            logo
+            name
+            slug
         }
     }
 
@@ -19873,4 +19893,3 @@ export const MEDIA_PAGINATION = gql`
         }
     }
 `;
-

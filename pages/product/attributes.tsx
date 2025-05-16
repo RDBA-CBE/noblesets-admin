@@ -13,15 +13,16 @@ import IconCaretDown from '@/components/Icon/IconCaretDown';
 
 import Swal from 'sweetalert2';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { ATTRIBUTE_LIST, CREATE_ATTRIBUTE, DELETE_ATTRIBUTE, DELETE_CATEGORY } from '@/query/product';
+import { ATTRIBUTE_LIST, DELETE_ATTRIBUTE} from '@/query/product';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import { useRouter } from 'next/router';
 import CommonLoader from '../elements/commonLoader';
 import IconArrowBackward from '@/components/Icon/IconArrowBackward';
 import IconArrowForward from '@/components/Icon/IconArrowForward';
 import Modal from '@/components/Modal';
-import { Failure, Success } from '@/utils/functions';
+import { Failure, PRODUCT_TYPE, Success } from '@/utils/functions';
 import IconLoader from '@/components/Icon/IconLoader';
+import { CREATE_ATTRIBUTE, UPDATE_PRODUCT_TYPE } from '@/query/attribute';
 
 const Category = () => {
     const isRtl = useSelector((state: any) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -94,6 +95,7 @@ const Category = () => {
     const { data, refetch: refetch } = useQuery(ATTRIBUTE_LIST);
 
     const [createAttribute, { loading: createLoading }] = useMutation(CREATE_ATTRIBUTE);
+    const [updateProductType, { loading: typeoading }] = useMutation(UPDATE_PRODUCT_TYPE);
 
     const [fetchNextPage] = useLazyQuery(ATTRIBUTE_LIST, {
         onCompleted: (data) => {
@@ -270,6 +272,7 @@ const Category = () => {
                 if (res?.data?.attributeCreate?.errors?.length > 0) {
                     Failure(res.data.attributeCreate.errors[0].message);
                 } else {
+                    assignAttributeToProductType(res?.data?.attributeCreate?.attribute?.id);
                     refresh();
                     Success('Attribute created successfully');
                     setIsOpenCreate(false);
@@ -280,6 +283,21 @@ const Category = () => {
                     setTotalCount(totalCount + 1);
                 }
             }
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    };
+
+    const assignAttributeToProductType = async (attributeId) => {
+        try {
+            let arr = [];
+            arr = recordsData?.map((item: any) => item.id);
+            await updateProductType({
+                variables: {
+                    id: PRODUCT_TYPE,
+                    productAttributes: [...arr, attributeId],
+                },
+            });
         } catch (error) {
             console.log('error: ', error);
         }

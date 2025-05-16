@@ -51,7 +51,7 @@ import {
     UPDATE_PRODUCT_CHANNEL,
     UPDATE_VARIANT_LIST,
 } from '@/query/product';
-import { CHANNEL_USD, sampleParams } from '@/utils/functions';
+import { CHANNEL_USD, PRODUCT_TYPE, sampleParams } from '@/utils/functions';
 import IconRestore from '@/components/Icon/IconRestore';
 import { cA } from '@fullcalendar/core/internal-common';
 const AddCoupon = () => {
@@ -390,7 +390,7 @@ const AddCoupon = () => {
                         collections: collectionId,
                         description: '{"time":1714018366783,"blocks":[{"id":"EWn3NJZQaf","type":"paragraph","data":{"text":"TESTING"}}],"version":"2.24.3"}',
                         name: productName,
-                        productType: 'UHJvZHVjdFR5cGU6Mg==',
+                        productType: PRODUCT_TYPE,
                         seo: {
                             description: seoDesc,
                             title: seoTittle,

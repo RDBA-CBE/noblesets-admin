@@ -14,11 +14,12 @@ import Swal from 'sweetalert2';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { BRAND_LIST, CREATE_BRAND, UPDATE_BRAND, DELETE_BRAND } from '@/query/brand';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
-import { Success } from '@/utils/functions';
+import { addNewMediaFile, Failure, getFileType, getImageDimensions, resizeImage, resizingImage, Success, useSetState } from '@/utils/functions';
 import IconLoader from '@/components/Icon/IconLoader';
 import IconArrowBackward from '@/components/Icon/IconArrowBackward';
 import IconArrowForward from '@/components/Icon/IconArrowForward';
 import CommonLoader from '../elements/commonLoader';
+import { ADD_NEW_MEDIA_IMAGE, MEDIA_PAGINATION } from '@/query/product';
 
 const Brands = () => {
     const [addTag, { loading: addLoading }] = useMutation(CREATE_BRAND);
@@ -31,6 +32,7 @@ const Brands = () => {
     const [selectedRecords, setSelectedRecords] = useState<any>([]);
 
     const [recordsData, setRecordsData] = useState([]);
+console.log('✌️recordsData --->', recordsData);
     const [startCursor, setStartCursor] = useState(null);
     const [endCursor, setEndCursor] = useState(null);
     const [hasNextPage, setHasNextPage] = useState(false);
@@ -44,6 +46,13 @@ const Brands = () => {
     const [modalTitle, setModalTitle] = useState(null);
     const [modalContant, setModalContant] = useState<any>(null);
     const [totalCount, setTotalCount] = useState(0);
+    const [state, setState] = useSetState({});
+
+    const [addNewImages, { loading: addNewImageLoading }] = useMutation(ADD_NEW_MEDIA_IMAGE);
+
+    const { refetch: mediaRefetch } = useQuery(MEDIA_PAGINATION);
+
+    const PAGE_LIMIT = 10;
 
     const {
         data: customerData,
@@ -108,6 +117,7 @@ const Brands = () => {
             return {
                 name: item.node?.name,
                 id: item.node?.id,
+                logo: item.node?.logo,
             };
         });
         setRecordsData(newData);
@@ -185,24 +195,115 @@ const Brands = () => {
         name: Yup.string().required('Please fill the Name'),
     });
 
+    const generateUniqueFilenames = async (filename) => {
+        let uniqueFilename = filename;
+        let counter = 0;
+        let fileExists = true;
+
+        while (fileExists) {
+            const res = await mediaRefetch({
+                first: PAGE_LIMIT,
+                after: null,
+                fileType: '',
+                month: null,
+                year: null,
+                name: uniqueFilename,
+            });
+
+            if (res?.data?.files?.edges?.length > 0) {
+                counter += 1;
+                const fileParts = filename.split('.');
+                const extension = fileParts.pop();
+                uniqueFilename = `${fileParts.join('.')}-${counter}.${extension}`;
+            } else {
+                fileExists = false;
+            }
+        }
+
+        return uniqueFilename;
+    };
+
+    const addNewImage = async (files) => {
+        const isImage = files.type.startsWith('image/');
+        if (isImage) {
+            if (files.size > 300 * 1024) {
+                files = await resizingImage(files);
+                files = await resizeImage(files, 1160, 1340);
+            } else {
+                files = await resizeImage(files, 1160, 1340);
+            }
+            const { width, height } = await getImageDimensions(files);
+        }
+
+        const unique = await generateUniqueFilenames(files.name);
+        const result = await addNewMediaFile(files, unique);
+        const fileType = await getFileType(result);
+        const body = {
+            fileUrl: result,
+            title: '',
+            alt: '',
+            description: '',
+            caption: '',
+            fileType: fileType,
+        };
+        const response = await addNewImages({
+            variables: {
+                input: body,
+            },
+        });
+        const bodys = {
+            node: {
+                fileUrl: response.data?.fileCreate?.file?.fileUrl,
+            },
+        };
+        console.log('✌️bodys --->', bodys);
+        return response.data?.fileCreate?.file?.fileUrl;
+    };
     // form submit
     const onSubmit = async (record: any, { resetForm }: any) => {
         try {
-            const variables = {
+            // let imgFile = await addNewImage(state.imgFile);
+            const body: any = {};
+
+            if (state.imgFile) {
+                let sizeimg = await addNewImage(state.imgFile);
+                body.sizeimg = encodeURI(sizeimg);
+            }
+            const variables: any = {
                 input: {
                     name: record.name,
+                    // logo: body.sizeimg,
                 },
             };
-
-            await (modalTitle ? updateTag({ variables: { ...variables, id: modalContant.id } }) : addTag({ variables }));
-            if (modalTitle) {
-                Success('Brand updated successfully');
-            } else {
-                Success('Brand created successfully');
+            if (state.imgFile) {
+                variables.input.logo = body.sizeimg;
             }
-            refresh();
-            setModal1(false);
-            resetForm();
+
+            const res = await (modalTitle ? updateTag({ variables: { ...variables, id: modalContant.id } }) : addTag({ variables }));
+            if (modalTitle) {
+                if (res?.data?.brandUpdate?.errors?.length > 0) {
+                    Failure(res?.data?.brandUpdate?.errors[0]?.message);
+                    return;
+                } else {
+                    Success('Brand updated successfully');
+                    refresh();
+                    setModal1(false);
+                    resetForm();
+                    setState({ imagePreview: null,imgFile:null });
+                }
+            } else {
+                if (res?.data?.brandCreate?.errors?.length > 0) {
+                    Failure(res?.data?.brandCreate?.errors[0]?.message);
+                    return;
+                } else {
+                    Success('Brand created successfully');
+                    refresh();
+                    setModal1(false);
+                    resetForm();
+                    setState({ imagePreview: null,imgFile:null });
+
+                }
+            }
         } catch (error) {
             console.log('error: ', error);
         }
@@ -213,6 +314,7 @@ const Brands = () => {
         setModal1(true);
         setModalTitle(record);
         setModalContant(record);
+        setState({ imagePreview: record.logo });
     };
 
     // category table create
@@ -221,11 +323,6 @@ const Brands = () => {
         setModalTitle(null);
         setModalContant(null);
     };
-
-    // view categotry
-    // const ViewCategory = (record: any) => {
-    //     setViewModal(true);
-    // };
 
     // delete Alert Message
     const showDeleteAlert = (onConfirm: () => void, onCancel: () => void) => {
@@ -292,6 +389,26 @@ const Brands = () => {
         );
     };
 
+    const uploadFiles = async (e) => {
+        let file = e.target.files[0];
+        const isImage = file.type.startsWith('image/');
+        if (!isImage) return;
+
+        if (file.size > 300 * 1024) {
+            file = await resizingImage(file);
+            file = await resizeImage(file, 1160, 1340);
+        } else {
+            file = await resizeImage(file, 1160, 1340);
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setState({ imagePreview: reader.result });
+        };
+        reader.readAsDataURL(file);
+        setState({ imgFile: file });
+    };
+
     return (
         <div>
             {/* {getLoading ? (
@@ -303,28 +420,6 @@ const Brands = () => {
 
                     <div className="flex ltr:ml-auto rtl:mr-auto">
                         <input type="text" className="form-input mr-2 w-auto" placeholder="Search..." value={search} onChange={(e) => handleSearchChange(e.target.value)} />
-                        {/* <div className="dropdown  mr-2 ">
-                                <Dropdown
-                                    placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                    btnClassName="btn btn-outline-primary dropdown-toggle"
-                                    button={
-                                        <>
-                                            Bulk Actions
-                                            <span>
-                                                <IconCaretDown className="inline-block ltr:ml-1 rtl:mr-1" />
-                                            </span>
-                                        </>
-                                    }
-                                >
-                                    <ul className="!min-w-[170px]">
-                                        <li>
-                                            <button type="button" onClick={() => BulkDeleteCategory()}>
-                                                Delete
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </Dropdown>
-                            </div> */}
                         <button type="button" className="btn btn-primary" onClick={() => CreateTags()}>
                             + Create
                         </button>
@@ -338,6 +433,15 @@ const Brands = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
+                                {
+                                    accessor: 'logo',
+                                    title: 'Logo',
+                                    render: (row: any) => (
+                                        <div className="flex items-center gap-2">
+                                            <img src={row?.logo} alt="Logo" className="h-10 w-10 rounded-full" />
+                                        </div>
+                                    ),
+                                },
                                 { accessor: 'name', sortable: true },
                                 {
                                     accessor: 'actions',
@@ -419,17 +523,49 @@ const Brands = () => {
                                             }}
                                         >
                                             {({ errors, submitCount, touched, setFieldValue, values }: any) => (
-                                                <Form className="space-y-5">
-                                                    <div className={submitCount ? (errors.name ? 'has-error' : 'has-success') : ''}>
-                                                        <label htmlFor="fullName">Name</label>
-                                                        <Field name="name" type="text" id="fullName" placeholder="Enter Name" className="form-input" />
-                                                        {submitCount ? errors.name ? <div className="mt-1 text-danger">{errors.name}</div> : <div className="mt-1 text-success"></div> : ''}
+                                                <>
+                                                    <div>
+                                                        <label htmlFor="name" className="block text-lg font-medium text-gray-700">
+                                                            Image
+                                                        </label>
                                                     </div>
+                                                    <div className="active border-1 border p-4 pt-5">
+                                                        {!state.imagePreview ? (
+                                                            <div className="flex h-[100px] items-center justify-center">
+                                                                <div className="w-1/2 text-center">
+                                                                    <h3 className="mb-2 text-xl font-semibold">Upload Image</h3>
+                                                                    <p className="mb-2 text-sm">or</p>
+                                                                    <input type="file" accept="image/*" className="mb-2 ml-32" onChange={uploadFiles} />
+                                                                    <p className="mb-2 text-sm">Maximum upload file size: 30 MB.</p>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex  items-center gap-4">
+                                                                <img src={state.imagePreview} alt="Uploaded" className="max-h-[400px] rounded shadow" />
+                                                                <div className="flex gap-3">
+                                                                    <button onClick={() => document.getElementById('image-upload').click()} className="rounded bg-blue-600 px-4 py-2 text-white">
+                                                                        Replace Image
+                                                                    </button>
+                                                                    {/* <button onClick={removeImage} className="rounded bg-red-500 px-4 py-2 text-white">
+                                                                Remove
+                                                            </button> */}
+                                                                </div>
+                                                                <input id="image-upload" type="file" accept="image/*" className="hidden" onChange={uploadFiles} />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <Form className="space-y-5">
+                                                        <div className={submitCount ? (errors.name ? 'has-error' : 'has-success') : ''}>
+                                                            <label htmlFor="fullName">Name</label>
+                                                            <Field name="name" type="text" id="fullName" placeholder="Enter Name" className="form-input" />
+                                                            {submitCount ? errors.name ? <div className="mt-1 text-danger">{errors.name}</div> : <div className="mt-1 text-success"></div> : ''}
+                                                        </div>
 
-                                                    <button type="submit" className="btn btn-primary !mt-6">
-                                                        {addLoading || updateLoading ? <IconLoader /> : 'Submit'}
-                                                    </button>
-                                                </Form>
+                                                        <button type="submit" className="btn btn-primary !mt-6">
+                                                            {addLoading || updateLoading ? <IconLoader /> : 'Submit'}
+                                                        </button>
+                                                    </Form>
+                                                </>
                                             )}
                                         </Formik>
                                     </div>

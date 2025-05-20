@@ -61,7 +61,9 @@ const LoginBoxed = () => {
     const submitForm = async () => {
         setLoading(true);
         const { data } = await addFormData({
-            variables: { email: formData.email, password: formData.password },
+            // variables: { email: formData.email, password: formData.password },
+            variables: { email: "inbarepute@gmail.com", password: "Tamilan123*" },
+
         });
         if (data?.tokenCreate?.errors?.length > 0) {
             Failure(data?.tokenCreate?.errors[0]?.message);

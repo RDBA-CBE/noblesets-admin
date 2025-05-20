@@ -54,10 +54,12 @@ import {
     MEDIA_PAGINATION,
     GET_ATTRIBUTE_BY_PRODUCT_TYPE,
     NEW_PARENT_CATEGORY_LIST,
+    ATTRIBUTE_LIST,
 } from '@/query/product';
 import {
     CHANNEL_USD,
     Failure,
+    PRODUCT_TYPE,
     Success,
     WAREHOUSE_ID,
     addCommasToNumber,
@@ -91,6 +93,9 @@ import { BRAND_LIST, CREATE_BRAND } from '@/query/brand';
 import BrandSelect from '@/components/Layouts/BrandSelect';
 import { SIZEGUIDE_LIST } from '@/query/sizeGuide';
 import SizeGuideSelect from '@/components/Layouts/SizeGuideSelect';
+import DynamicSizeTable from '@/components/Layouts/DynamicTable';
+import Link from 'next/link';
+import { CREATE_PRICE_BREAKUP } from '@/query/priceBreakUp';
 
 const ProductAdd = () => {
     const router = useRouter();
@@ -145,14 +150,6 @@ const ProductAdd = () => {
         parentCategory: '',
     });
 
-    //for accordiant
-    // const [selectedArr, setSelectedArr] = useState<any>([]);
-    // const [accordions, setAccordions] = useState<any>([]);
-    // const [openAccordion, setOpenAccordion] = useState('');
-    // const [attDropDownError, setAttDropDownError] = useState('');
-    // const [chooseType, setChooseType] = useState('');
-    const [selectedValues, setSelectedValues] = useState<any>({});
-
     // error message start
     const [productNameErrMsg, setProductNameErrMsg] = useState('');
     const [slugErrMsg, setSlugErrMsg] = useState('');
@@ -174,7 +171,6 @@ const ProductAdd = () => {
     const [selectedAttributes, setSelectedAttributes] = useState({});
     const [attributesData, setAttributesData] = useState([]);
     // error message end
-    // const [dropdowndata, setDropdownData] = useState<any>('');
 
     const [images, setImages] = useState<any>('');
     const [imageUrl, setImageUrl] = useState<any>('');
@@ -193,7 +189,6 @@ const ProductAdd = () => {
     // ------------------------------------------New Data--------------------------------------------
 
     const [quantityTrack, setQuantityTrack] = useState(true);
-    // const [parentLists, setParentLists] = useState([]);
     const [newCatParentLists, setNewCatParentLists] = useState([]);
 
     const [searchUpsells, setSearchUpsells] = useState('');
@@ -209,58 +204,19 @@ const ProductAdd = () => {
         { value: 'hot', label: 'Hot' },
     ];
 
-    // const arr = [
-    //     { type: 'design', designName: dropdowndata?.design },
-    //     { type: 'style', styleName: dropdowndata?.style },
-    //     { type: 'stone', stoneName: dropdowndata?.stoneType },
-    //     { type: 'finish', finishName: dropdowndata?.finish },
-    //     { type: 'stoneColor', stoneColorName: dropdowndata?.stoneColor },
-    //     { type: 'type', typeName: dropdowndata?.type },
-    //     { type: 'size', sizeName: dropdowndata?.size },
-    // ];
-
-    // const optionsVal = arr.map((item) => ({ value: item.type, label: item.type }));
-
     // -------------------------------------New Added-------------------------------------------------------
     const { refetch: productListRefetch } = useQuery(PRODUCT_LIST_BY_ID);
 
     const { refetch: relatedProductsRefetch } = useQuery(RELATED_PRODUCT);
 
-    // const { error, data: orderDetails } = useQuery(CHANNEL_LIST, {
-    //     variables: sampleParams,
-    // });
-    // const { data: finishData, refetch: finishRefetch } = useQuery(FINISH_LIST, {
-    //     variables: sampleParams,
-    // });
+    const [priceBreakupCreate] = useMutation(CREATE_PRICE_BREAKUP);
 
-    // const { data: stoneData, refetch: stoneRefetch } = useQuery(STONE_LIST, {
-    //     variables: sampleParams,
-    // });
-    // const { data: designData, refetch: designRefetch } = useQuery(DESIGN_LIST, {
-    //     variables: sampleParams,
-    // });
-
-    // const { data: styleData, refetch: styleRefetch } = useQuery(STYLE_LIST, {
-    //     variables: sampleParams,
-    // });
-    // -----------------New --------------------------------
-    // const { data: stoneColorData, refetch: stoneColorRefetch } = useQuery(COLOR_LIST, {
-    //     variables: sampleParams,
-    // });
-
-    // const { data: typeData, refetch: typeRefetch } = useQuery(TYPE_LIST, {
-    //     variables: sampleParams,
-    // });
-
-    // const { data: sizeData, refetch: sizeRefetch } = useQuery(SIZE_LIST, {
-    //     variables: sampleParams,
-    // });
 
     const { refetch: mediaRefetch } = useQuery(MEDIA_PAGINATION);
 
     const { data: getAttribute } = useQuery(GET_ATTRIBUTE_BY_PRODUCT_TYPE, {
         variables: {
-            id: 'UHJvZHVjdFR5cGU6Mg==',
+            id: PRODUCT_TYPE,
             firstValues: 100,
         },
     });
@@ -320,19 +276,27 @@ const ProductAdd = () => {
     const [updateImages, { loading: mediaUpdateLoading }] = useMutation(UPDATE_MEDIA_IMAGE);
     const [deleteImages] = useMutation(DELETE_MEDIA_IMAGE);
 
-    const { data: customerData, refetch: customerListRefetch } = useQuery(MEDIA_PAGINATION, {
+    const {
+        data: customerData,
+        loading: getLoading,
+        refetch: categoryListRefetch,
+    } = useQuery(ATTRIBUTE_LIST, {
         variables: {
             first: PAGE_SIZE,
             after: null,
-            fileType: mediaType == 'all' ? '' : mediaType,
-            month: 9,
-            year: 2024,
-            name: '',
+            filter: {
+                // search: search ? search : '',
+            },
+            sort: { direction: 'DESC', field: 'CREATED_aT' },
         },
         onCompleted: (data) => {
-            commonPagination(data);
+console.log('✌️data --->', data);
+            // commonPagination(data);
         },
     });
+
+console.log('✌️customerData --->', customerData);
+
 
     const handleNextPage = () => {
         fetchNextPage({
@@ -369,25 +333,6 @@ const ProductAdd = () => {
         setMediaPreviousPage(data.files.pageInfo.hasPreviousPage);
     };
 
-    // useEffect(() => {
-    //     const arr1 = {
-    //         design: designData?.productDesigns,
-    //         style: styleData?.productStyles,
-    //         finish: finishData?.productFinishes,
-    //         stoneType: stoneData?.productStoneTypes,
-    //         stoneColor: stoneColorData?.stoneColors,
-    //         type: typeData?.itemTypes,
-    //         size: sizeData?.sizes,
-    //     };
-
-    //     const singleObj = Object.entries(arr1).reduce((acc: any, [key, value]) => {
-    //         acc[key] = value?.edges.map(({ node }: any) => ({ value: node?.id, label: node?.name }));
-    //         return acc;
-    //     }, {});
-
-    //     setDropdownData(singleObj);
-    // }, [finishData, stoneData, designData, styleData, stoneColorData, typeData, sizeData]);
-
     useEffect(() => {
         getAttributeList();
     }, [getAttribute]);
@@ -399,6 +344,7 @@ const ProductAdd = () => {
             console.log('error: ', error);
         }
     };
+
 
     useEffect(() => {
         const getparentCategoryList = parentList?.categories?.edges;
@@ -444,8 +390,8 @@ const ProductAdd = () => {
 
     const [productType, setProductType] = useState([]);
     const [selectedCat, setselectedCat] = useState<any>([]);
-    const [selectedBrand, setselectedBrand] = useState<any>([]);
-    const [selectedSizeGuide, setSelectedSizeGuide] = useState<any>([]);
+    const [selectedBrand, setselectedBrand] = useState<any>(null);
+    const [selectedSizeGuide, setSelectedSizeGuide] = useState<any>(null);
 
     const [isOpenCat, setIsOpenCat] = useState(false);
     const [createBrandLoader, setCreateBrandLoader] = useState(false);
@@ -466,6 +412,8 @@ const ProductAdd = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [selectedImages, setSelectedImages] = useState([]);
+    const [tableHtml, setTableHtml] = useState(null);
+
     const longPressTimeout = useRef(null);
 
     const [createCategoryLoader, setCreateCategoryLoader] = useState(false);
@@ -554,17 +502,13 @@ const ProductAdd = () => {
     }, [value]);
 
     const editor = useCallback(() => {
-        // Check if the window object is available and if the editorRef.current is set
         if (typeof window === 'undefined' || !editorRef.current) return;
 
-        // Ensure only one editor instance is created
         if (editorInstance) {
             return;
         }
 
-        // Dynamically import the EditorJS module
         import('@editorjs/editorjs').then(({ default: EditorJS }) => {
-            // Create a new instance of EditorJS with the appropriate configuration
             const editor = new EditorJS({
                 holder: editorRef.current,
                 data: value,
@@ -582,11 +526,9 @@ const ProductAdd = () => {
                 },
             });
 
-            // Set the editorInstance state variable
             setEditorInstance(editor);
         });
 
-        // Cleanup function to destroy the current editor instance when the component unmounts
         return () => {
             if (editorInstance) {
                 editorInstance?.blocks?.clear();
@@ -602,14 +544,6 @@ const ProductAdd = () => {
         name: Yup.string().required('Name is required'),
     });
 
-    const getFullDetails = (selectedValues, arr) => {
-        return Object.keys(selectedValues).reduce((acc, key) => {
-            if (arr[key]) {
-                acc[key] = arr[key].edges.filter((edge) => selectedValues[key].includes(edge.node.id)).map((edge) => edge.node);
-            }
-            return acc;
-        }, {});
-    };
 
     const previewClick = async () => {
         setPreviewLoading(true);
@@ -651,7 +585,6 @@ const ProductAdd = () => {
         let parentCat = '';
         let relateProducts = [];
 
-        // Step 2: Filter objects from the first array
         const result = parentList?.categories?.edges.filter((item) => idSet.has(item.node.id) && item.node.level === 0).map((item) => item.node);
 
         if (result.length > 0) {
@@ -723,8 +656,6 @@ const ProductAdd = () => {
             let errors = null;
             let variantErrors = null;
 
-            // let attributeErrors = null;
-            // Reset error messages
             setProductNameErrMsg('');
             setSlugErrMsg('');
             setSeoTittleErrMsg('');
@@ -738,9 +669,7 @@ const ProductAdd = () => {
             // Validation
             errors = validateMainFields(JSON.parse(descr));
             variantErrors = validateVariants();
-            // attributeErrors = validateAttributes();
 
-            // Set errors
             if (publish !== 'draft') {
                 setProductNameErrMsg(errors.productName);
                 setSlugErrMsg(errors.slug);
@@ -751,9 +680,7 @@ const ProductAdd = () => {
                 setCategoryErrMsg(errors.category);
                 setVariantErrors(variantErrors);
 
-                // if (Object.keys(attributeErrors).length > 0) {
-                //     setAttributeError(attributeErrors);
-                // }
+             
                 if (Object.values(errors).some((msg) => msg !== '') || variantErrors.some((err) => Object.keys(err).length > 0)) {
                     setCreateLoading(false);
                     Failure('Please fill in all required fields');
@@ -781,7 +708,7 @@ const ProductAdd = () => {
                                 collections: [],
                                 tags: tagId,
                                 name: productName,
-                                productType: 'UHJvZHVjdFR5cGU6Mg==',
+                                productType: PRODUCT_TYPE,
                                 upsells,
                                 crosssells,
                                 seo: {
@@ -790,13 +717,9 @@ const ProductAdd = () => {
                                 },
                                 slug: slug,
                                 order_no: menuOrder,
-                                // ...(selectedValues && selectedValues.design && { prouctDesign: selectedValues.design }),
-                                // ...(selectedValues && selectedValues.style && { productstyle: selectedValues.style }),
-                                // ...(selectedValues && selectedValues.finish && { productFinish: selectedValues.finish }),
-                                // ...(selectedValues && selectedValues.stone && { productStoneType: selectedValues.stone }),
-                                // ...(selectedValues && selectedValues.type && { productItemtype: selectedValues.type }),
-                                // ...(selectedValues && selectedValues.size && { productSize: selectedValues.size }),
-                                // ...(selectedValues && selectedValues.stoneColor && { productStonecolor: selectedValues.stoneColor }),
+                                brand: selectedBrand?.value,
+                                size_guide: selectedSizeGuide?.value,
+                               
                             },
                         },
                     });
@@ -847,7 +770,7 @@ const ProductAdd = () => {
                                 collections: [],
                                 tags: tagId,
                                 name: productName,
-                                productType: 'UHJvZHVjdFR5cGU6Mg==',
+                                productType: PRODUCT_TYPE,
                                 upsells,
                                 crosssells,
                                 seo: {
@@ -857,14 +780,8 @@ const ProductAdd = () => {
                                 slug: slug,
                                 // ...(menuOrder && menuOrder > 0 && { order_no: menuOrder }),
                                 order_no: menuOrder,
-
-                                // ...(selectedValues && selectedValues.design && { prouctDesign: selectedValues.design }),
-                                // ...(selectedValues && selectedValues.style && { productstyle: selectedValues.style }),
-                                // ...(selectedValues && selectedValues.finish && { productFinish: selectedValues.finish }),
-                                // ...(selectedValues && selectedValues.stone && { productStoneType: selectedValues.stone }),
-                                // ...(selectedValues && selectedValues.type && { productItemtype: selectedValues.type }),
-                                // ...(selectedValues && selectedValues.size && { productSize: selectedValues.size }),
-                                // ...(selectedValues && selectedValues.stoneColor && { productStonecolor: selectedValues.stoneColor }),
+                                brand: selectedBrand?.value,
+                                size_guide: selectedSizeGuide?.value,
                             },
                         },
                     });
@@ -922,27 +839,6 @@ const ProductAdd = () => {
         });
     };
 
-    // Helper function to validate attributes
-    const validateAttributes = () => {
-        const attributeErrors = {};
-        const attributeChecks = {
-            stone: 'Stone cannot be empty',
-            design: 'Design cannot be empty',
-            style: 'Style cannot be empty',
-            finish: 'Finish cannot be empty',
-            type: 'Type cannot be empty',
-            size: 'Size cannot be empty',
-            stoneColor: 'Stone color cannot be empty',
-        };
-
-        Object.keys(attributeChecks).forEach((key) => {
-            if (selectedValues.hasOwnProperty(key) && (!selectedValues[key] || selectedValues[key].length === 0)) {
-                attributeErrors[key] = attributeChecks[key];
-            }
-        });
-
-        return attributeErrors;
-    };
 
     const productChannelListUpdate = async (productId: any) => {
         try {
@@ -1092,6 +988,9 @@ const ProductAdd = () => {
                 Failure(data?.updateMetadata?.errors[0]?.message);
                 deleteProduct(productId);
             } else {
+                if (tableHtml !== null) {
+                    createPriceBreakup(productId);
+                }
                 // if (selectedTag?.length > 0) {
                 //     assignsTagToProduct(productId);
                 //     console.log('success: ', data);
@@ -1119,6 +1018,22 @@ const ProductAdd = () => {
             console.log('error: ', error);
         }
     };
+
+    const createPriceBreakup = async (productId: any) => {
+        try {
+            const { data } = await priceBreakupCreate({
+                variables: {
+                    product: productId,
+                    breakupDetails: tableHtml,
+                },
+            });
+        } catch (error) {
+            setCreateLoading(false);
+            console.log('error: ', error);
+        }
+    };
+
+    // tableHtml
 
     const deleteProduct = (productId: any) => {
         const { data }: any = deleteProducts({
@@ -1588,6 +1503,24 @@ const ProductAdd = () => {
         }));
     };
 
+    const tableData = (columns, rows) => {
+        console.log('✌️columns,row --->', columns, rows);
+        const tableRows = rows.map((row) => `<tr>${columns.map((col) => `<td>${row[col] || ''}</td>`).join('')}<td></td></tr>`).join('');
+
+        const tableHTML = `
+        <table border="1" cellpadding="5" cellspacing="0">
+            <thead>
+                <tr>
+                    ${columns.map((col) => `<th>${col}</th>`).join('')}
+                </tr>
+            </thead>
+            <tbody>
+                ${tableRows}
+            </tbody>
+        </table>`;
+        setTableHtml(tableHTML);
+    };
+
     return (
         <div>
             <div className="mt-6">
@@ -1650,6 +1583,14 @@ const ProductAdd = () => {
                             ></textarea>
                             {shortDesErrMsg && <p className="error-message mt-1 text-red-500 ">{shortDesErrMsg}</p>}
                         </div>
+
+                        <div className="panel mb-5 mt-5">
+                            <label htmlFor="editor" className="block text-sm font-medium text-gray-700">
+                                Price Breakup
+                            </label>
+                            <DynamicSizeTable tableData={tableData} />
+                        </div>
+
                         <div className="panel mb-5">
                             <label htmlFor="editor" className="block text-sm font-medium text-gray-700">
                                 Product Description
@@ -2202,15 +2143,15 @@ const ProductAdd = () => {
                                     queryFunc={fetchSizeGuide} // Pass the function to fetch categories
                                     selectedCategory={selectedSizeGuide} // Use 'selectedCategory' instead of 'value'
                                     onCategoryChange={(data) => setSelectedSizeGuide(data)} // Use 'onCategoryChange' instead of 'onChange'
-                                    placeholder="Select brands"
+                                    placeholder="Select size guide"
                                 />
                                 {/* <Select isMulti value={selectedCat} onChange={(e) => setselectedCat(e)} options={parentLists} placeholder="Select categories..." className="form-select" /> */}
 
-                                {categoryErrMsg && <p className="error-message mt-1 text-red-500 ">{categoryErrMsg}</p>}
+                                {/* {categoryErrMsg && <p className="error-message mt-1 text-red-500 ">{categoryErrMsg}</p>} */}
                             </div>
-                            <p className="mt-5 cursor-pointer text-primary underline" onClick={() => setIsOpenBrand(true)}>
-                                Add a new brand
-                            </p>
+                            <Link className="mt-5 cursor-pointer text-primary underline" href={'/apps/sizeGuide/createSizeGuide'} target="_blank">
+                                Add a new size guide
+                            </Link>
                         </div>
 
                         <div className="panel order-1  mt-5 md:order-4">

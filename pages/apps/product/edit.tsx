@@ -15,32 +15,19 @@ import { Tab } from '@headlessui/react';
 import AnimateHeight from 'react-animate-height';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import {
-    ASSIGN_TAG_PRODUCT,
-    CATEGORY_LIST,
-    CHANNEL_LIST,
     COLLECTION_LIST,
-    COLOR_LIST,
     CREATE_PRODUCT,
     CREATE_VARIANT,
     DELETE_VARIENT,
-    DESIGN_LIST,
-    FINISH_LIST,
     PARENT_CATEGORY_LIST,
     PRODUCTS_MEDIA_ORDERS,
     PRODUCT_BY_NAME,
-    PRODUCT_CAT_LIST,
-    PRODUCT_DETAILS,
     PRODUCT_FULL_DETAILS,
     PRODUCT_LIST_TAGS,
-    PRODUCT_MEDIA_CREATE,
     PRODUCT_MEDIA_CREATE_NEW,
     PRODUCT_TYPE_LIST,
     RELATED_PRODUCT,
     REMOVE_IMAGE,
-    SIZE_LIST,
-    STONE_LIST,
-    STYLE_LIST,
-    TYPE_LIST,
     UPDATE_META_DATA,
     UPDATE_PRODUCT,
     UPDATE_PRODUCT_CHANNEL,
@@ -61,22 +48,15 @@ import {
     Success,
     WAREHOUSE_ID,
     addCommasToNumber,
-    addNewFile,
     addNewMediaFile,
     capitalizeFLetter,
-    deleteImagesFromS3,
-    docFilter,
-    fetchImagesFromS3,
     formatOptions,
-    generatePresignedPost,
     getFileNameFromUrl,
     getFileType,
     getImageDimensions,
     getKey,
     getMonthNumber,
     getValueByKey,
-    imageFilter,
-    isEmptyObject,
     months,
     objIsEmpty,
     resizeImage,
@@ -84,21 +64,22 @@ import {
     sampleParams,
     showDeleteAlert,
     uploadImage,
-    videoFilter,
 } from '@/utils/functions';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import IconLoader from '@/components/Icon/IconLoader';
 import moment from 'moment';
-import axios from 'axios';
-import { productPreview } from '@/store/authConfigSlice';
-import { channel } from 'diagnostics_channel';
-import { endsWith } from 'lodash';
 import CommonLoader from '@/pages/elements/commonLoader';
 import Image from 'next/image';
 import IconArrowBackward from '@/components/Icon/IconArrowBackward';
 import IconArrowForward from '@/components/Icon/IconArrowForward';
 import CategorySelect from '@/components/CategorySelect';
 import TagSelect from '@/components/TagSelect';
+import SizeGuideSelect from '@/components/Layouts/SizeGuideSelect';
+import BrandSelect from '@/components/Layouts/BrandSelect';
+import { BRAND_LIST } from '@/query/brand';
+import { SIZEGUIDE_LIST } from '@/query/sizeGuide';
+import DynamicSizeTable from '@/components/Layouts/DynamicTable';
+import { UPDATE_PRICE_BREAKUP } from '@/query/priceBreakUp';
 
 const ProductEdit = (props: any) => {
     const router = useRouter();
@@ -106,8 +87,6 @@ const ProductEdit = (props: any) => {
     const { id } = router.query;
 
     const PAGE_SIZE = 30;
-
-    const isRtl = useSelector((state: any) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
 
     const [modal1, setModal1] = useState(false);
     const [modal2, setModal2] = useState(false);
@@ -133,7 +112,6 @@ const ProductEdit = (props: any) => {
     const [menuOrder, setMenuOrder] = useState(null);
     const [selectedUpsell, setSelectedUpsell] = useState([]);
     const [selectedCrosssell, setSelectedCrosssell] = useState([]);
-    const [mediaDate, setMediaDate] = useState('all');
     const [keyword, setKeyword] = useState('');
     const [selectedAttributes, setSelectedAttributes] = useState({});
     const [attributesData, setAttributesData] = useState([]);
@@ -164,17 +142,18 @@ const ProductEdit = (props: any) => {
     const [searchCrossell, setSearchCrossell] = useState('');
     const [shortDesErrMsg, setShortDesErrMsg] = useState('');
     const [categoryErrMsg, setCategoryErrMsg] = useState('');
-    const [attributeError, setAttributeError] = useState('');
     const [variantErrors, setVariantErrors] = useState<any>([]);
     const [mediaStartCussor, setMediaStartCussor] = useState('');
     const [mediaEndCursor, setMediaEndCursor] = useState('');
     const [mediaHasNextPage, setMediaHasNextPage] = useState(false);
     const [mediaPreviousPage, setMediaPreviousPage] = useState(false);
 
+    const [selectedBrand, setselectedBrand] = useState<any>(null);
+    const [selectedSizeGuide, setSelectedSizeGuide] = useState<any>(null);
+
     // error message end
 
     // ------------------------------------------New Data--------------------------------------------
-    const [quantityTrack, setQuantityTrack] = useState(true);
     const [active, setActive] = useState<string>('1');
 
     const options = [
@@ -208,36 +187,18 @@ const ProductEdit = (props: any) => {
         variables: sampleParams,
     });
 
-    const { data: finishData, refetch: finishRefetch } = useQuery(FINISH_LIST, {
-        variables: sampleParams,
-    });
-
-    const { data: stoneData, refetch: stoneRefetch } = useQuery(STONE_LIST, {
-        variables: sampleParams,
-    });
-    const { data: designData, refetch: designRefetch } = useQuery(DESIGN_LIST, {
-        variables: sampleParams,
-    });
-    const { data: styleData, refetch: styleRefetch } = useQuery(STYLE_LIST, {
-        variables: sampleParams,
-    });
-
-    const { data: stoneColorData, refetch: stoneColorRefetch } = useQuery(COLOR_LIST, {
-        variables: sampleParams,
-    });
-
-    const { data: typeData, refetch: typeRefetch } = useQuery(TYPE_LIST, {
-        variables: sampleParams,
-    });
-
-    const { data: sizeData, refetch: sizeRefetch } = useQuery(SIZE_LIST, {
-        variables: sampleParams,
-    });
-
     const { data: parentList, error: parentListError } = useQuery(PARENT_CATEGORY_LIST, {
         variables: { channel: 'india-channel' },
     });
     const { refetch: categorySearchRefetch } = useQuery(NEW_PARENT_CATEGORY_LIST, {
+        variables: { channel: 'india-channel' },
+    });
+
+    const { refetch: brandRefetch } = useQuery(BRAND_LIST, {
+        variables: { channel: 'india-channel' },
+    });
+
+    const { refetch: sizeGuideRefetch } = useQuery(SIZEGUIDE_LIST, {
         variables: { channel: 'india-channel' },
     });
 
@@ -247,9 +208,19 @@ const ProductEdit = (props: any) => {
         return await categorySearchRefetch(variables);
     };
 
+    const fetchBrands = async (variables) => {
+        return await brandRefetch(variables);
+    };
+
+    const fetchSizeGuide = async (variables) => {
+        return await sizeGuideRefetch(variables);
+    };
+
     const fetchTag = async (variables) => {
         return await tagRefetch(variables);
     };
+
+    const [priceBreakupUpdate] = useMutation(UPDATE_PRICE_BREAKUP);
 
     const [addFormData] = useMutation(CREATE_PRODUCT);
     const [updateProductChannelList, { loading: updateChannelLoad }] = useMutation(UPDATE_PRODUCT_CHANNEL);
@@ -286,6 +257,7 @@ const ProductEdit = (props: any) => {
     const [previewLoading, setPreviewLoading] = useState(false);
     const [productPreview, setPreviewData] = useState(null);
     const [previewSelectedImg, setPreviewSelectedImg] = useState(null);
+    const [tableHtml, setTableHtml] = useState(null);
 
     const [imageUrl, setImageUrl] = useState([]);
 
@@ -295,19 +267,13 @@ const ProductEdit = (props: any) => {
     const [copied, setCopied] = useState(false);
     const [isLongPress, setIsLongPress] = useState(false);
     const [deletedImages, setDeletedImages] = useState<any>([]);
-    const [selectedArr, setSelectedArr] = useState<any>([]);
-    const [attDropDownError, setAttDropDownError] = useState('');
-    const [accordions, setAccordions] = useState<any>([]);
-    const [openAccordion, setOpenAccordion] = useState<any>('');
-    const [chooseType, setChooseType] = useState<any>('');
-    const [selectedValues, setSelectedValues] = useState<any>({});
-    const [dropdowndata, setDropdownData] = useState<any>([]);
     const [dropIndex, setDropIndex] = useState<any>(null);
     const [updateLoading, setUpdateLoading] = useState(false);
     const [mediaMonth, setMediaMonth] = useState('all');
     const [mediaType, setMediaType] = useState('all');
     const [selectedCat, setselectedCat] = useState<any>([]);
     const [monthNumber, setMonthNumber] = useState(null);
+    const [priceBreackupId, setPriceBreackupId] = useState(null);
 
     const [variants, setVariants] = useState([
         {
@@ -321,19 +287,19 @@ const ProductEdit = (props: any) => {
         },
     ]);
 
-    const { data: customerData, refetch: customerListRefetch } = useQuery(MEDIA_PAGINATION, {
-        variables: {
-            first: PAGE_SIZE,
-            after: null,
-            fileType: mediaType == 'all' ? '' : mediaType,
-            month: 9,
-            year: 2024,
-            name: '',
-        },
-        onCompleted: (data) => {
-            commonPagination(data);
-        },
-    });
+    // const { data: customerData, refetch: customerListRefetch } = useQuery(MEDIA_PAGINATION, {
+    //     variables: {
+    //         first: PAGE_SIZE,
+    //         after: null,
+    //         fileType: mediaType == 'all' ? '' : mediaType,
+    //         month: 9,
+    //         year: 2024,
+    //         name: '',
+    //     },
+    //     onCompleted: (data) => {
+    //         commonPagination(data);
+    //     },
+    // });
 
     const handleNextPage = () => {
         fetchNextPage({
@@ -432,6 +398,7 @@ const ProductEdit = (props: any) => {
 
     const productsDetails = async () => {
         try {
+
             if (productDetails) {
                 if (productDetails && productDetails?.product) {
                     const data = productDetails?.product;
@@ -453,7 +420,19 @@ const ProductEdit = (props: any) => {
                     }
 
                     setselectedCat(data?.category?.map((item) => ({ value: item.id, label: item.name })));
+
                     setSelectedCrosssell(crossells);
+
+                    if (!objIsEmpty(data?.brand)) {
+                        setselectedBrand({ value: data?.brand?.id, label: data?.brand?.name });
+                    }
+                    if (!objIsEmpty(data?.sizeGuide)) {
+                        setSelectedSizeGuide({ value: data?.sizeGuide?.id, label: data?.sizeGuide?.name });
+                    }
+                    if (!objIsEmpty(data?.priceBreakup)) {
+                        setPriceBreackupId(data?.priceBreakup?.id);
+                        setTableHtml(data?.priceBreakup?.breakupDetails);
+                    }
 
                     if (data?.tags?.length > 0) {
                         const tags: any = data?.tags?.map((item: any) => ({ value: item.id, label: item.name }));
@@ -507,7 +486,6 @@ const ProductEdit = (props: any) => {
                     }
                     setPublish(data?.channelListings[0]?.isPublished == true ? 'published' : 'draft');
 
-                    // setRegularPrice()
                 }
             }
         } catch (error) {
@@ -516,7 +494,6 @@ const ProductEdit = (props: any) => {
     };
 
     const handleSelectChange = (attributeId, selectedOptions) => {
-        // Ensure slug is used in place of value or label for state
         const selectedValues = selectedOptions.map((option) => option.slug); // Access slug here
         setSelectedAttributes((prev) => ({
             ...prev,
@@ -533,86 +510,10 @@ const ProductEdit = (props: any) => {
             return acc;
         }, {});
 
-        // Update state with the selected attributes
         setSelectedAttributes((prev) => ({
             ...prev,
             ...selectedAttributes,
         }));
-
-        const styleRes = await styleRefetch({
-            sampleParams,
-        });
-
-        const designRes = await designRefetch({
-            sampleParams,
-        });
-
-        const finishRes = await finishRefetch({
-            sampleParams,
-        });
-
-        const stoneTypeRes = await stoneRefetch({
-            sampleParams,
-        });
-
-        const stoneColorRes = await stoneColorRefetch({
-            sampleParams,
-        });
-
-        const typeRes = await typeRefetch({
-            sampleParams,
-        });
-
-        const sizeRes = await sizeRefetch({
-            sampleParams,
-        });
-
-        const arr1 = {
-            design: designRes?.data?.productDesigns,
-            style: styleRes?.data?.productStyles,
-            finish: finishRes?.data?.productFinishes,
-            stoneType: stoneTypeRes?.data?.productStoneTypes,
-            stoneColor: stoneColorRes?.data?.stoneColors,
-            type: typeRes?.data?.itemTypes,
-            size: sizeRes?.data?.sizes,
-        };
-
-        const singleObj = Object.entries(arr1).reduce((acc: any, [key, value]) => {
-            acc[key] = value?.edges.map(({ node }: any) => ({ value: node?.id, label: node?.name }));
-            return acc;
-        }, {});
-
-        setDropdownData(singleObj);
-
-        const arr = [];
-        const type: any[] = [];
-        let selectedAccValue: any = {};
-
-        const attributes = [
-            { key: 'prouctDesign', type: 'design', name: 'designName', dropdowndataKey: 'design' },
-            { key: 'productstyle', type: 'style', name: 'styleName', dropdowndataKey: 'style' },
-            { key: 'productStoneType', type: 'stone', name: 'stoneName', dropdowndataKey: 'stoneType' },
-            { key: 'productFinish', type: 'finish', name: 'finishName', dropdowndataKey: 'finish' },
-            { key: 'productStonecolor', type: 'stoneColor', name: 'stoneColorName', dropdowndataKey: 'stoneColor' },
-            { key: 'productItemtype', type: 'type', name: 'typeName', dropdowndataKey: 'type' },
-            { key: 'productSize', type: 'size', name: 'sizeName', dropdowndataKey: 'size' },
-        ];
-
-        attributes.forEach((attribute) => {
-            if (data?.[attribute.key]?.length > 0) {
-                const obj = {
-                    type: attribute.type,
-                    [attribute.name]: singleObj?.[attribute.dropdowndataKey],
-                };
-                arr.push(obj);
-                type.push(attribute.type);
-                selectedAccValue[attribute.type] = data?.[attribute.key].map((item: any) => item.id);
-            }
-        });
-
-        setAccordions(arr.flat());
-        setSelectedArr(type);
-        // setSelectedValues(selectedAccValue);
     };
 
     const DescriptionEditor = async (Description) => {
@@ -689,8 +590,6 @@ const ProductEdit = (props: any) => {
         };
     }, []);
 
-    // editor end
-
     const tags_list = async () => {
         try {
             if (tagsList) {
@@ -756,14 +655,6 @@ const ProductEdit = (props: any) => {
         } catch (error) {
             console.log('error: ', error);
         }
-    };
-
-    const selectCat = (cat: any) => {
-        setselectedCat(cat);
-    };
-
-    const selectedCollections = (data: any) => {
-        setSelectedCollection(data);
     };
 
     const handleFileChange = async (e: any) => {
@@ -902,33 +793,9 @@ const ProductEdit = (props: any) => {
         return variants.map((variant) => {
             const errors: any = {};
             if (!variant.sku) errors.sku = 'SKU cannot be empty';
-            // if (variant.quantity <= 0 || isNaN(variant.quantity)) errors.quantity = 'Quantity must be a valid number and greater than 0';
             if (variant.regularPrice <= 0 || isNaN(variant.regularPrice)) errors.regularPrice = 'Price must be a valid number and greater than 0';
-            // if (!variant.stackMgmt) errors.stackMgmt = 'Check Stack Management';
             return errors;
         });
-    };
-
-    // Helper function to validate attributes
-    const validateAttributes = () => {
-        const attributeErrors = {};
-        const attributeChecks = {
-            stone: 'Stone cannot be empty',
-            design: 'Design cannot be empty',
-            style: 'Style cannot be empty',
-            finish: 'Finish cannot be empty',
-            type: 'Type cannot be empty',
-            size: 'Size cannot be empty',
-            stoneColor: 'Stone color cannot be empty',
-        };
-
-        Object.keys(attributeChecks).forEach((key) => {
-            if (selectedValues.hasOwnProperty(key) && (!selectedValues[key] || selectedValues[key].length === 0)) {
-                attributeErrors[key] = attributeChecks[key];
-            }
-        });
-
-        return attributeErrors;
     };
 
     const updateProducts = async () => {
@@ -948,7 +815,6 @@ const ProductEdit = (props: any) => {
                 })
                 .filter(Boolean); // Filters out any null values where no selections were made
 
-            // Reset error messages
             setProductNameErrMsg('');
             setSlugErrMsg('');
             setSeoTittleErrMsg('');
@@ -956,19 +822,14 @@ const ProductEdit = (props: any) => {
             setShortDesErrMsg('');
             setCategoryErrMsg('');
             setDescriptionErrMsg('');
-            setAttributeError('');
             setVariantErrors([]);
             console.log('errors: ');
 
-            // Validation
             const errors = validateMainFields(JSON.parse(descr));
             console.log('errors: ', errors);
             const variantErrors = validateVariants();
             console.log('variantErrors: ', variantErrors);
-            // const attributeErrors: any = validateAttributes();
-            // console.log('attributeErrors: ', attributeErrors);
 
-            // Set errors
             if (publish !== 'draft') {
                 setProductNameErrMsg(errors.productName);
                 setSlugErrMsg(errors.slug);
@@ -979,11 +840,6 @@ const ProductEdit = (props: any) => {
                 setCategoryErrMsg(errors.category);
                 setVariantErrors(variantErrors);
 
-                // if (Object.keys(attributeErrors).length > 0) {
-                //     setAttributeError(attributeErrors);
-                // }
-
-                // Check if any error exists
                 if (Object.values(errors).some((msg) => msg !== '') || variantErrors.some((err) => Object.keys(err).length > 0)) {
                     // setCreateLoading(false);
                     Failure('Please fill in all required fields');
@@ -1021,13 +877,8 @@ const ProductEdit = (props: any) => {
                                 slug: slug,
                                 order_no: menuOrder,
                                 attributes: att,
-                                // ...(selectedValues && selectedValues.design && { prouctDesign: selectedValues.design }),
-                                // ...(selectedValues && selectedValues.style && { productstyle: selectedValues.style }),
-                                // ...(selectedValues && selectedValues.finish && { productFinish: selectedValues.finish }),
-                                // ...(selectedValues && selectedValues.stone && { productStoneType: selectedValues.stone }),
-                                // ...(selectedValues && selectedValues.type && { productItemtype: selectedValues.type }),
-                                // ...(selectedValues && selectedValues.size && { productSize: selectedValues.size }),
-                                // ...(selectedValues && selectedValues.stoneColor && { productStonecolor: selectedValues.stoneColor }),
+                                brand: selectedBrand?.value,
+                                size_guide: selectedSizeGuide?.value,
                             },
                             firstValues: 10,
                         },
@@ -1077,16 +928,9 @@ const ProductEdit = (props: any) => {
                                 upsells,
                                 crosssells,
                                 slug: slug,
-                                // ...(menuOrder && menuOrder > 0 && { order_no: menuOrder }),
                                 order_no: menuOrder,
-
-                                ...(selectedValues && selectedValues.design && { prouctDesign: selectedValues.design }),
-                                ...(selectedValues && selectedValues.style && { productstyle: selectedValues.style }),
-                                ...(selectedValues && selectedValues.finish && { productFinish: selectedValues.finish }),
-                                ...(selectedValues && selectedValues.stone && { productStoneType: selectedValues.stone }),
-                                ...(selectedValues && selectedValues.type && { productItemtype: selectedValues.type }),
-                                ...(selectedValues && selectedValues.size && { productSize: selectedValues.size }),
-                                ...(selectedValues && selectedValues.stoneColor && { productStonecolor: selectedValues.stoneColor }),
+                                brand: selectedBrand?.value,
+                                size_guide: selectedSizeGuide?.value,
                             },
                             firstValues: 10,
                         },
@@ -1131,6 +975,7 @@ const ProductEdit = (props: any) => {
                 setUpdateLoading(false);
                 Failure(data?.productChannelListingUpdate?.errors[0]?.message);
             } else {
+                updatePriceBreakup();
                 variantListUpdate();
                 const updatedImg = images?.map((item: any) => item.id);
                 if (deletedImages?.length > 0) {
@@ -1147,6 +992,23 @@ const ProductEdit = (props: any) => {
                     },
                 });
             }
+        } catch (error) {
+            setUpdateLoading(false);
+
+            console.log('error: ', error);
+        }
+    };
+
+    const updatePriceBreakup = async () => {
+        try {
+            const { data } = await priceBreakupUpdate({
+                variables: {
+                    id: priceBreackupId,
+                    product: id,
+                    breakupDetails: tableHtml,
+                },
+            });
+            console.log('✌️data --->', data);
         } catch (error) {
             setUpdateLoading(false);
 
@@ -1361,60 +1223,6 @@ const ProductEdit = (props: any) => {
             setUpdateLoading(false);
             console.log('error: ', error);
         }
-    };
-
-    const arr = [
-        { type: 'design', designName: dropdowndata?.design },
-        { type: 'style', styleName: dropdowndata?.style },
-        { type: 'stone', stoneName: dropdowndata?.stoneType },
-        { type: 'finish', finishName: dropdowndata?.finish },
-        { type: 'stoneColor', stoneColorName: dropdowndata?.stoneColor },
-        { type: 'type', typeName: dropdowndata?.type },
-        { type: 'size', sizeName: dropdowndata?.size },
-    ];
-
-    const optionsVal = arr.map((item) => ({ value: item.type, label: item.type }));
-
-    const handleAddAccordion = () => {
-        // const selectedType = arr.find((item) => item.type === chooseType);
-        // setSelectedArr([chooseType, ...selectedArr]);
-        // setAccordions([selectedType, ...accordions]);
-        // setOpenAccordion(chooseType);
-        // setSelectedValues({ ...selectedValues, [chooseType]: [] }); // Clear selected values for the chosen type
-
-        if (chooseType == '') {
-            setAttDropDownError('Please select a type');
-        } else {
-            const selectedType = arr.find((item) => item?.type === chooseType);
-            setSelectedArr([chooseType, ...selectedArr]);
-            setAccordions([selectedType, ...accordions]);
-            setOpenAccordion(chooseType);
-            setSelectedValues({ ...selectedValues, [chooseType]: [] }); // Clear selected values for the chosen type
-            setChooseType('');
-            setAttDropDownError('');
-        }
-    };
-
-    const handleRemoveAccordion = (type: any) => {
-        setSelectedArr(selectedArr.filter((item: any) => item !== type));
-        setAccordions(accordions.filter((item: any) => item.type !== type));
-        setOpenAccordion('');
-        const updatedSelectedValues = { ...selectedValues };
-        delete updatedSelectedValues[type];
-        setSelectedValues(updatedSelectedValues);
-    };
-
-    const handleDropdownChange = (event: any, type: any) => {
-        setChooseType(type);
-    };
-
-    const handleToggleAccordion = (type: any) => {
-        setOpenAccordion(openAccordion === type ? '' : type);
-    };
-
-    const handleMultiSelectChange = (selectedOptions: any, type: any) => {
-        const selectedValuesForType = selectedOptions.map((option: any) => option.value);
-        setSelectedValues({ ...selectedValues, [type]: selectedValuesForType });
     };
 
     const handleChange = (index: any, fieldName: any, fieldValue: any) => {
@@ -1829,6 +1637,23 @@ const ProductEdit = (props: any) => {
         return loading;
     };
 
+    const tableData = (columns, rows) => {
+        const tableRows = rows.map((row) => `<tr>${columns.map((col) => `<td>${row[col] || ''}</td>`).join('')}<td></td></tr>`).join('');
+
+        const tableHTML = `
+        <table border="1" cellpadding="5" cellspacing="0">
+            <thead>
+                <tr>
+                    ${columns.map((col) => `<th>${col}</th>`).join('')}
+                </tr>
+            </thead>
+            <tbody>
+                ${tableRows}
+            </tbody>
+        </table>`;
+        setTableHtml(tableHTML);
+    };
+
     return (
         <div>
             <div className="  mt-6">
@@ -1925,6 +1750,12 @@ const ProductEdit = (props: any) => {
                                 required
                             ></textarea>
                             {shortDesErrMsg && <p className="error-message mt-1 text-red-500 ">{shortDesErrMsg}</p>}
+                        </div>
+                        <div className="panel mb-5 mt-5">
+                            <label htmlFor="editor" className="block text-sm font-medium text-gray-700">
+                                Price Breakup
+                            </label>
+                            <DynamicSizeTable tableData={tableData} htmlTableString={tableHtml} />
                         </div>
                         <div className="panel mb-5 ">
                             {/* <div className="mb-5 flex flex-col border-b border-gray-200 pb-5 pl-10 sm:flex-row">
@@ -2477,6 +2308,42 @@ const ProductEdit = (props: any) => {
                                     placeholder="Select categories"
                                 />
                                 {categoryErrMsg && <p className="error-message mt-1 text-red-500 ">{categoryErrMsg}</p>}
+                            </div>
+                        </div>
+                        <div className="panel order-4  mt-5 md:order-3">
+                            <div className="mb-5 border-b border-gray-200 pb-2">
+                                <h5 className=" block text-lg font-medium text-gray-700">Product Brands</h5>
+                            </div>
+                            <div className="mb-5">
+                                <BrandSelect
+                                    queryFunc={fetchBrands} // Pass the function to fetch categories
+                                    selectedCategory={selectedBrand} // Use 'selectedCategory' instead of 'value'
+                                    onCategoryChange={(data) => setselectedBrand(data)} // Use 'onCategoryChange' instead of 'onChange'
+                                    placeholder="Select brands"
+                                />
+                                {/* <Select isMulti value={selectedCat} onChange={(e) => setselectedCat(e)} options={parentLists} placeholder="Select categories..." className="form-select" /> */}
+
+                                {categoryErrMsg && <p className="error-message mt-1 text-red-500 ">{categoryErrMsg}</p>}
+                            </div>
+                            {/* <p className="mt-5 cursor-pointer text-primary underline" onClick={() => setIsOpenBrand(true)}>
+                                Add a new brand
+                            </p> */}
+                        </div>
+
+                        <div className="panel order-4  mt-5 md:order-3">
+                            <div className="mb-5 border-b border-gray-200 pb-2">
+                                <h5 className=" block text-lg font-medium text-gray-700">Product Size Guide</h5>
+                            </div>
+                            <div className="mb-5">
+                                <SizeGuideSelect
+                                    queryFunc={fetchSizeGuide} // Pass the function to fetch categories
+                                    selectedCategory={selectedSizeGuide} // Use 'selectedCategory' instead of 'value'
+                                    onCategoryChange={(data) => setSelectedSizeGuide(data)} // Use 'onCategoryChange' instead of 'onChange'
+                                    placeholder="Select size guide"
+                                />
+                                {/* <Select isMulti value={selectedCat} onChange={(e) => setselectedCat(e)} options={parentLists} placeholder="Select categories..." className="form-select" /> */}
+
+                                {/* {categoryErrMsg && <p className="error-message mt-1 text-red-500 ">{categoryErrMsg}</p>} */}
                             </div>
                         </div>
 

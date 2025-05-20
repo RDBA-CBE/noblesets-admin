@@ -247,6 +247,9 @@ const Sidebar = () => {
                                                 <li>
                                                     <Link href="/apps/pincode" target='_blank'>{t('Pincode')}</Link>
                                                 </li>
+                                                <li>
+                                                    <Link href="/apps/custom_reports" target='_blank'>{t('Custom Reports')}</Link>
+                                                </li>
                                                  <li>
                                                     <Link href="/product/warehouse">{t('Warehouse')}</Link>
                                                 </li>
@@ -409,6 +412,16 @@ const Sidebar = () => {
                                                 {/* <IconPaymentList className="shrink-0 group-hover:!text-primary" /> */}
                                                 <Image src={PaymentImage.src} alt="Payments" className="h-5 w-5 shrink-0 object-cover group-hover:!text-primary rtl:mr-3" width={20} height={20} />
                                                 <span className="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{t('Payments')}</span>
+                                            </div>
+                                        </Link>
+                                    </li>
+
+                                    <li className="nav-item">
+                                        <Link href="/shipping_zone" className="group">
+                                            <div className="flex items-center">
+                                                {/* <IconPaymentList className="shrink-0 group-hover:!text-primary" /> */}
+                                                <Image src={PaymentImage.src} alt="Payments" className="h-5 w-5 shrink-0 object-cover group-hover:!text-primary rtl:mr-3" width={20} height={20} />
+                                                <span className="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{t('Shipping Zone')}</span>
                                             </div>
                                         </Link>
                                     </li>

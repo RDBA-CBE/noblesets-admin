@@ -18,7 +18,9 @@ import IconLoader from '@/components/Icon/IconLoader';
 import IconArrowBackward from '@/components/Icon/IconArrowBackward';
 import IconArrowForward from '@/components/Icon/IconArrowForward';
 import CommonLoader from '../elements/commonLoader';
-import { CREATE_PINCODE, DELETE_PINCODE, PINCODE_LIST, UPDATE_PINCODE } from '@/query/pincode';
+import { CREATE_PINCODE, DELETE_PINCODE, UPDATE_PINCODE } from '@/query/pincode';
+import { REPORT_LIST } from '@/query/customProduct';
+import moment from 'moment';
 
 const Pincode = () => {
     const [addTag, { loading: addLoading }] = useMutation(CREATE_PINCODE);
@@ -49,7 +51,7 @@ const Pincode = () => {
         data: customerData,
         loading: getLoading,
         refetch: categoryListRefetch,
-    } = useQuery(PINCODE_LIST, {
+    } = useQuery(REPORT_LIST, {
         variables: {
             channel: 'india-channel',
             first: PAGE_SIZE,
@@ -64,7 +66,7 @@ const Pincode = () => {
         },
     });
 
-    const {} = useQuery(PINCODE_LIST, {
+    const {} = useQuery(REPORT_LIST, {
         variables: {
             channel: 'india-channel',
             first: PAGE_SIZE,
@@ -74,11 +76,11 @@ const Pincode = () => {
             },
         },
         onCompleted: (data) => {
-            setTotalCount(data?.pincodes?.totalCount);
+            setTotalCount(data?.customProducts?.totalCount);
         },
     });
 
-    const { data, refetch: refetch } = useQuery(PINCODE_LIST, {
+    const { data, refetch: refetch } = useQuery(REPORT_LIST, {
         variables: {
             channel: 'india-channel',
             first: PAGE_SIZE,
@@ -89,27 +91,30 @@ const Pincode = () => {
         },
     });
 
-    const [fetchNextPage] = useLazyQuery(PINCODE_LIST, {
+    const [fetchNextPage] = useLazyQuery(REPORT_LIST, {
         onCompleted: (data) => {
             commonPagination(data);
         },
     });
 
-    const [fetchPreviousPage] = useLazyQuery(PINCODE_LIST, {
+    const [fetchPreviousPage] = useLazyQuery(REPORT_LIST, {
         onCompleted: (data) => {
             commonPagination(data);
         },
     });
 
     const commonPagination = (data) => {
-        const customers = data.pincodes.edges;
-        const pageInfo = data.pincodes?.pageInfo;
+        const customers = data.customProducts.edges;
+        const pageInfo = data.customProducts?.pageInfo;
 
         const newData = customers?.map((item: any) => {
             return {
-                name: item.node?.name,
+                name: item.node?.customer == null ? item?.node?.customerName : `${item.node?.customer?.firstName} ${item.node?.customer?.lastName}`,
                 id: item.node?.id,
-                code: item.node?.code,
+                baseProduct: item.node?.baseProduct?.name,
+                image: item.node?.baseProduct?.thumbnail?.url,
+                created_at: moment(item.node?.createdAt).format("DD-MM-YYYY"),
+                message: item.node?.customizationDetails ? JSON.parse(item.node?.customizationDetails).message : '',
             };
         });
         setRecordsData(newData);
@@ -316,11 +321,11 @@ const Pincode = () => {
             ) : ( */}
             <div className="panel mt-6">
                 <div className="mb-5 flex flex-col gap-5 md:flex-row md:items-center">
-                    <h5 className="text-lg font-semibold dark:text-white-light">Custom Reports ({totalCount})</h5>
+                    <h5 className="text-lg font-semibold dark:text-white-light">Custom Products ({totalCount})</h5>
 
                     <div className="flex ltr:ml-auto rtl:mr-auto">
                         <input type="text" className="form-input mr-2 w-auto" placeholder="Search..." value={search} onChange={(e) => handleSearchChange(e.target.value)} />
-{/* 
+                        {/* 
                         <button type="button" className="btn btn-primary" onClick={() => CreateTags()}>
                             + Create
                         </button> */}
@@ -334,9 +339,23 @@ const Pincode = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                { accessor: 'name', sortable: true },
-                                { accessor: 'code', sortable: true },
+                                {
+                                    accessor: 'image',
+                                    render: (row) => <img src={row?.image ? row?.image : '/assets/images/placeholder.png'} alt="Product" className="h-10 w-10 object-cover ltr:mr-2 rtl:ml-2" />,
+                                },
+                                { accessor: 'name',  },
+                                { accessor: 'baseProduct', },
+                                {
+                                    accessor: 'message',
 
+                                    render: (row) => (
+                                        <Tippy content={row?.message} placement="top" className="rounded-lg bg-black p-1 text-sm text-white">
+                                            <div>{row?.message?.length > 20 ? `${row.message.slice(0, 20)}...` : row?.message}</div>
+                                        </Tippy>
+                                    ),
+                                },
+
+                                { accessor: 'created_at', },
                                 {
                                     accessor: 'actions',
                                     title: 'Actions',

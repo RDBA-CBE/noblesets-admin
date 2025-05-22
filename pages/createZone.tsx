@@ -83,9 +83,6 @@ const CreateCoupon = () => {
                 id: id,
             });
             console.log('✌️res --->', res);
-            
-// console.log('✌️result --->', result);
-
         } catch (error) {
             console.log('✌️error --->', error);
         }
@@ -115,73 +112,128 @@ const CreateCoupon = () => {
         }
     };
 
+    const menu = (
+        <Menu onClick={handleMenuClick}>
+            <Menu.Item key="standard">Standard Shipping</Menu.Item>
+            <Menu.Item key="express">Express Shipping</Menu.Item>
+        </Menu>
+    );
 
-    // const createShippingZone = async () => {
-    //     try {
-    //         let errors: any = {};
-    //         // if (state.zoneName === '') {
-    //         //     errors.nameError = 'Shipping Zone Name is required';
-    //         // }
-    //         // if (state.selectedCountry === '') {
-    //         //     errors.countryError = 'Please select country';
-    //         // }
-    //         // if (state.standardShippingRupee === '') {
-    //         //     errors.standardShippingRupeeError = 'Standard Shipping (₹) is required';
-    //         // }
-    //         // if (state.standardShippingDollar === '') {
-    //         //     errors.standardShippingDollarError = 'Standard Shipping ($) is required';
-    //         // }
-    //         // if (state.expressShippingRupee === '') {
-    //         //     errors.expressShippingRupeeError = 'Express Shipping (₹) is required';
-    //         // }
-    //         // if (state.expressShippingDollar === '') {
-    //         //     errors.expressShippingDollarError = 'Express Shipping ($) is required';
-    //         // }
-    //         // if (state.standardShippingRupee < 0) {
-    //         //     errors.standardShippingRupeeError = 'Standard Shipping (₹) must be greater than 0';
-    //         // }
-    //         // if (state.standardShippingDollar < 0) {
-    //         //     errors.standardShippingDollarError = 'Standard Shipping ($) must be greater than 0';
-    //         // }
-    //         // if (state.expressShippingRupee < 0) {
-    //         //     errors.expressShippingRupeeError = 'Express Shipping (₹) must be greater than 0';
-    //         // }
-    //         // if (state.expressShippingDollar < 0) {
-    //         //     errors.expressShippingDollarError = 'Express Shipping ($) must be greater than 0';
-    //         // }
+    const addManualCode = () => {
+        if (state.manualCode == '') {
+            setState({ manualCodeErr: 'Please enter coupon code' });
+        } else {
+            setState({ isOpen: false, manualCodeErr: '', manualCode: '', generatedCodes: [...state.generatedCodes, state.manualCode], errors: { generatedCodesError: '' } });
+        }
+    };
 
-    //         if (Object.keys(errors).length > 0) {
-    //             setState({ errors });
-    //             return;
-    //         }
+    const addGenerateCode = () => {
+        if (state.autoCodeNumber == '') {
+            setState({ autoCodeNumberErr: 'Please enter coupon code quantity' });
+        } else {
+            const quantity = parseInt(state.autoCodeNumber, 10);
+            if (isNaN(quantity) || quantity <= 0 || quantity > 50) {
+                setState((prevState) => ({
+                    ...prevState,
+                    autoCodeNumberErr: 'Please enter a valid number between 1 and 50',
+                }));
+                return;
+            }
+            const codes = Array.from({ length: quantity }, generateRandomCode);
+            setState({
+                generatedCodes: [...state.generatedCodes, ...codes],
+                autoCodeNumberErr: '',
+                autoCode: false,
+                errors: { generatedCodesError: '' },
+            });
+        }
+    };
 
-    //         const body = {
-    //             name: state.zoneName,
-    //             countries: ["US"],
-    //             default: false,
-    //             addChannels: [CHANNEL_INR, CHANNEL_USD],
-    //         };
+    const deleteCode = (row) => {
+        const filter = state.generatedCodes?.filter((item) => item !== row);
+        setState({ generatedCodes: filter });
+    };
 
-    //         console.log('✌️body --->', body);
+    const handleStartDateChange = (e) => {
+        setState({
+            startDate: e.target.value,
+            endDate: '', // Clear endDate when startDate changes
+        });
+    };
 
-    //         const res = await createZone({
-    //             variables: {
-    //                 input: body,
-    //             },
-    //         });
+    const handleEndDateChange = (e) => {
+        setState({
+            endDate: e.target.value,
+            errors: { endDateError: '' },
+        });
+    };
 
-    //         if (res?.data?.shippingZoneCreate?.errors?.length > 0) {
-    //             Failure(res.data.shippingZoneCreate.errors[0].message);
-    //         } else {
-    //             const zoneId = res.data.shippingZoneCreate.shippingZone.id;
-    //             shippingMethodCreate(zoneId);
-    //         }
-    //     } catch (error) {
-    //         console.log('error: ', error);
-    //     }
-    // };
+    const createShippingZone = async () => {
+        try {
+            let errors: any = {};
+            // if (state.zoneName === '') {
+            //     errors.nameError = 'Shipping Zone Name is required';
+            // }
+            // if (state.selectedCountry === '') {
+            //     errors.countryError = 'Please select country';
+            // }
+            // if (state.standardShippingRupee === '') {
+            //     errors.standardShippingRupeeError = 'Standard Shipping (₹) is required';
+            // }
+            // if (state.standardShippingDollar === '') {
+            //     errors.standardShippingDollarError = 'Standard Shipping ($) is required';
+            // }
+            // if (state.expressShippingRupee === '') {
+            //     errors.expressShippingRupeeError = 'Express Shipping (₹) is required';
+            // }
+            // if (state.expressShippingDollar === '') {
+            //     errors.expressShippingDollarError = 'Express Shipping ($) is required';
+            // }
+            // if (state.standardShippingRupee < 0) {
+            //     errors.standardShippingRupeeError = 'Standard Shipping (₹) must be greater than 0';
+            // }
+            // if (state.standardShippingDollar < 0) {
+            //     errors.standardShippingDollarError = 'Standard Shipping ($) must be greater than 0';
+            // }
+            // if (state.expressShippingRupee < 0) {
+            //     errors.expressShippingRupeeError = 'Express Shipping (₹) must be greater than 0';
+            // }
+            // if (state.expressShippingDollar < 0) {
+            //     errors.expressShippingDollarError = 'Express Shipping ($) must be greater than 0';
+            // }
 
-    const updateAmount = async (zoneId=id ) => {
+            if (Object.keys(errors).length > 0) {
+                setState({ errors });
+                return;
+            }
+
+            const body = {
+                name: state.zoneName,
+                countries: state.exceptIndia,
+                default: false,
+                addChannels: [CHANNEL_INR, CHANNEL_USD],
+            };
+
+            console.log('✌️body --->', body);
+
+            const res = await createZone({
+                variables: {
+                    input: body,
+                },
+            });
+
+            if (res?.data?.shippingZoneCreate?.errors?.length > 0) {
+                Failure(res.data.shippingZoneCreate.errors[0].message);
+            } else {
+                const zoneId = res.data.shippingZoneCreate.shippingZone.id;
+                shippingMethodCreate(zoneId);
+            }
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    };
+
+    const shippingMethodCreate = async (zoneId: string) => {
         try {
             const arr = [
                 {
@@ -418,7 +470,7 @@ const CreateCoupon = () => {
 
             <div className="panel">
                 <div className="mt-5 flex items-center justify-end gap-4">
-                    <button type="button" className="btn btn-primary  w-full md:mb-0 md:w-auto" onClick={() => updateAmount()}>
+                    <button type="button" className="btn btn-primary  w-full md:mb-0 md:w-auto" onClick={() => createShippingZone()}>
                         {createLoading || chennelLoading ? <IconLoader className="mr-2 h-4 w-4 animate-spin" /> : 'Submit'}
                     </button>
                     <button type="button" className="btn btn-danger  w-full md:mb-0 md:w-auto" onClick={() => router.push('/shipping_zone')}>

@@ -12032,6 +12032,19 @@ export const PRODUCT_FULL_DETAILS = gql`
             breakupDetails
             id
         }
+        brand {
+            logo
+            name
+            slug
+            id
+        }
+        sizeGuide {
+            id
+            name
+            sizedetail
+            sizeimg
+            slug
+        }
     }
 
     fragment ProductVariantAttributes on Product {

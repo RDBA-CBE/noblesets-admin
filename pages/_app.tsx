@@ -49,7 +49,7 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
 
     const getLayout = Component.getLayout ?? ((page) => <DefaultLayout>{page}</DefaultLayout>);
 
- 
+    
     return (
         <ApolloProvider client={client}>
             <Provider store={store}>

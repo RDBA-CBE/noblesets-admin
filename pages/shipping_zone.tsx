@@ -192,9 +192,9 @@ const Coupon = () => {
                                                         <IconEdit className="h-4.5 w-4.5" />
                                                     </button>
 
-                                                    <button type="button" className="flex hover:text-danger" onClick={() => deleteData(row)}>
+                                                    {/* <button type="button" className="flex hover:text-danger" onClick={() => deleteData(row)}>
                                                         <IconTrashLines />
-                                                    </button>
+                                                    </button> */}
                                                 </div>
                                             </>
                                         );

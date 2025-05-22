@@ -21,7 +21,7 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState, Fragment } from 'react';
 import CommonLoader from './elements/commonLoader';
-import { CHANNEL_USD, Failure, Success, WAREHOUSE_ID, formatCurrency, formatOptions, roundOff } from '@/utils/functions';
+import { CHANNEL_USD, Failure, Success, WAREHOUSE_ID, formatCurrency, formatOptions, objIsEmpty, roundOff } from '@/utils/functions';
 import Dropdown from '../components/Dropdown';
 import IconCaretDown from '@/components/Icon/IconCaretDown';
 import Swal from 'sweetalert2';
@@ -571,6 +571,7 @@ const Index = () => {
                 id: row.id,
             });
             const response = res.data?.product;
+            console.log('✌️response --->', response);
 
             CreateDuplicateProduct(response);
         } catch (error) {
@@ -634,6 +635,17 @@ const Index = () => {
                 return acc;
             }, []);
 
+            let brand = null;
+            let size_guide = null;
+
+            if (!objIsEmpty(row?.brand)) {
+                brand = row?.brand?.id;
+            }
+
+            if (!objIsEmpty(row?.sizeGuide)) {
+                size_guide = row?.sizeGuide?.id;
+            }
+
             const { data } = await addFormData({
                 variables: {
                     input: {
@@ -653,11 +665,16 @@ const Index = () => {
                         },
                         slug: row.slug + '-1',
                         order_no: row.orderNo,
-                        prouctDesign: design,
-                        productstyle: style,
-                        productFinish: finish,
-                        productStoneType: stone,
-                        productSize: size,
+                        brand,
+                        size_guide,
+
+                        // brand: selectedBrand?.value,
+                        // size_guide: selectedSizeGuide?.value,
+                        // prouctDesign: design,
+                        // productstyle: style,
+                        // productFinish: finish,
+                        // productStoneType: stone,
+                        // productSize: size,
                     },
                 },
             });

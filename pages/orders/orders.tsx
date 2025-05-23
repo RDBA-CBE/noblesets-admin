@@ -19,7 +19,7 @@ import OrderQuickEdit from '@/components/orderQuickEdit';
 import Modal from '@/components/Modal';
 import IconLoader from '@/components/Icon/IconLoader';
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 const AbandonedCarts = () => {
     const router = useRouter();
@@ -78,6 +78,7 @@ const AbandonedCarts = () => {
         } else {
             body = { created: durations, search: search, status: filterStatus };
         }
+
         return body;
     };
 

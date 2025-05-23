@@ -61,6 +61,7 @@ import {
     Failure,
     PRODUCT_TYPE,
     Success,
+    TAX_CLASS,
     WAREHOUSE_ID,
     addCommasToNumber,
     addNewMediaFile,
@@ -154,6 +155,7 @@ const ProductAdd = () => {
     const [productNameErrMsg, setProductNameErrMsg] = useState('');
     const [slugErrMsg, setSlugErrMsg] = useState('');
     const [seoTittleErrMsg, setSeoTittleErrMsg] = useState('');
+    const [priceBreakUpError, setPriceBreakUpError] = useState('');
     const [seoDescErrMsg, setSeoDescErrMsg] = useState('');
     const [shortDesErrMsg, setShortDesErrMsg] = useState('');
     const [categoryErrMsg, setCategoryErrMsg] = useState('');
@@ -210,7 +212,6 @@ const ProductAdd = () => {
     const { refetch: relatedProductsRefetch } = useQuery(RELATED_PRODUCT);
 
     const [priceBreakupCreate] = useMutation(CREATE_PRICE_BREAKUP);
-
 
     const { refetch: mediaRefetch } = useQuery(MEDIA_PAGINATION);
 
@@ -290,13 +291,12 @@ const ProductAdd = () => {
             sort: { direction: 'DESC', field: 'CREATED_aT' },
         },
         onCompleted: (data) => {
-console.log('✌️data --->', data);
+            console.log('✌️data --->', data);
             // commonPagination(data);
         },
     });
 
-console.log('✌️customerData --->', customerData);
-
+    console.log('✌️customerData --->', customerData);
 
     const handleNextPage = () => {
         fetchNextPage({
@@ -344,7 +344,6 @@ console.log('✌️customerData --->', customerData);
             console.log('error: ', error);
         }
     };
-
 
     useEffect(() => {
         const getparentCategoryList = parentList?.categories?.edges;
@@ -413,6 +412,8 @@ console.log('✌️customerData --->', customerData);
     const [description, setDescription] = useState('');
     const [selectedImages, setSelectedImages] = useState([]);
     const [tableHtml, setTableHtml] = useState(null);
+    const [columns, setColumns] = useState([]);
+    const [rows, SetRows] = useState([]);
 
     const longPressTimeout = useRef(null);
 
@@ -503,38 +504,40 @@ console.log('✌️customerData --->', customerData);
 
     const editor = useCallback(() => {
         if (typeof window === 'undefined' || !editorRef.current) return;
-
-        if (editorInstance) {
-            return;
-        }
-
-        import('@editorjs/editorjs').then(({ default: EditorJS }) => {
-            const editor = new EditorJS({
-                holder: editorRef.current,
-                data: value,
-                tools: {
-                    // Configure tools as needed
-                    header: {
-                        class: require('@editorjs/header'),
-                    },
-                    list: {
-                        class: require('@editorjs/list'),
-                    },
-                    table: {
-                        class: require('@editorjs/table'),
-                    },
-                },
-            });
-
-            setEditorInstance(editor);
-        });
-
+        if (editorInstance) return;
+      
+        (async () => {
+          const EditorJS = (await import('@editorjs/editorjs')).default;
+          const Header = (await import('@editorjs/header')).default;
+          const List = (await import('@editorjs/list')).default;
+          const Table = (await import('@editorjs/table')).default;
+      
+          const editor = new EditorJS({
+            holder: editorRef.current,
+            data: value,
+            tools: {
+              header: {
+                class: Header,
+              },
+              list: {
+                class: List,
+              },
+              table: {
+                class: Table,
+              },
+            },
+          });
+      
+          setEditorInstance(editor);
+        })();
+      
         return () => {
-            if (editorInstance) {
-                editorInstance?.blocks?.clear();
-            }
+          if (editorInstance) {
+            editorInstance?.blocks?.clear();
+          }
         };
-    }, [editorInstance, value]);
+      }, [editorInstance, value]);
+      
 
     const selectedCollections = (data: any) => {
         setSelectedCollection(data);
@@ -543,7 +546,6 @@ console.log('✌️customerData --->', customerData);
     const SubmittedForm = Yup.object().shape({
         name: Yup.string().required('Name is required'),
     });
-
 
     const previewClick = async () => {
         setPreviewLoading(true);
@@ -665,6 +667,7 @@ console.log('✌️customerData --->', customerData);
             setDescriptionErrMsg('');
             setAttributeError('');
             setVariantErrors([]);
+            setPriceBreakUpError('');
 
             // Validation
             errors = validateMainFields(JSON.parse(descr));
@@ -679,8 +682,8 @@ console.log('✌️customerData --->', customerData);
                 setShortDesErrMsg(errors.shortDescription);
                 setCategoryErrMsg(errors.category);
                 setVariantErrors(variantErrors);
+                setPriceBreakUpError(errors?.priceBreakup);
 
-             
                 if (Object.values(errors).some((msg) => msg !== '') || variantErrors.some((err) => Object.keys(err).length > 0)) {
                     setCreateLoading(false);
                     Failure('Please fill in all required fields');
@@ -719,7 +722,7 @@ console.log('✌️customerData --->', customerData);
                                 order_no: menuOrder,
                                 brand: selectedBrand?.value,
                                 size_guide: selectedSizeGuide?.value,
-                               
+                                taxClass: TAX_CLASS,
                             },
                         },
                     });
@@ -782,6 +785,7 @@ console.log('✌️customerData --->', customerData);
                                 order_no: menuOrder,
                                 brand: selectedBrand?.value,
                                 size_guide: selectedSizeGuide?.value,
+                                taxClass: TAX_CLASS,
                             },
                         },
                     });
@@ -808,6 +812,8 @@ console.log('✌️customerData --->', customerData);
 
     const validateMainFields = (savedContent) => {
         let errors = null;
+        const hasEmptyCells = rows.some((row) => columns.some((col) => !row[col] || row[col].trim() === ''));
+
         if (publish !== 'draft') {
             errors = {
                 productName: productName.trim() === '' ? 'Product name cannot be empty' : '',
@@ -817,6 +823,14 @@ console.log('✌️customerData --->', customerData);
                 description: savedContent?.blocks?.length === 0 ? 'Description cannot be empty' : '',
                 shortDescription: shortDescription?.trim() === '' ? 'Short description cannot be empty' : '',
                 category: selectedCat?.length === 0 ? 'Category cannot be empty' : '',
+                priceBreakup:
+                columns.length == 0
+                    ? 'At least column is required'
+                    : columns.length > 0 && rows.length == 0
+                    ? 'At least one row is required if columns are added.'
+                    : hasEmptyCells
+                    ? 'All row cells must be filled.'
+                    : '',
             };
         } else {
             errors = {
@@ -838,7 +852,6 @@ console.log('✌️customerData --->', customerData);
             return errors;
         });
     };
-
 
     const productChannelListUpdate = async (productId: any) => {
         try {
@@ -1519,6 +1532,8 @@ console.log('✌️customerData --->', customerData);
             </tbody>
         </table>`;
         setTableHtml(tableHTML);
+        setColumns(columns);
+        SetRows(rows);
     };
 
     return (
@@ -1589,6 +1604,7 @@ console.log('✌️customerData --->', customerData);
                                 Price Breakup
                             </label>
                             <DynamicSizeTable tableData={tableData} />
+                            {priceBreakUpError && <p className="error-message mt-1 text-red-500 ">{priceBreakUpError}</p>}
                         </div>
 
                         <div className="panel mb-5">
@@ -2127,7 +2143,6 @@ console.log('✌️customerData --->', customerData);
                                 />
                                 {/* <Select isMulti value={selectedCat} onChange={(e) => setselectedCat(e)} options={parentLists} placeholder="Select categories..." className="form-select" /> */}
 
-                                {categoryErrMsg && <p className="error-message mt-1 text-red-500 ">{categoryErrMsg}</p>}
                             </div>
                             <p className="mt-5 cursor-pointer text-primary underline" onClick={() => setIsOpenBrand(true)}>
                                 Add a new brand

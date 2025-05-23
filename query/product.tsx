@@ -11476,6 +11476,9 @@ export const CREATE_PRODUCT = gql`
             product {
                 id
                 __typename
+                taxClass {
+                    id
+                }
             }
             __typename
         }
@@ -11853,449 +11856,464 @@ export const PRODUCT_MEDIA_CREATE = gql`
 `;
 
 export const PRODUCT_FULL_DETAILS = gql`
-    query ProductDetails($id: ID!, $channel: String, $firstValues: Int, $afterValues: String, $lastValues: Int, $beforeValues: String) {
-        product(id: $id, channel: $channel) {
-            metadata {
-                key
-                value
-                __typename
-            }
-            attributes {
-                attribute {
-                    id
-                    slug
-                    name
-                    inputType
-                    entityType
-                    valueRequired
-                    unit
-                    choices(first: 200) {
-                        ...AttributeValueList
-                        __typename
-                    }
-                    __typename
-                }
-                values {
-                    ...AttributeValueDetails
-                    __typename
-                }
-                __typename
-            }
-            ...Product
-            __typename
-            getUpsells {
-                name
-                productId
-                __typename
-            }
-            getCrosssells {
-                name
-                productId
-                __typename
-            }
-            productFinish {
-                id
-                name
-                __typename
-            }
-            productStoneType {
-                id
-                name
-                __typename
-            }
-            productstyle {
-                id
-                name
-                __typename
-            }
-            prouctDesign {
-                id
-                name
-                __typename
-            }
-            productStonecolor {
-                id
-                name
-                __typename
-            }
-            productSize {
-                id
-                name
-                __typename
-            }
-            productItemtype {
-                id
-                name
-                __typename
-            }
-            attributes {
-                attribute {
-                    id
-                }
-            }
-        }
+   query ProductDetails($id: ID!, $channel: String, $firstValues: Int, $afterValues: String, $lastValues: Int, $beforeValues: String) {
+  product(id: $id, channel: $channel) {
+    metadata {
+      key
+      value
+      __typename
     }
-
-    fragment Product on Product {
-        ...ProductVariantAttributes
-        name
-        slug
-        description
-        seoTitle
-        seoDescription
-        rating
-        defaultVariant {
-            id
-            __typename
-        }
-        category {
-            id
-            name
-            __typename
-        }
-        collections {
-            id
-            name
-            __typename
-        }
-        channelListings {
-            ...ChannelListingProductWithoutPricing
-            __typename
-        }
-        media {
-            ...ProductMedia
-            __typename
-        }
-        isAvailable
-        variants {
-            ...ProductDetailsVariant
-            __typename
-        }
-        productType {
-            id
-            name
-            hasVariants
-            __typename
-        }
-        weight {
-            ...Weight
-            __typename
-        }
-        taxClass {
-            id
-            name
-            __typename
-        }
-        __typename
-        productFinish {
-            id
-            name
-            __typename
-        }
-        productStoneType {
-            id
-            name
-            __typename
-        }
-        productstyle {
-            id
-            name
-            __typename
-        }
-        prouctDesign {
-            id
-            name
-            __typename
-        }
-        productStonecolor {
-            id
-            name
-            __typename
-        }
-        productSize {
-            id
-            name
-            __typename
-        }
-        productItemtype {
-            id
-            name
-            __typename
-        }
-        orderNo
-        tags {
-            id
-            name
-            __typename
-        }
-        priceBreakup {
-            breakupDetails
-            id
-        }
-        brand {
-            logo
-            name
-            slug
-            id
-        }
-        sizeGuide {
-            id
-            name
-            sizedetail
-            sizeimg
-            slug
-        }
-    }
-
-    fragment ProductVariantAttributes on Product {
+    attributes {
+      attribute {
         id
-        attributes {
-            attribute {
-                id
-                slug
-                name
-                inputType
-                entityType
-                valueRequired
-                unit
-                __typename
-            }
-            values {
-                ...AttributeValueDetails
-                __typename
-            }
-            __typename
-        }
-        productType {
-            id
-            variantAttributes {
-                ...VariantAttribute
-                __typename
-            }
-            __typename
-        }
-        channelListings {
-            channel {
-                id
-                name
-                currencyCode
-                __typename
-            }
-            __typename
-        }
-        __typename
-        thumbnail {
-            url
-            alt
-            __typename
-        }
-        priceBreakup {
-            breakupDetails
-            id
-        }
-        sizeGuide {
-            id
-            name
-            sizeimg
-            slug
-        }
-        brand {
-            id
-            logo
-            name
-            slug
-        }
-    }
-
-    fragment AttributeValueList on AttributeValueCountableConnection {
-        pageInfo {
-            ...PageInfo
-            __typename
-        }
-        edges {
-            cursor
-            node {
-                ...AttributeValueDetails
-                __typename
-            }
-            __typename
-        }
-        __typename
-    }
-
-    fragment PageInfo on PageInfo {
-        endCursor
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        __typename
-    }
-
-    fragment AttributeValueDetails on AttributeValue {
-        ...AttributeValue
-        plainText
-        richText
-        __typename
-    }
-
-    fragment AttributeValue on AttributeValue {
-        id
-        name
         slug
-        file {
-            ...File
-            __typename
-        }
-        reference
-        boolean
-        date
-        dateTime
-        value
-        __typename
-    }
-
-    fragment File on File {
-        url
-        contentType
-        __typename
-    }
-
-    fragment VariantAttribute on Attribute {
-        id
         name
-        slug
         inputType
         entityType
         valueRequired
         unit
-        choices(first: $firstValues, after: $afterValues, last: $lastValues, before: $beforeValues) {
-            ...AttributeValueList
-            __typename
+        choices(first: 200) {
+          ...AttributeValueList
+          __typename
         }
         __typename
-    }
-
-    fragment ChannelListingProductWithoutPricing on ProductChannelListing {
-        isPublished
-        publicationDate
-        isAvailableForPurchase
-        availableForPurchase
-        visibleInListings
-        channel {
-            id
-            name
-            currencyCode
-            __typename
-        }
+      }
+      values {
+        ...AttributeValueDetails
         __typename
+      }
+      __typename
     }
-
-    fragment ProductMedia on ProductMedia {
+    ...Product
+    __typename
+    getUpsells {
+      name
+      productId
+      __typename
+    }
+    getCrosssells {
+      name
+      productId
+      __typename
+    }
+    productFinish {
+      id
+      name
+      __typename
+    }
+    productStoneType {
+      id
+      name
+      __typename
+    }
+    productstyle {
+      id
+      name
+      __typename
+    }
+    prouctDesign {
+      id
+      name
+      __typename
+    }
+    productStonecolor {
+      id
+      name
+      __typename
+    }
+    productSize {
+      id
+      name
+      __typename
+    }
+    productItemtype {
+      id
+      name
+      __typename
+    }
+    attributes {
+      attribute {
         id
-        alt
-        sortOrder
-        url(size: 1024)
-        type
-        oembedData
-        __typename
+      }
     }
+    taxClass {
+      id
+      name
+      countries {
+        country {
+          code
+        }
+        rate
+      }
+    }
+  }
+}
 
-    fragment ProductDetailsVariant on ProductVariant {
-        id
-        sku
-        name
-        attributes {
-            attribute {
-                id
-                name
-                __typename
-            }
-            values {
-                ...AttributeValueDetails
-                __typename
-            }
-            __typename
-        }
-        media {
-            url(size: 200)
-            __typename
-        }
-        stocks {
-            ...Stock
-            __typename
-        }
-        trackInventory
-        preorder {
-            ...Preorder
-            __typename
-        }
-        channelListings {
-            ...ChannelListingProductVariant
-            __typename
-        }
-        quantityLimitPerCustomer
-        __typename
-    }
+fragment Product on Product {
+  ...ProductVariantAttributes
+  name
+  slug
+  description
+  seoTitle
+  seoDescription
+  rating
+  defaultVariant {
+    id
+    __typename
+  }
+  category {
+    id
+    name
+    __typename
+  }
+  collections {
+    id
+    name
+    __typename
+  }
+  channelListings {
+    ...ChannelListingProductWithoutPricing
+    __typename
+  }
+  media {
+    ...ProductMedia
+    __typename
+  }
+  isAvailable
+  variants {
+    ...ProductDetailsVariant
+    __typename
+  }
+  productType {
+    id
+    name
+    hasVariants
+    __typename
+  }
+  weight {
+    ...Weight
+    __typename
+  }
+  taxClass {
+    id
+    name
+    __typename
+  }
+  __typename
+  productFinish {
+    id
+    name
+    __typename
+  }
+  productStoneType {
+    id
+    name
+    __typename
+  }
+  productstyle {
+    id
+    name
+    __typename
+  }
+  prouctDesign {
+    id
+    name
+    __typename
+  }
+  productStonecolor {
+    id
+    name
+    __typename
+  }
+  productSize {
+    id
+    name
+    __typename
+  }
+  productItemtype {
+    id
+    name
+    __typename
+  }
+  orderNo
+  tags {
+    id
+    name
+    __typename
+  }
+  priceBreakup {
+    breakupDetails
+    id
+  }
+  brand {
+    logo
+    name
+    slug
+    id
+  }
+  sizeGuide {
+    id
+    name
+    sizedetail
+    sizeimg
+    slug
+  }
+}
 
-    fragment Stock on Stock {
-        id
-        quantity
-        quantityAllocated
-        warehouse {
-            ...Warehouse
-            __typename
-        }
-        __typename
+fragment ProductVariantAttributes on Product {
+  id
+  attributes {
+    attribute {
+      id
+      slug
+      name
+      inputType
+      entityType
+      valueRequired
+      unit
+      __typename
     }
+    values {
+      ...AttributeValueDetails
+      __typename
+    }
+    __typename
+  }
+  productType {
+    id
+    variantAttributes {
+      ...VariantAttribute
+      __typename
+    }
+    __typename
+  }
+  channelListings {
+    channel {
+      id
+      name
+      currencyCode
+      __typename
+    }
+    __typename
+  }
+  __typename
+  thumbnail {
+    url
+    alt
+    __typename
+  }
+  priceBreakup {
+    breakupDetails
+    id
+  }
+  sizeGuide {
+    id
+    name
+    sizeimg
+    slug
+  }
+  brand {
+    id
+    logo
+    name
+    slug
+  }
+}
 
-    fragment Warehouse on Warehouse {
-        id
-        name
-        __typename
+fragment AttributeValueList on AttributeValueCountableConnection {
+  pageInfo {
+    ...PageInfo
+    __typename
+  }
+  edges {
+    cursor
+    node {
+      ...AttributeValueDetails
+      __typename
     }
+    __typename
+  }
+  __typename
+}
 
-    fragment Preorder on PreorderData {
-        globalThreshold
-        globalSoldUnits
-        endDate
-        __typename
-    }
+fragment PageInfo on PageInfo {
+  endCursor
+  hasNextPage
+  hasPreviousPage
+  startCursor
+  __typename
+}
 
-    fragment ChannelListingProductVariant on ProductVariantChannelListing {
-        id
-        channel {
-            id
-            name
-            currencyCode
-            __typename
-        }
-        price {
-            ...Money
-            __typename
-        }
-        costPrice {
-            ...Money
-            __typename
-        }
-        preorderThreshold {
-            quantity
-            soldUnits
-            __typename
-        }
-        __typename
-    }
+fragment AttributeValueDetails on AttributeValue {
+  ...AttributeValue
+  plainText
+  richText
+  __typename
+}
 
-    fragment Money on Money {
-        amount
-        currency
-        __typename
-    }
+fragment AttributeValue on AttributeValue {
+  id
+  name
+  slug
+  file {
+    ...File
+    __typename
+  }
+  reference
+  boolean
+  date
+  dateTime
+  value
+  __typename
+}
 
-    fragment Weight on Weight {
-        unit
-        value
-        __typename
+fragment File on File {
+  url
+  contentType
+  __typename
+}
+
+fragment VariantAttribute on Attribute {
+  id
+  name
+  slug
+  inputType
+  entityType
+  valueRequired
+  unit
+  choices(
+    first: $firstValues
+    after: $afterValues
+    last: $lastValues
+    before: $beforeValues
+  ) {
+    ...AttributeValueList
+    __typename
+  }
+  __typename
+}
+
+fragment ChannelListingProductWithoutPricing on ProductChannelListing {
+  isPublished
+  publicationDate
+  isAvailableForPurchase
+  availableForPurchase
+  visibleInListings
+  channel {
+    id
+    name
+    currencyCode
+    __typename
+  }
+  __typename
+}
+
+fragment ProductMedia on ProductMedia {
+  id
+  alt
+  sortOrder
+  url(size: 1024)
+  type
+  oembedData
+  __typename
+}
+
+fragment ProductDetailsVariant on ProductVariant {
+  id
+  sku
+  name
+  attributes {
+    attribute {
+      id
+      name
+      __typename
     }
+    values {
+      ...AttributeValueDetails
+      __typename
+    }
+    __typename
+  }
+  media {
+    url(size: 200)
+    __typename
+  }
+  stocks {
+    ...Stock
+    __typename
+  }
+  trackInventory
+  preorder {
+    ...Preorder
+    __typename
+  }
+  channelListings {
+    ...ChannelListingProductVariant
+    __typename
+  }
+  quantityLimitPerCustomer
+  __typename
+}
+
+fragment Stock on Stock {
+  id
+  quantity
+  quantityAllocated
+  warehouse {
+    ...Warehouse
+    __typename
+  }
+  __typename
+}
+
+fragment Warehouse on Warehouse {
+  id
+  name
+  __typename
+}
+
+fragment Preorder on PreorderData {
+  globalThreshold
+  globalSoldUnits
+  endDate
+  __typename
+}
+
+fragment ChannelListingProductVariant on ProductVariantChannelListing {
+  id
+  channel {
+    id
+    name
+    currencyCode
+    __typename
+  }
+  price {
+    ...Money
+    __typename
+  }
+  costPrice {
+    ...Money
+    __typename
+  }
+  preorderThreshold {
+    quantity
+    soldUnits
+    __typename
+  }
+  __typename
+}
+
+fragment Money on Money {
+  amount
+  currency
+  __typename
+}
+
+fragment Weight on Weight {
+  unit
+  value
+  __typename
+}
 `;
 
 export const PRODUCT_DETAILS = gql`

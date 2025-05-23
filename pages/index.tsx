@@ -21,7 +21,7 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState, Fragment } from 'react';
 import CommonLoader from './elements/commonLoader';
-import { CHANNEL_USD, Failure, Success, WAREHOUSE_ID, formatCurrency, formatOptions, objIsEmpty, roundOff } from '@/utils/functions';
+import { CHANNEL_USD, Failure, Success, TAX_CLASS, WAREHOUSE_ID, formatCurrency, formatOptions, objIsEmpty, roundOff } from '@/utils/functions';
 import Dropdown from '../components/Dropdown';
 import IconCaretDown from '@/components/Icon/IconCaretDown';
 import Swal from 'sweetalert2';
@@ -667,6 +667,7 @@ const Index = () => {
                         order_no: row.orderNo,
                         brand,
                         size_guide,
+                        taxClass:TAX_CLASS
 
                         // brand: selectedBrand?.value,
                         // size_guide: selectedSizeGuide?.value,

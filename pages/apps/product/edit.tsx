@@ -46,6 +46,7 @@ import {
     CHANNEL_USD,
     Failure,
     Success,
+    TAX_CLASS,
     WAREHOUSE_ID,
     addCommasToNumber,
     addNewMediaFile,
@@ -147,7 +148,7 @@ const ProductEdit = (props: any) => {
     const [mediaEndCursor, setMediaEndCursor] = useState('');
     const [mediaHasNextPage, setMediaHasNextPage] = useState(false);
     const [mediaPreviousPage, setMediaPreviousPage] = useState(false);
-
+    const [priceBreakUpError, setPriceBreakUpError] = useState('');
     const [selectedBrand, setselectedBrand] = useState<any>(null);
     const [selectedSizeGuide, setSelectedSizeGuide] = useState<any>(null);
 
@@ -234,6 +235,9 @@ const ProductEdit = (props: any) => {
     const [updateProduct, { loading: updateProductLoad }] = useMutation(UPDATE_PRODUCT);
     const [deleteVarient, { loading: deleteVariantLoad }] = useMutation(DELETE_VARIENT);
     const longPressTimeout = useRef(null);
+
+    const [columns, setColumns] = useState([]);
+    const [rows, SetRows] = useState([]);
 
     const [addNewImages] = useMutation(ADD_NEW_MEDIA_IMAGE);
     const [updateImages, { loading: mediaUpdateLoading }] = useMutation(UPDATE_MEDIA_IMAGE);
@@ -398,7 +402,6 @@ const ProductEdit = (props: any) => {
 
     const productsDetails = async () => {
         try {
-
             if (productDetails) {
                 if (productDetails && productDetails?.product) {
                     const data = productDetails?.product;
@@ -485,7 +488,6 @@ const ProductEdit = (props: any) => {
                         setVariants(variant);
                     }
                     setPublish(data?.channelListings[0]?.isPublished == true ? 'published' : 'draft');
-
                 }
             }
         } catch (error) {
@@ -557,6 +559,7 @@ const ProductEdit = (props: any) => {
         if (editorInstance) {
             return;
         }
+
 
         // Dynamically import the EditorJS module
         import('@editorjs/editorjs').then(({ default: EditorJS }) => {
@@ -769,6 +772,8 @@ const ProductEdit = (props: any) => {
 
     const validateMainFields = (savedContent) => {
         let errors: any;
+        const hasEmptyCells = rows.some((row) => columns.some((col) => !row[col] || row[col].trim() === ''));
+
         if (publish !== 'draft') {
             errors = {
                 productName: productName == '' ? 'Product name cannot be empty' : '',
@@ -778,6 +783,14 @@ const ProductEdit = (props: any) => {
                 description: savedContent?.blocks?.length == 0 ? 'Description cannot be empty' : '',
                 shortDescription: shortDescription == '' ? 'Short description cannot be empty' : '',
                 category: selectedCat?.length == 0 ? 'Category cannot be empty' : '',
+                priceBreakup:
+                    columns.length == 0
+                        ? 'At least column is required'
+                        : columns.length > 0 && rows.length == 0
+                        ? 'At least one row is required if columns are added.'
+                        : hasEmptyCells
+                        ? 'All row cells must be filled.'
+                        : '',
             };
         } else {
             errors = {
@@ -839,6 +852,7 @@ const ProductEdit = (props: any) => {
                 setShortDesErrMsg(errors.shortDescription);
                 setCategoryErrMsg(errors.category);
                 setVariantErrors(variantErrors);
+                setPriceBreakUpError(errors?.priceBreakup);
 
                 if (Object.values(errors).some((msg) => msg !== '') || variantErrors.some((err) => Object.keys(err).length > 0)) {
                     // setCreateLoading(false);
@@ -879,6 +893,7 @@ const ProductEdit = (props: any) => {
                                 attributes: att,
                                 brand: selectedBrand?.value,
                                 size_guide: selectedSizeGuide?.value,
+                                taxClass: TAX_CLASS,
                             },
                             firstValues: 10,
                         },
@@ -931,6 +946,7 @@ const ProductEdit = (props: any) => {
                                 order_no: menuOrder,
                                 brand: selectedBrand?.value,
                                 size_guide: selectedSizeGuide?.value,
+                                taxClass: TAX_CLASS,
                             },
                             firstValues: 10,
                         },
@@ -1652,6 +1668,8 @@ const ProductEdit = (props: any) => {
             </tbody>
         </table>`;
         setTableHtml(tableHTML);
+        setColumns(columns);
+        SetRows(rows);
     };
 
     return (
@@ -1756,6 +1774,7 @@ const ProductEdit = (props: any) => {
                                 Price Breakup
                             </label>
                             <DynamicSizeTable tableData={tableData} htmlTableString={tableHtml} />
+                            {priceBreakUpError && <p className="error-message mt-1 text-red-500 ">{priceBreakUpError}</p>}
                         </div>
                         <div className="panel mb-5 ">
                             {/* <div className="mb-5 flex flex-col border-b border-gray-200 pb-5 pl-10 sm:flex-row">

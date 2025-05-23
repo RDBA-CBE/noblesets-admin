@@ -18,7 +18,9 @@ export const CHANNEL_USD = 'Q2hhbm5lbDox';
 
 export const CHANNEL_INR = 'Q2hhbm5lbDoy';
 
-export const PRODUCT_TYPE = "UHJvZHVjdFR5cGU6Mw=="
+export const PRODUCT_TYPE = 'UHJvZHVjdFR5cGU6Mw==';
+
+export const TAX_CLASS = 'VGF4Q2xhc3M6NA==';
 
 export const capitalizeFLetter = (string = '') => {
     if (string.length > 0) {

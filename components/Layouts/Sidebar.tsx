@@ -253,6 +253,9 @@ const Sidebar = () => {
                                                 <li>
                                                     <Link href="/apps/custom_reports" target='_blank'>{t('Custom Products')}</Link>
                                                 </li>
+                                                <li>
+                                                    <Link href="/apps/tax" target='_blank'>{t('Tax')}</Link>
+                                                </li>
                                                  <li>
                                                     <Link href="/product/warehouse">{t('Warehouse')}</Link>
                                                 </li>

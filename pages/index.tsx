@@ -41,6 +41,7 @@ import IconX from '@/components/Icon/IconX';
 import ErrorMessage from '@/components/Layouts/ErrorMessage';
 import CategorySelect from '@/components/CategorySelect';
 import TagSelect from '@/components/TagSelect';
+import { UPDATE_PRICE_BREAKUP } from '@/query/priceBreakUp';
 
 const Index = () => {
     const PAGE_SIZE = 20;
@@ -128,6 +129,8 @@ const Index = () => {
     const { refetch: refreshfetch } = useQuery(UPDATED_PRODUCT_PAGINATION);
     const [updateProduct] = useMutation(UPDATE_PRODUCT);
     const [updateVariant] = useMutation(UPDATE_VARIANT);
+    const [priceBreakupUpdate] = useMutation(UPDATE_PRICE_BREAKUP);
+
     const { data: productCat, refetch: categorySearchRefetch } = useQuery(NEW_PARENT_CATEGORY_LIST);
 
     const { data: parentList } = useQuery(PARENT_CATEGORY_LIST, {
@@ -667,7 +670,7 @@ const Index = () => {
                         order_no: row.orderNo,
                         brand,
                         size_guide,
-                        taxClass:TAX_CLASS
+                        taxClass: TAX_CLASS,
 
                         // brand: selectedBrand?.value,
                         // size_guide: selectedSizeGuide?.value,
@@ -847,6 +850,7 @@ const Index = () => {
                 deleteDuplicateProduct(productId, row);
                 setLoadingRows((prev) => ({ ...prev, [row.id]: false }));
             } else {
+                updatePriceBreakup(productId, row);
                 // if (selectedTag?.length > 0) {
                 //     assignsTagToProduct(productId);
                 //     console.log('success: ', data);
@@ -857,6 +861,22 @@ const Index = () => {
                 duplicate_refresh(row);
             }
         } catch (error) {
+            console.log('error: ', error);
+        }
+    };
+
+    const updatePriceBreakup = async (productId, row) => {
+        try {
+            const { data } = await priceBreakupUpdate({
+                variables: {
+                    id: row?.priceBreakup?.id,
+                    product: productId,
+                    breakupDetails: row?.priceBreakup?.breakupDetails,
+                },
+            });
+        } catch (error) {
+            setLoadingRows((prev) => ({ ...prev, [row.id]: false }));
+
             console.log('error: ', error);
         }
     };

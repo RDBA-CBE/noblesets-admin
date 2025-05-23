@@ -503,40 +503,45 @@ const ProductAdd = () => {
     }, [value]);
 
     const editor = useCallback(() => {
+        // Check if the window object is available and if the editorRef.current is set
         if (typeof window === 'undefined' || !editorRef.current) return;
-        if (editorInstance) return;
-      
-        (async () => {
-          const EditorJS = (await import('@editorjs/editorjs')).default;
-          const Header = (await import('@editorjs/header')).default;
-          const List = (await import('@editorjs/list')).default;
-          const Table = (await import('@editorjs/table')).default;
-      
-          const editor = new EditorJS({
-            holder: editorRef.current,
-            data: value,
-            tools: {
-              header: {
-                class: Header,
-              },
-              list: {
-                class: List,
-              },
-              table: {
-                class: Table,
-              },
-            },
-          });
-      
-          setEditorInstance(editor);
-        })();
-      
+
+        // Ensure only one editor instance is created
+        if (editorInstance) {
+            return;
+        }
+
+        // Dynamically import the EditorJS module
+        import('@editorjs/editorjs').then(({ default: EditorJS }) => {
+            // Create a new instance of EditorJS with the appropriate configuration
+            const editor = new EditorJS({
+                holder: editorRef.current,
+                data: value,
+                tools: {
+                    // Configure tools as needed
+                    header: {
+                        class: require('@editorjs/header'),
+                    },
+                    list: {
+                        class: require('@editorjs/list'),
+                    },
+                    table: {
+                        class: require('@editorjs/table'),
+                    },
+                },
+            });
+
+            // Set the editorInstance state variable
+            setEditorInstance(editor);
+        });
+
+        // Cleanup function to destroy the current editor instance when the component unmounts
         return () => {
-          if (editorInstance) {
-            editorInstance?.blocks?.clear();
-          }
+            if (editorInstance) {
+                editorInstance?.blocks?.clear();
+            }
         };
-      }, [editorInstance, value]);
+    }, [editorInstance, value]);
       
 
     const selectedCollections = (data: any) => {

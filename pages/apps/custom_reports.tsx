@@ -56,9 +56,7 @@ const Pincode = () => {
             channel: 'india-channel',
             first: PAGE_SIZE,
             after: null,
-            filter: {
-                search: search !== '' ? search : '',
-            },
+            baseProduct: search !== '' ? search : '',
         },
         onCompleted: (data) => {
             console.log('✌️data --->', data);
@@ -71,9 +69,7 @@ const Pincode = () => {
             channel: 'india-channel',
             first: PAGE_SIZE,
             after: null,
-            filter: {
-                search: '',
-            },
+            baseProduct: '',
         },
         onCompleted: (data) => {
             setTotalCount(data?.customProducts?.totalCount);
@@ -85,9 +81,7 @@ const Pincode = () => {
             channel: 'india-channel',
             first: PAGE_SIZE,
             after: null,
-            filter: {
-                search: '',
-            },
+            baseProduct: '',
         },
     });
 
@@ -113,7 +107,7 @@ const Pincode = () => {
                 id: item.node?.id,
                 baseProduct: item.node?.baseProduct?.name,
                 image: item.node?.baseProduct?.thumbnail?.url,
-                created_at: moment(item.node?.createdAt).format("DD-MM-YYYY"),
+                created_at: moment(item.node?.createdAt).format('DD-MM-YYYY'),
                 message: item.node?.customizationDetails ? JSON.parse(item.node?.customizationDetails).message : '',
             };
         });
@@ -131,9 +125,7 @@ const Pincode = () => {
                 first: PAGE_SIZE,
                 after: endCursor,
                 before: null,
-                filter: {
-                    search: search,
-                },
+                baseProduct: search,
             },
         });
     };
@@ -144,9 +136,7 @@ const Pincode = () => {
                 channel: 'india-channel',
                 last: PAGE_SIZE,
                 before: startCursor,
-                filter: {
-                    search: search,
-                },
+                baseProduct: search,
             },
         });
     };
@@ -157,12 +147,9 @@ const Pincode = () => {
                 channel: 'india-channel',
                 first: PAGE_SIZE,
                 after: null,
-
-                filter: {
-                    search: '',
-                },
+                baseProduct: '',
             });
-            setTotalCount(data?.pincodes?.totalCount);
+            setTotalCount(data?.customProducts?.totalCount);
             commonPagination(data);
         } catch (error) {
             console.log('error: ', error);
@@ -176,14 +163,13 @@ const Pincode = () => {
             const res = await categoryListRefetch({
                 variables: {
                     channel: 'india-channel',
+                    baseProduct: e,
 
-                    filter: {
-                        search: e,
-                    },
                     last: PAGE_SIZE,
                     before: startCursor,
                 },
             });
+            setTotalCount(res?.data?.customProducts?.totalCount);
             commonPagination(res?.data);
         }
     };
@@ -343,8 +329,8 @@ const Pincode = () => {
                                     accessor: 'image',
                                     render: (row) => <img src={row?.image ? row?.image : '/assets/images/placeholder.png'} alt="Product" className="h-10 w-10 object-cover ltr:mr-2 rtl:ml-2" />,
                                 },
-                                { accessor: 'name',  },
-                                { accessor: 'baseProduct', },
+                                { accessor: 'baseProduct' },
+                                { accessor: 'name' },
                                 {
                                     accessor: 'message',
 
@@ -355,7 +341,7 @@ const Pincode = () => {
                                     ),
                                 },
 
-                                { accessor: 'created_at', },
+                                { accessor: 'created_at' },
                                 {
                                     accessor: 'actions',
                                     title: 'Actions',

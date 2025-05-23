@@ -95,10 +95,10 @@ const CreateCoupon = () => {
             }));
 
             setState({
-                standardShippingRupee: shippingData.standardShippingINR.amount.toString(),
-                standardShippingDollar: shippingData.standardShippingUSD.amount.toString(),
-                expressShippingRupee: shippingData.expressShippingINR.amount.toString(),
-                expressShippingDollar: shippingData.expressShippingUSD.amount.toString(),
+                standardShippingRupee: shippingData?.standardShippingINR?.amount?.toString(),
+                standardShippingDollar: shippingData?.standardShippingUSD?.amount?.toString(),
+                expressShippingRupee: shippingData?.expressShippingINR?.amount?.toString(),
+                expressShippingDollar: shippingData?.expressShippingUSD?.amount?.toString(),
                 zoneName: matchedZone?.node?.name,
                 selectedCountry: matchedZone?.node?.name == 'India zone' ? { value: 'IN', label: 'India' } : { value: 'US', label: 'Other Countries' },
                 shippingMethodId: matchedZone?.node?.id,

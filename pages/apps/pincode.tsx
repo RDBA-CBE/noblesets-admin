@@ -184,8 +184,10 @@ const Pincode = () => {
     };
 
     const SubmittedForm = Yup.object().shape({
-        name: Yup.string().required('Please fill the Name'),
-        pincode: Yup.number().required('Please fill the Name'),
+        name: Yup.string().required('Name is required'),
+        pincode: Yup.string()
+            .required('Pincode is required')
+            .matches(/^\d{6}$/, 'Pincode must be exactly 6 digits'),
     });
 
     // form submit
@@ -427,6 +429,7 @@ const Pincode = () => {
                                                     <div className={submitCount ? (errors.name ? 'has-error' : 'has-success') : ''}>
                                                         <label htmlFor="pincode">Pincode</label>
                                                         <Field name="pincode" type="number" id="pincode" placeholder="Enter Pincode" className="form-input" />
+                                                        <div className='text-sm'>Minimum 6 digits</div>
                                                         {submitCount ? errors.pincode ? <div className="mt-1 text-danger">{errors.pincode}</div> : <div className="mt-1 text-success"></div> : ''}
                                                     </div>
 

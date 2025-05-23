@@ -27,6 +27,7 @@ import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import IconLoader from '@/components/Icon/IconLoader';
 import DynamicSizeTable from '@/components/Layouts/DynamicTable';
 import { CREATE_SIZEGUIDE, SIZEGUIDE_DETAIL, UPDATE_SIZEGUIDE } from '@/query/sizeGuide';
+import * as Yup from 'yup';
 
 const UpdateSizeGuide = () => {
     const router = useRouter();
@@ -45,6 +46,8 @@ const UpdateSizeGuide = () => {
     const [state, setState] = useSetState({
         imgFile: null,
         imagePreview: null,
+        columns: [],
+        rows: [],
     });
 
     useEffect(() => {
@@ -173,11 +176,46 @@ const UpdateSizeGuide = () => {
                 ${tableRows}
             </tbody>
         </table>`;
-        setState({ tableHTML: tableHTML });
+        setState({ tableHTML: tableHTML,rows, columns  });
     };
+
+    const SubmittedForm = Yup.object()
+        .shape({
+            name: Yup.string().required('Please fill the Name'),
+            image: Yup.string().required('Image is required'),
+            // Custom test at the object level using `.test()` outside of individual fields
+        })
+        .test('rows-columns-validation', 'At least one row is required if columns are added, and all cells must be filled.', function (values) {
+            const { columns, rows } = this.options.context;
+
+            if (columns.length > 0 && rows.length === 0) {
+                return this.createError({ path: 'size', message: 'At least one row is required if columns are added.' });
+            }
+
+            const hasEmptyCells = rows.some((row) => columns.some((col) => !row[col] || row[col].trim() === ''));
+
+            if (hasEmptyCells) {
+                return this.createError({ path: 'size', message: 'All row cells must be filled.' });
+            }
+
+            return true;
+        });
 
     const handleSubmit = async () => {
         try {
+            const values = {
+                name: state.name,
+                image: state.imagePreview,
+            };
+
+            await SubmittedForm.validate(values, {
+                abortEarly: false,
+                context: {
+                    columns: state.columns,
+                    rows: state.rows,
+                },
+            });
+
             const body: any = {};
             if (state.imgFile) {
                 let sizeimg = await addNewImage(state.imgFile);
@@ -204,8 +242,15 @@ const UpdateSizeGuide = () => {
                 Success('Size Guide Updated Successfully');
                 router.push('/apps/sizeGuide/sizeGuide');
             }
-        } catch (error) {
-            console.log('✌️error --->', error);
+        } catch (err) {
+            if (err.inner) {
+                const newErrors = {};
+                err.inner.forEach((e) => {
+                    newErrors[e.path] = e.message;
+                });
+                setState({ errors: newErrors });
+            }
+            console.log('✌️error --->', err);
         }
     };
 
@@ -227,6 +272,7 @@ const UpdateSizeGuide = () => {
                 className="form-input"
                 required
             />
+            {state.errors?.name && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.name}</p>}
 
             <div className="active pt-5 ">
                 {!state.imagePreview ? (
@@ -255,12 +301,15 @@ const UpdateSizeGuide = () => {
                     </div>
                 )}
             </div>
+            {state.errors?.image && <div className="mt-1 text-danger">{state.errors?.image}</div>}
+
             <div>
                 <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                     Size Chart
                 </label>
 
                 <DynamicSizeTable tableData={tableData} htmlTableString={state.tableHTML} />
+                {state.errors?.size && <div className="mt-1 text-danger">{state.errors?.size}</div>}
             </div>
             <div className="flex items-center justify-end gap-5 pt-5">
                 <button type="button" className="btn btn-outline-primary  w-full md:mb-0 md:w-auto" onClick={() => router.push('/apps/sizeGuide/sizeGuide')}>

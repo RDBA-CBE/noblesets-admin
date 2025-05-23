@@ -209,9 +209,11 @@ const CreateCoupon = () => {
 
             const body = {
                 name: state.zoneName,
-                countries: state.exceptIndia,
+                countries:["IN"],
                 default: false,
-                addChannels: [CHANNEL_INR, CHANNEL_USD],
+                addChannels: [CHANNEL_USD],
+                // addChannels: [CHANNEL_INR, CHANNEL_USD],
+
             };
 
             console.log('✌️body --->', body);
@@ -246,30 +248,30 @@ const CreateCoupon = () => {
                             amount: Number(state.standardShippingRupee),
                             currency: 'INR',
                         },
-                        {
-                            channelId: CHANNEL_INR,
-                            amount: Number(state.standardShippingDollar),
-                            currency: 'USD',
-                        },
+                        // {
+                        //     channelId: CHANNEL_INR,
+                        //     amount: Number(state.standardShippingDollar),
+                        //     currency: 'USD',
+                        // },
                     ],
                 },
-                {
-                    name: 'Express Shipping',
-                    description: state.description,
-                    type: 'PRICE',
-                    shippingCosts: [
-                        {
-                            channelId: CHANNEL_USD,
-                            amount: Number(state.expressShippingRupee),
-                            currency: 'INR',
-                        },
-                        {
-                            channelId: CHANNEL_INR,
-                            amount: Number(state.expressShippingDollar),
-                            currency: 'USD',
-                        },
-                    ],
-                },
+                // {
+                //     name: 'Express Shipping',
+                //     description: state.description,
+                //     type: 'PRICE',
+                //     shippingCosts: [
+                //         {
+                //             channelId: CHANNEL_USD,
+                //             amount: Number(state.expressShippingRupee),
+                //             currency: 'INR',
+                //         },
+                //         {
+                //             channelId: CHANNEL_INR,
+                //             amount: Number(state.expressShippingDollar),
+                //             currency: 'USD',
+                //         },
+                //     ],
+                // },
             ];
 
             const promises = arr.map(async (shippingOption) => {
@@ -361,24 +363,24 @@ const CreateCoupon = () => {
                         Shipping Methods
                     </label>
 
-                    <label htmlFor="name" className="block text-lg font-medium text-gray-700">
+                    {/* <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                         Country
-                    </label>
-                    <Select
+                    </label> */}
+                    {/* <Select
                         placeholder="Select countries"
                         options={state.countryList}
                         value={state.selectedCountry}
                         onChange={(data: any) => setState({ selectedCountry: data })}
                         isSearchable={true}
                         isMulti={true}
-                    />
+                    /> */}
                     {/* {state.errors?.countryError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.countryError}</p>}
                     {state.selectedCountry && ( */}
                     <>
                         <div className="flex w-full gap-5 pt-5">
                             <div className="col-6 md:w-6/12">
                                 <label htmlFor="name" className="block text-lg font-medium text-gray-700">
-                                    Standard Shipping (₹)
+                                     Shipping Price (₹)
                                 </label>
                                 <div className="flex items-center gap-4">
                                     <input
@@ -394,7 +396,7 @@ const CreateCoupon = () => {
                                 {state.errors?.standardShippingRupeeError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.standardShippingRupeeError}</p>}
                             </div>
 
-                            <div className="col-6 md:w-6/12">
+                            {/* <div className="col-6 md:w-6/12">
                                 <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                                     Standard Shipping ($)
                                 </label>
@@ -410,9 +412,9 @@ const CreateCoupon = () => {
                                     />
                                 </div>
                                 {state.errors?.standardShippingDollar && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.standardShippingDollar}</p>}
-                            </div>
+                            </div> */}
                         </div>
-                        <div className="flex w-full gap-5 pt-5">
+                        {/* <div className="flex w-full gap-5 pt-5">
                             <div className="col-6 md:w-6/12">
                                 <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                                     Express Shipping (₹)
@@ -448,7 +450,7 @@ const CreateCoupon = () => {
                                 </div>
                                 {state.errors?.expressShippingDollarError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.expressShippingDollarError}</p>}
                             </div>
-                        </div>
+                        </div> */}
                     </>
                     {/* )} */}
                 </div>

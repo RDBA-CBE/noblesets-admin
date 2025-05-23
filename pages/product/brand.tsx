@@ -32,7 +32,6 @@ const Brands = () => {
     const [selectedRecords, setSelectedRecords] = useState<any>([]);
 
     const [recordsData, setRecordsData] = useState([]);
-console.log('✌️recordsData --->', recordsData);
     const [startCursor, setStartCursor] = useState(null);
     const [endCursor, setEndCursor] = useState(null);
     const [hasNextPage, setHasNextPage] = useState(false);
@@ -46,7 +45,9 @@ console.log('✌️recordsData --->', recordsData);
     const [modalTitle, setModalTitle] = useState(null);
     const [modalContant, setModalContant] = useState<any>(null);
     const [totalCount, setTotalCount] = useState(0);
-    const [state, setState] = useSetState({});
+    const [state, setState] = useSetState({
+        imagePreview:"",
+    });
 
     const [addNewImages, { loading: addNewImageLoading }] = useMutation(ADD_NEW_MEDIA_IMAGE);
 
@@ -187,12 +188,15 @@ console.log('✌️recordsData --->', recordsData);
                     before: startCursor,
                 },
             });
+            setTotalCount(res?.data?.brands?.totalCount);
+
             commonPagination(res?.data);
         }
     };
 
     const SubmittedForm = Yup.object().shape({
         name: Yup.string().required('Please fill the Name'),
+        image: Yup.string().required('Image is required'),
     });
 
     const generateUniqueFilenames = async (filename) => {
@@ -251,6 +255,7 @@ console.log('✌️recordsData --->', recordsData);
                 input: body,
             },
         });
+
         const bodys = {
             node: {
                 fileUrl: response.data?.fileCreate?.file?.fileUrl,
@@ -259,10 +264,18 @@ console.log('✌️recordsData --->', recordsData);
         console.log('✌️bodys --->', bodys);
         return response.data?.fileCreate?.file?.fileUrl;
     };
+
     // form submit
-    const onSubmit = async (record: any, { resetForm }: any) => {
+    const onSubmit = async () => {
         try {
-            // let imgFile = await addNewImage(state.imgFile);
+
+            const values: any = {
+                name: state.name, 
+                image: state.imagePreview,
+            };
+
+            await SubmittedForm.validate(values, { abortEarly: false });
+
             const body: any = {};
 
             if (state.imgFile) {
@@ -271,7 +284,7 @@ console.log('✌️recordsData --->', recordsData);
             }
             const variables: any = {
                 input: {
-                    name: record.name,
+                    name: state.name,
                     // logo: body.sizeimg,
                 },
             };
@@ -288,8 +301,13 @@ console.log('✌️recordsData --->', recordsData);
                     Success('Brand updated successfully');
                     refresh();
                     setModal1(false);
-                    resetForm();
-                    setState({ imagePreview: null,imgFile:null });
+                    setState({
+                        name: '',
+                        imagePreview: "",
+                        imgFile: null,
+                        errors: null,
+                    });
+                    // resetForm();
                 }
             } else {
                 if (res?.data?.brandCreate?.errors?.length > 0) {
@@ -299,22 +317,34 @@ console.log('✌️recordsData --->', recordsData);
                     Success('Brand created successfully');
                     refresh();
                     setModal1(false);
-                    resetForm();
-                    setState({ imagePreview: null,imgFile:null });
-
+                    setState({
+                        name: '',
+                        imgFile: null,
+                        errors: null,
+                        imagePreview: "",
+                    });
+                    // resetForm();
                 }
             }
-        } catch (error) {
-            console.log('error: ', error);
+        } catch (err) {
+            if (err.inner) {
+                const newErrors = {};
+                err.inner.forEach((e) => {
+                    newErrors[e.path] = e.message;
+                });
+                setState({ errors: newErrors });
+            }
+            console.log('error: ', err);
         }
     };
 
     // category table edit
     const EditCategory = (record: any) => {
+        console.log('✌️record --->', record);
         setModal1(true);
         setModalTitle(record);
         setModalContant(record);
-        setState({ imagePreview: record.logo });
+        setState({ imagePreview: record.logo, name: record.name });
     };
 
     // category table create
@@ -492,7 +522,19 @@ console.log('✌️recordsData --->', recordsData);
 
             {/* CREATE AND EDIT Tags FORM */}
             <Transition appear show={modal1} as={Fragment}>
-                <Dialog as="div" open={modal1} onClose={() => setModal1(false)}>
+                <Dialog
+                    as="div"
+                    open={modal1}
+                    onClose={() => {
+                        setModal1(false);
+                        setState({
+                            name: '',
+                            imagePreview: "",
+                            imgFile: null,
+                            errors: null,
+                        });
+                    }}
+                >
                     <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
                         <div className="fixed inset-0" />
                     </Transition.Child>
@@ -510,64 +552,62 @@ console.log('✌️recordsData --->', recordsData);
                                 <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
                                     <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
                                         <div className="text-lg font-bold">{modalTitle === null ? 'Create Brand' : 'Edit Brand'}</div>
-                                        <button type="button" className="text-white-dark hover:text-dark" onClick={() => setModal1(false)}>
+                                        <button
+                                            type="button"
+                                            className="text-white-dark hover:text-dark"
+                                            onClick={() => {
+                                                setModal1(false);
+                                                setState({
+                                                    name: '',
+                                                    imagePreview: "",
+                                                    imgFile: null,
+                                                    errors: null,
+                                                });
+                                            }}
+                                        >
                                             <IconX />
                                         </button>
                                     </div>
                                     <div className="mb-5 p-5">
-                                        <Formik
-                                            initialValues={modalContant === null ? { name: '' } : { name: modalContant?.name }}
-                                            validationSchema={SubmittedForm}
-                                            onSubmit={(values, { resetForm }) => {
-                                                onSubmit(values, { resetForm }); // Call the onSubmit function with form values and resetForm method
-                                            }}
-                                        >
-                                            {({ errors, submitCount, touched, setFieldValue, values }: any) => (
-                                                <>
-                                                    <div>
-                                                        <label htmlFor="name" className="block text-lg font-medium text-gray-700">
-                                                            Image
-                                                        </label>
-                                                    </div>
-                                                    <div className="active border-1 border p-4 pt-5">
-                                                        {!state.imagePreview ? (
-                                                            <div className="flex h-[100px] items-center justify-center">
-                                                                <div className="w-1/2 text-center">
-                                                                    <h3 className="mb-2 text-xl font-semibold">Upload Image</h3>
-                                                                    <p className="mb-2 text-sm">or</p>
-                                                                    <input type="file" accept="image/*" className="mb-2 ml-32" onChange={uploadFiles} />
-                                                                    <p className="mb-2 text-sm">Maximum upload file size: 30 MB.</p>
-                                                                </div>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="flex  items-center gap-4">
-                                                                <img src={state.imagePreview} alt="Uploaded" className="max-h-[400px] rounded shadow" />
-                                                                <div className="flex gap-3">
-                                                                    <button onClick={() => document.getElementById('image-upload').click()} className="rounded bg-blue-600 px-4 py-2 text-white">
-                                                                        Replace Image
-                                                                    </button>
-                                                                    {/* <button onClick={removeImage} className="rounded bg-red-500 px-4 py-2 text-white">
-                                                                Remove
-                                                            </button> */}
-                                                                </div>
-                                                                <input id="image-upload" type="file" accept="image/*" className="hidden" onChange={uploadFiles} />
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <Form className="space-y-5">
-                                                        <div className={submitCount ? (errors.name ? 'has-error' : 'has-success') : ''}>
-                                                            <label htmlFor="fullName">Name</label>
-                                                            <Field name="name" type="text" id="fullName" placeholder="Enter Name" className="form-input" />
-                                                            {submitCount ? errors.name ? <div className="mt-1 text-danger">{errors.name}</div> : <div className="mt-1 text-success"></div> : ''}
-                                                        </div>
+                                        <div>
+                                            <label htmlFor="name" className="block text-lg font-medium text-gray-700">
+                                                Brand Image
+                                            </label>
+                                        </div>
 
-                                                        <button type="submit" className="btn btn-primary !mt-6">
-                                                            {addLoading || updateLoading ? <IconLoader /> : 'Submit'}
+                                        <div className="active border-1 border p-4 pt-5">
+                                            {!state.imagePreview ? (
+                                                <div className="flex h-[100px] items-center justify-center">
+                                                    <div className="w-1/2 text-center">
+                                                        <h3 className="mb-2 text-xl font-semibold">Upload Image</h3>
+                                                        <p className="mb-2 text-sm">or</p>
+                                                        <input type="file" accept="image/*" className="mb-2 ml-32" onChange={uploadFiles} />
+                                                        <p className="mb-2 text-sm">Maximum upload file size: 30 MB.</p>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-4">
+                                                    <img src={state.imagePreview} alt="Uploaded" className="max-h-[400px] rounded shadow" />
+                                                    <div className="flex gap-3">
+                                                        <button type="button" onClick={() => document.getElementById('image-upload').click()} className="rounded bg-blue-600 px-4 py-2 text-white">
+                                                            Replace Image
                                                         </button>
-                                                    </Form>
-                                                </>
+                                                    </div>
+                                                    <input id="image-upload" type="file" accept="image/*" className="hidden" onChange={uploadFiles} />
+                                                </div>
                                             )}
-                                        </Formik>
+                                        </div>
+                                        {state.errors?.image && <div className="mt-1 text-danger">{state.errors?.image}</div>}
+
+                                        <div>
+                                            <label htmlFor="fullName">Name</label>
+                                            <input id="fullName" type="text" value={state.name} onChange={(e) => setState({ name: e.target.value })} placeholder="Enter Name" className="form-input" />
+                                            {state.errors?.name && <div className="mt-1 text-danger">{state.errors?.name}</div>}
+                                        </div>
+
+                                        <button type="button" className="btn btn-primary !mt-6" onClick={onSubmit}>
+                                            {addLoading || updateLoading ? <IconLoader /> : 'Submit'}
+                                        </button>
                                     </div>
                                 </Dialog.Panel>
                             </Transition.Child>

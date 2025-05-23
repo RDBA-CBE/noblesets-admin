@@ -14,14 +14,9 @@ import {
 } from '@/utils/functions';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
-import { Menu, Dropdown, Button } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
-import Modal from '@/components/Modal';
-import { DataTable, DataTableProps } from 'mantine-datatable';
-import IconTrashLines from '@/components/Icon/IconTrashLines';
-import Select from 'react-select';
+import * as Yup from 'yup';
 import { useMutation, useQuery } from '@apollo/client';
-import { ADD_NEW_MEDIA_IMAGE, COUPON_CHANNEL_UPDATE, COUPON_META_DATA, CREATE_COUPEN, GET_MEDIA_IMAGE, MEDIA_PAGINATION } from '@/query/product';
+import { ADD_NEW_MEDIA_IMAGE, MEDIA_PAGINATION } from '@/query/product';
 import { Description } from '@headlessui/react/dist/components/description/description';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import IconLoader from '@/components/Icon/IconLoader';
@@ -40,8 +35,10 @@ const CreateSizeGuide = () => {
     const { refetch: mediaRefetch } = useQuery(MEDIA_PAGINATION);
 
     const [state, setState] = useSetState({
-        imgFile: null,
-        imagePreview: null,
+        imgFile: '',
+        imagePreview: '',
+        columns: [],
+        rows: [],
     });
 
     const generateUniqueFilenames = async (filename) => {
@@ -148,11 +145,58 @@ const CreateSizeGuide = () => {
                 ${tableRows}
             </tbody>
         </table>`;
-        setState({ tableHTML: tableHTML });
+
+        setState({ tableHTML: tableHTML, rows, columns });
     };
+
+    const SubmittedForm = Yup.object()
+        .shape({
+            name: Yup.string().required('Please fill the Name'),
+            image: Yup.string().required('Image is required'),
+            // Custom test at the object level using `.test()` outside of individual fields
+        })
+        .test('rows-columns-validation', 'At least one row is required if columns are added, and all cells must be filled.', function (values) {
+            const { columns, rows } = this.options.context;
+
+            if (columns.length > 0 && rows.length === 0) {
+                return this.createError({ path: 'size', message: 'At least one row is required if columns are added.' });
+            }
+
+            const hasEmptyCells = rows.some((row) => columns.some((col) => !row[col] || row[col].trim() === ''));
+
+            if (hasEmptyCells) {
+                return this.createError({ path: 'size', message: 'All row cells must be filled.' });
+            }
+
+            return true;
+        });
 
     const handleSubmit = async () => {
         try {
+            const values = {
+                name: state.name,
+                image: state.imgFile,
+            };
+
+            await SubmittedForm.validate(values, {
+                abortEarly: false,
+                context: {
+                    columns: state.columns,
+                    rows: state.rows,
+                },
+            });
+            if (state.columns.length == 0 && state.rows.length == 0) {
+                setState({ errors: { ...state.errors, size: 'At least one row is required if columns are added.' } });
+                return null;
+            }
+
+            const hasEmptyCells = state.rows.some((row) => state.columns.some((col) => row[col].trim() === ''));
+
+            if (hasEmptyCells) {
+                setState({ errors: { ...state.errors, size: 'All row cells must be filled.' } });
+                return;
+            }
+
             const body: any = {};
             if (state.imgFile) {
                 body.sizeimg = await addNewImage(state.imgFile);
@@ -164,20 +208,26 @@ const CreateSizeGuide = () => {
                 input: {
                     sizeimg: encodeURI(body.sizeimg),
                     sizedetail: body.sizedetail,
-                    name:state.name
+                    name: state.name,
                 },
             };
 
             const res = await addSizeGuide({ variables: inputs });
-            console.log('✌️res --->', res);
             if (res?.data?.sizeGuidCreate?.errors?.length > 0) {
                 Failure(res.data.sizeGuidCreate.errors[0].message);
             } else {
                 Success('Size Guide Created Successfully');
                 router.push('/apps/sizeGuide/sizeGuide');
             }
-        } catch (error) {
-            console.log('✌️error --->', error);
+        } catch (err) {
+            if (err.inner) {
+                const newErrors = {};
+                err.inner.forEach((e) => {
+                    newErrors[e.path] = e.message;
+                });
+                setState({ errors: newErrors });
+            }
+            console.log('✌️error --->', err);
         }
     };
 
@@ -193,13 +243,13 @@ const CreateSizeGuide = () => {
                 <input
                     type="text"
                     value={state.name}
-                    onChange={(e) => setState({ name: e.target.value, errors: { nameError: '' } })}
+                    onChange={(e) => setState({ name: e.target.value, errors: { nameError: '', ...state.errors } })}
                     placeholder="Enter  Name"
                     name="name"
                     className="form-input"
                     required
                 />
-                {state.errors?.nameError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.nameError}</p>}
+                {state.errors?.name && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.name}</p>}
             </div>
             <div>
                 <label htmlFor="name" className="block text-lg font-medium text-gray-700">
@@ -231,12 +281,15 @@ const CreateSizeGuide = () => {
                     </div>
                 )}
             </div>
+            {state.errors?.image && <div className="mt-1 text-danger">{state.errors?.image}</div>}
+
             <div>
                 <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                     Size Chart
                 </label>
 
                 <DynamicSizeTable tableData={tableData} />
+                {state.errors?.size && <div className="mt-1 text-danger">{state.errors?.size}</div>}
             </div>
             <div className="flex items-center justify-end gap-5 pt-5">
                 <button type="button" className="btn btn-outline-primary  w-full md:mb-0 md:w-auto" onClick={() => router.push('/apps/sizeGuide/sizeGuide')}>

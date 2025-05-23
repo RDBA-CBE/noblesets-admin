@@ -331,6 +331,7 @@ const CustomerList = () => {
                                 {
                                     accessor: 'name',
                                     sortable: true,
+                                    title:"Product Name"
                                 },
 
                                 { accessor: 'created_at', sortable: true, title: 'Created Date' },
@@ -340,8 +341,8 @@ const CustomerList = () => {
                                     title: 'Actions',
                                     render: (row: any) => (
                                         <>
-                                            <div className="mx-auto flex w-max items-center gap-4">
-                                                <button className="flex hover:text-info" onClick={() => window.open(`/review_details?id=${row.id}`, '_blank')}>
+                                            <div className="items-center ">
+                                                <button className="flex hover:text-info" onClick={() => window.open(`/product/review_details?id=${row.id}`, '_blank')}>
                                                     <IconEye className="h-4.5 w-4.5" />
                                                 </button>
 

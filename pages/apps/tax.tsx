@@ -1,5 +1,5 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useEffect } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import IconTrashLines from '@/components/Icon/IconTrashLines';
@@ -19,12 +19,14 @@ import IconArrowBackward from '@/components/Icon/IconArrowBackward';
 import IconArrowForward from '@/components/Icon/IconArrowForward';
 import CommonLoader from '../elements/commonLoader';
 import { CREATE_PINCODE, CREATE_TAX, DELETE_PINCODE, DELETE_TAX, TAX_LIST, UPDATE_PINCODE, UPDATE_TAX } from '@/query/pincode';
+import { COUNTRY_LIST } from '@/query/product';
 
 const Tax = () => {
     const [addTag, { loading: addLoading }] = useMutation(CREATE_TAX);
     const [updateTag, { loading: updateLoading }] = useMutation(UPDATE_TAX);
     const [deleteCategory] = useMutation(DELETE_TAX);
     const [bulkDelete] = useMutation(DELETE_TAX);
+    const { data: country } = useQuery(COUNTRY_LIST);
 
     const PAGE_SIZE = 10;
 
@@ -44,7 +46,11 @@ const Tax = () => {
     const [modalTitle, setModalTitle] = useState(null);
     const [modalContant, setModalContant] = useState<any>(null);
     const [totalCount, setTotalCount] = useState(0);
+    const [countryList, setCountryList] = useState(0);
 
+    useEffect(() => {
+        getCountryList();
+    }, [country]);
     const {
         data: customerData,
         loading: getLoading,
@@ -189,6 +195,19 @@ const Tax = () => {
         rate: Yup.string().required('rate is required'),
     });
 
+    const getCountryList = async () => {
+        try {
+            const dropdownData = country?.shop?.countries?.map((item: any) => {
+                return { value: item.code, label: item.country };
+            });
+            const exceptIndia = dropdownData?.filter((item) => item.value != 'IN').map((value) => value.value);
+            setCountryList(exceptIndia);
+            // setParentLists(getparentCategoryList);
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    };
+
     // form submit
     const onSubmit = async (record: any, { resetForm }: any) => {
         try {
@@ -325,13 +344,13 @@ const Tax = () => {
                 <div className="mb-5 flex flex-col gap-5 md:flex-row md:items-center">
                     <h5 className="text-lg font-semibold dark:text-white-light">Tax ({totalCount})</h5>
 
-                    {/* <div className="flex ltr:ml-auto rtl:mr-auto">
+                    <div className="flex ltr:ml-auto rtl:mr-auto">
                         <input type="text" className="form-input mr-2 w-auto" placeholder="Search..." value={search} onChange={(e) => handleSearchChange(e.target.value)} />
 
                         <button type="button" className="btn btn-primary" onClick={() => CreateTags()}>
                             + Create
                         </button>
-                    </div> */}
+                    </div>
                 </div>
                 {getLoading ? (
                     <CommonLoader />
@@ -343,7 +362,7 @@ const Tax = () => {
                             columns={[
                                 { accessor: 'name' },
                                 { accessor: 'country' },
-                                { accessor: 'rate' },
+                                { accessor: 'rate', title: 'Rate (%)' },
                                 {
                                     accessor: 'actions',
                                     title: 'Actions',
@@ -354,11 +373,11 @@ const Tax = () => {
                                                     <IconPencil className="ltr:mr-2 rtl:ml-2" />
                                                 </button>
                                             </Tippy>
-                                            {/* <Tippy content="Delete">
+                                            <Tippy content="Delete">
                                                 <button type="button" onClick={() => DeleteCategory(row)}>
                                                     <IconTrashLines />
                                                 </button>
-                                            </Tippy> */}
+                                            </Tippy>
                                         </>
                                     ),
                                 },

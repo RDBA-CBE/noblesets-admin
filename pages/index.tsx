@@ -21,7 +21,7 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState, Fragment } from 'react';
 import CommonLoader from './elements/commonLoader';
-import { CHANNEL_USD, Failure, Success, TAX_CLASS, WAREHOUSE_ID, formatCurrency, formatOptions, objIsEmpty, roundOff } from '@/utils/functions';
+import { CHANNEL_USD, FRONTEND_URL, Failure, Success, TAX_CLASS, WAREHOUSE_ID, formatCurrency, formatOptions, objIsEmpty, roundOff } from '@/utils/functions';
 import Dropdown from '../components/Dropdown';
 import IconCaretDown from '@/components/Icon/IconCaretDown';
 import Swal from 'sweetalert2';
@@ -1433,7 +1433,7 @@ const Index = () => {
                                                     if (row.status == 'Draft') {
                                                         Failure('Product is Draft !');
                                                     } else {
-                                                        window.open(`http://www1.prade.in/product-details/${row?.slug}`, '_blank'); // '_blank' parameter opens the link in a new tab
+                                                        window.open(`${FRONTEND_URL}/product-details/${row?.slug}`, '_blank'); // '_blank' parameter opens the link in a new tab
                                                     }
                                                 }}
                                             >

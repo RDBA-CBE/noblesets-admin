@@ -136,6 +136,7 @@ const CustomerList = () => {
                 ...item.node,
                 image: item?.node.thumbnail,
                 name: `${item.node.product?.name} `,
+                productId:item.node.product?.id,
                 created_at: moment(item.node.created_at).format('YYYY-MM-DD'),
             }))
         );
@@ -342,7 +343,7 @@ const CustomerList = () => {
                                     render: (row: any) => (
                                         <>
                                             <div className="items-center ">
-                                                <button className="flex hover:text-info" onClick={() => window.open(`/product/review_details?id=${row.id}`, '_blank')}>
+                                                <button className="flex hover:text-info" onClick={() => window.open(`/product/review_details?id=${row.productId}`, '_blank')}>
                                                     <IconEye className="h-4.5 w-4.5" />
                                                 </button>
 

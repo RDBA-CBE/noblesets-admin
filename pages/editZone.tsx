@@ -45,65 +45,69 @@ const CreateCoupon = () => {
                 console.warn('Shipping zone not found');
                 return;
             }
-
+            if (matchedZone?.node?.shippingMethods?.length > 0) {
+                const standardShippingRupee = matchedZone?.node?.shippingMethods[0];
+                const price = standardShippingRupee?.channelListings?.[0]?.price?.amount.toString();
+                setState({ shippingMethod: matchedZone, zoneName: matchedZone?.node?.name, standardShippingRupee: price });
+            }
             // Initial output structure
-            const shippingData = {
-                standardShippingUSD: null,
-                expressShippingUSD: null,
-                standardShippingINR: null,
-                expressShippingINR: null,
-            };
+            // const shippingData = {
+            //     standardShippingUSD: null,
+            //     expressShippingUSD: null,
+            //     standardShippingINR: null,
+            //     expressShippingINR: null,
+            // };
 
-            matchedZone.node.shippingMethods.forEach((method) => {
-                method.channelListings.forEach((listing) => {
-                    const isUSD = listing.channel.name === 'USD';
-                    const isINR = listing.channel.name === 'INR';
+            // matchedZone.node.shippingMethods.forEach((method) => {
+            //     method.channelListings.forEach((listing) => {
+            //         const isUSD = listing.channel.name === 'USD';
+            //         const isINR = listing.channel.name === 'INR';
 
-                    if (method.name === 'Standard Shipping') {
-                        if (isUSD) {
-                            shippingData.standardShippingUSD = {
-                                id: method.id,
-                                amount: listing.price.amount,
-                            };
-                        } else if (isINR) {
-                            shippingData.standardShippingINR = {
-                                id: method.id,
-                                amount: listing.price.amount,
-                            };
-                        }
-                    } else if (method.name === 'Express Shipping') {
-                        if (isUSD) {
-                            shippingData.expressShippingUSD = {
-                                id: method.id,
-                                amount: listing.price.amount,
-                            };
-                        } else if (isINR) {
-                            shippingData.expressShippingINR = {
-                                id: method.id,
-                                amount: listing.price.amount,
-                            };
-                        }
-                    }
-                });
-            });
+            //         if (method.name === 'Standard Shipping') {
+            //             if (isUSD) {
+            //                 shippingData.standardShippingUSD = {
+            //                     id: method.id,
+            //                     amount: listing.price.amount,
+            //                 };
+            //             } else if (isINR) {
+            //                 shippingData.standardShippingINR = {
+            //                     id: method.id,
+            //                     amount: listing.price.amount,
+            //                 };
+            //             }
+            //         } else if (method.name === 'Express Shipping') {
+            //             if (isUSD) {
+            //                 shippingData.expressShippingUSD = {
+            //                     id: method.id,
+            //                     amount: listing.price.amount,
+            //                 };
+            //             } else if (isINR) {
+            //                 shippingData.expressShippingINR = {
+            //                     id: method.id,
+            //                     amount: listing.price.amount,
+            //                 };
+            //             }
+            //         }
+            //     });
+            // });
 
-            const arr = [];
-            arr.push(shippingData);
-            const output = Object.entries(arr[0]).map(([key, value]) => ({
-                name: key,
-                ...value,
-            }));
+            // const arr = [];
+            // arr.push(shippingData);
+            // const output = Object.entries(arr[0]).map(([key, value]) => ({
+            //     name: key,
+            //     ...value,
+            // }));
 
-            setState({
-                standardShippingRupee: shippingData?.standardShippingINR?.amount?.toString(),
-                standardShippingDollar: shippingData?.standardShippingUSD?.amount?.toString(),
-                expressShippingRupee: shippingData?.expressShippingINR?.amount?.toString(),
-                expressShippingDollar: shippingData?.expressShippingUSD?.amount?.toString(),
-                zoneName: matchedZone?.node?.name,
-                selectedCountry: matchedZone?.node?.name == 'India zone' ? { value: 'IN', label: 'India' } : { value: 'US', label: 'Other Countries' },
-                shippingMethodId: matchedZone?.node?.id,
-                array: output,
-            });
+            // setState({
+            //     standardShippingRupee: shippingData?.standardShippingINR?.amount?.toString(),
+            //     standardShippingDollar: shippingData?.standardShippingUSD?.amount?.toString(),
+            //     expressShippingRupee: shippingData?.expressShippingINR?.amount?.toString(),
+            //     expressShippingDollar: shippingData?.expressShippingUSD?.amount?.toString(),
+            //     zoneName: matchedZone?.node?.name,
+            //     selectedCountry: matchedZone?.node?.name == 'India zone' ? { value: 'IN', label: 'India' } : { value: 'US', label: 'Other Countries' },
+            //     shippingMethodId: matchedZone?.node?.id,
+            //     array: output,
+            // });
         } catch (error) {
             console.log('✌️error --->', error);
         }
@@ -123,30 +127,43 @@ const CreateCoupon = () => {
 
     const updateAmount = async () => {
         try {
-            const addChannels = await Promise.all(
-                state.array.map((item) =>
-                    updateChannelList({
-                        variables: {
-                            id: item?.id,
-                            input: {
-                                addChannels: [
-                                    {
-                                        channelId: item?.name === 'expressShippingINR' || item?.name === 'standardShippingINR' ? CHANNEL_USD : CHANNEL_INR,
-                                        price:
-                                            item?.name === 'standardShippingUSD'
-                                                ? Number(state.standardShippingDollar)
-                                                : item?.name === 'standardShippingINR'
-                                                ? Number(state.standardShippingRupee)
-                                                : item?.name === 'expressShippingINR'
-                                                ? Number(state.expressShippingRupee)
-                                                : Number(state.expressShippingDollar),
-                                    },
-                                ],
+            const res = await updateChannelList({
+                variables: {
+                    id: state.shippingMethod?.node?.shippingMethods?.[0]?.id,
+                    input: {
+                        addChannels: [
+                            {
+                                channelId: CHANNEL_USD,
+                                price: state.standardShippingRupee,
                             },
-                        },
-                    })
-                )
-            );
+                        ],
+                    },
+                },
+            });
+            // const addChannels = await Promise.all(
+            //     state.array.map((item) =>
+            //         updateChannelList({
+            //             variables: {
+            //                 id: item?.id,
+            //                 input: {
+            //                     addChannels: [
+            //                         {
+            //                             channelId: item?.name === 'expressShippingINR' || item?.name === 'standardShippingINR' ? CHANNEL_USD : CHANNEL_INR,
+            //                             price:
+            //                                 item?.name === 'standardShippingUSD'
+            //                                     ? Number(state.standardShippingDollar)
+            //                                     : item?.name === 'standardShippingINR'
+            //                                     ? Number(state.standardShippingRupee)
+            //                                     : item?.name === 'expressShippingINR'
+            //                                     ? Number(state.expressShippingRupee)
+            //                                     : Number(state.expressShippingDollar),
+            //                         },
+            //                     ],
+            //                 },
+            //             },
+            //         })
+            //     )
+            // );
 
             router.push('/shipping_zone');
             Success('Shipping Zone updated succssfully');
@@ -186,102 +203,22 @@ const CreateCoupon = () => {
                     </div>
 
                     <div className="panel   ">
-                        <div className=" w-full   ">
+                        <div className="col-6 md:w-6/12">
                             <label htmlFor="name" className="block text-lg font-medium text-gray-700">
-                                Shipping Methods
+                                Standard Shipping (₹)
                             </label>
-
-                            <label htmlFor="name" className="block text-lg font-medium text-gray-700">
-                                Country
-                            </label>
-                            <Select
-                                placeholder="Select countries"
-                                options={state.countryList}
-                                value={state.selectedCountry}
-                                onChange={(data: any) => setState({ selectedCountry: data })}
-                                isSearchable={true}
-                                isMulti={false}
-                                isDisabled
-                            />
-                            {/* {state.errors?.countryError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.countryError}</p>}
-                    {state.selectedCountry && ( */}
-                            <>
-                                <div className="flex w-full gap-5 pt-5">
-                                    <div className="col-6 md:w-6/12">
-                                        <label htmlFor="name" className="block text-lg font-medium text-gray-700">
-                                            Standard Shipping (₹)
-                                        </label>
-                                        <div className="flex items-center gap-4">
-                                            <input
-                                                type="number"
-                                                value={state.standardShippingRupee}
-                                                onChange={(e) => setState({ standardShippingRupee: e.target.value, errors: { standardShippingRupeeError: '' } })}
-                                                placeholder="Enter amount"
-                                                name="name"
-                                                className="form-input"
-                                                required
-                                            />
-                                        </div>
-                                        {state.errors?.standardShippingRupeeError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.standardShippingRupeeError}</p>}
-                                    </div>
-
-                                    <div className="col-6 md:w-6/12">
-                                        <label htmlFor="name" className="block text-lg font-medium text-gray-700">
-                                            Standard Shipping ($)
-                                        </label>
-                                        <div className="flex items-center gap-4">
-                                            <input
-                                                type="number"
-                                                value={state.standardShippingDollar}
-                                                onChange={(e) => setState({ standardShippingDollar: e.target.value, errors: { standardShippingDollarError: '' } })}
-                                                placeholder="Enter amount"
-                                                name="name"
-                                                className="form-input"
-                                                required
-                                            />
-                                        </div>
-                                        {state.errors?.standardShippingDollar && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.standardShippingDollar}</p>}
-                                    </div>
-                                </div>
-                                <div className="flex w-full gap-5 pt-5">
-                                    <div className="col-6 md:w-6/12">
-                                        <label htmlFor="name" className="block text-lg font-medium text-gray-700">
-                                            Express Shipping (₹)
-                                        </label>
-                                        <div className="flex items-center gap-4">
-                                            <input
-                                                type="number"
-                                                value={state.expressShippingRupee}
-                                                onChange={(e) => setState({ expressShippingRupee: e.target.value, errors: { expressShippingRupeeError: '' } })}
-                                                placeholder="Enter amount"
-                                                name="name"
-                                                className="form-input"
-                                                required
-                                            />
-                                        </div>
-                                        {state.errors?.expressShippingRupeeError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.expressShippingRupeeError}</p>}
-                                    </div>
-
-                                    <div className="col-6 md:w-6/12">
-                                        <label htmlFor="name" className="block text-lg font-medium text-gray-700">
-                                            Express Shipping ($)
-                                        </label>
-                                        <div className="flex items-center gap-4">
-                                            <input
-                                                type="number"
-                                                value={state.expressShippingDollar}
-                                                onChange={(e) => setState({ expressShippingDollar: e.target.value, errors: { expressShippingDollarError: '' } })}
-                                                placeholder="Enter amount"
-                                                name="name"
-                                                className="form-input"
-                                                required
-                                            />
-                                        </div>
-                                        {state.errors?.expressShippingDollarError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.expressShippingDollarError}</p>}
-                                    </div>
-                                </div>
-                            </>
-                            {/* )} */}
+                            <div className="flex items-center gap-4">
+                                <input
+                                    type="number"
+                                    value={state.standardShippingRupee}
+                                    onChange={(e) => setState({ standardShippingRupee: e.target.value, errors: { standardShippingRupeeError: '' } })}
+                                    placeholder="Enter amount"
+                                    name="name"
+                                    className="form-input"
+                                    required
+                                />
+                            </div>
+                            {state.errors?.standardShippingRupeeError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.standardShippingRupeeError}</p>}
                         </div>
                     </div>
 

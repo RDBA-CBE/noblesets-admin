@@ -41,6 +41,7 @@ import {
     MEDIA_PAGINATION,
     UPDATED_PRODUCT_PAGINATION,
     NEW_PARENT_CATEGORY_LIST,
+    VARIANT_UPDATES,
 } from '@/query/product';
 import {
     CHANNEL_USD,
@@ -227,6 +228,8 @@ const ProductEdit = (props: any) => {
     const [updateProductChannelList, { loading: updateChannelLoad }] = useMutation(UPDATE_PRODUCT_CHANNEL);
     const [updateVariantList, { loading: updateVariantListLoad }] = useMutation(UPDATE_VARIANT_LIST);
     const [updateVariant, { loading: updateVariantLoad }] = useMutation(UPDATE_VARIANT);
+    const [updateSingleVariant, { loading: updateSingleVariantLoad }] = useMutation(VARIANT_UPDATES);
+
     const [updateMedatData, { loading: updatemedaLoad }] = useMutation(UPDATE_META_DATA);
     // const [assignTagToProduct,{loading:updateAssignTagLoad}] = useMutation(ASSIGN_TAG_PRODUCT);
     const [mediaReorder, { loading: updateMediaReorderLoad }] = useMutation(PRODUCTS_MEDIA_ORDERS);
@@ -559,7 +562,6 @@ const ProductEdit = (props: any) => {
         if (editorInstance) {
             return;
         }
-
 
         // Dynamically import the EditorJS module
         import('@editorjs/editorjs').then(({ default: EditorJS }) => {
@@ -1040,6 +1042,7 @@ const ProductEdit = (props: any) => {
                 sku: item.sku,
                 name: item.name,
                 trackInventory: item.stackMgmt,
+
                 channelListings: {
                     update: [
                         {
@@ -1061,46 +1064,57 @@ const ProductEdit = (props: any) => {
 
             // const NewAddedVariant = arrayOfVariants.filter((item) => item.id == undefined);
             const NewAddedVariant = variants.filter((item) => item.id == undefined || item.id == '');
+console.log('✌️variants --->', variants);
 
             const updateArr = arrayOfVariants.filter((item) => item.id != undefined || item.id != '');
+            console.log('✌️updateArr --->', updateArr);
 
             if (NewAddedVariant?.length > 0) {
                 bulkVariantCreate(NewAddedVariant);
             } else {
-                const { data } = await updateVariant({
-                    variables: {
-                        product: id,
-                        input: updateArr,
-                        errorPolicy: 'REJECT_FAILED_ROWS',
-                    },
-                });
+console.log('✌️else --->', );
+                if (updateArr?.length > 0) {
+                    variants?.map(async (variant: any) => {
+                        const { data } = await updateSingleVariant({
+                            variables: {
+                                variantId:variant?.id,
 
-                if (data?.productVariantBulkUpdate?.errors?.length > 0) {
-                    setUpdateLoading(false);
-                    Failure(data?.productVariantBulkUpdate?.errors[0]?.message);
-                } else if (data?.productVariantBulkUpdate?.results[0]?.errors?.length > 0) {
-                    setUpdateLoading(false);
-                    Failure(data?.productVariantBulkUpdate?.results[0]?.errors[0]?.message);
-                } else {
-                    const results = data?.productVariantBulkUpdate?.results || [];
+                                // variantId: variant?.id, // Replace with actual variant global ID
+                                channelId: CHANNEL_USD, // Replace with actual channel global ID
+                                price: Number(variant?.regularPrice),
+                                costPrice: Number(variant?.regularPrice)
+                            },
+                        });
+                        console.log('✌️data --->', data);
+                    });
 
-                    if (results.length > 0) {
-                        // Find the first result with errors
-                        const firstErrorResult = results.find((result) => result.errors?.length > 0);
+                    if (data?.productVariantBulkUpdate?.errors?.length > 0) {
+                        setUpdateLoading(false);
+                        Failure(data?.productVariantBulkUpdate?.errors[0]?.message);
+                    } else if (data?.productVariantBulkUpdate?.results[0]?.errors?.length > 0) {
+                        setUpdateLoading(false);
+                        Failure(data?.productVariantBulkUpdate?.results[0]?.errors[0]?.message);
+                    } else {
+                        const results = data?.productVariantBulkUpdate?.results || [];
 
-                        if (firstErrorResult) {
-                            const errorMessage = firstErrorResult.errors[0]?.message;
-                            if (errorMessage) {
-                                Failure(errorMessage);
+                        if (results.length > 0) {
+                            // Find the first result with errors
+                            const firstErrorResult = results.find((result) => result.errors?.length > 0);
+
+                            if (firstErrorResult) {
+                                const errorMessage = firstErrorResult.errors[0]?.message;
+                                if (errorMessage) {
+                                    Failure(errorMessage);
+                                }
+                            } else {
+                                if (NewAddedVariant?.length === 0) {
+                                    updateMetaData();
+                                }
                             }
                         } else {
                             if (NewAddedVariant?.length === 0) {
                                 updateMetaData();
                             }
-                        }
-                    } else {
-                        if (NewAddedVariant?.length === 0) {
-                            updateMetaData();
                         }
                     }
                 }
@@ -1182,7 +1196,6 @@ const ProductEdit = (props: any) => {
                     id: id,
                     inputs: variantArr,
                 },
-                // variables: { email: formData.email, password: formData.password },
             });
 
             if (data?.productVariantBulkCreate?.errors?.length > 0) {
@@ -1211,7 +1224,7 @@ const ProductEdit = (props: any) => {
 
                 const variantArr = [
                     {
-                        channelId: CHANNEL_USD, // Fixed or dynamic channelId
+                        channelId: CHANNEL_USD,
                         price: newVariantData.regularPrice,
                         costPrice: newVariantData.regularPrice,
                     },

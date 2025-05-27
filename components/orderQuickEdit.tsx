@@ -40,6 +40,7 @@ import { useMutation } from '@apollo/client';
 import {
     Failure,
     NotesMsg,
+    SERVER_URL,
     Success,
     WAREHOUSE_ID,
     addCommasToNumber,
@@ -801,7 +802,7 @@ const OrderQuickEdit = (props: any) => {
                                                     <button
                                                         type="submit"
                                                         className="btn btn-outline-primary"
-                                                        onClick={() => window.open('http://file.prade.in' + orderData?.metadata[2]?.value, '_blank')}
+                                                        onClick={() => window.open(SERVER_URL + orderData?.metadata[2]?.value, '_blank')}
                                                     >
                                                         <IconDownload />
                                                     </button>

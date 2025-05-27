@@ -48,6 +48,7 @@ import {
     FullfillQuantity,
     NotesMsg,
     Quantity,
+    SERVER_URL,
     Success,
     WAREHOUSE_ID,
     addCommasToNumber,
@@ -2395,7 +2396,7 @@ const Editorder = () => {
                                         <button type="submit" className="btn btn-primary" onClick={() => payslipSend()}>
                                             {sendPayslipLoading ? <IconLoader /> : 'Send'}
                                         </button>
-                                        <button type="submit" className="btn btn-outline-primary" onClick={() => window.open('http://file.prade.in' + orderData?.metadata[2]?.value, '_blank')}>
+                                        <button type="submit" className="btn btn-outline-primary" onClick={() => window.open(SERVER_URL + orderData?.metadata[2]?.value, '_blank')}>
                                             <IconDownload />
                                         </button>
                                     </div>

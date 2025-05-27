@@ -61,8 +61,8 @@ const LoginBoxed = () => {
     const submitForm = async () => {
         setLoading(true);
         const { data } = await addFormData({
-            // variables: { email: formData.email, password: formData.password },
-            variables: { email: "inbarepute@gmail.com", password: "Tamilan123*" },
+            variables: { email: formData.email, password: formData.password },
+            // variables: { email: "inbarepute@gmail.com", password: "Tamilan123*" },
 
         });
         if (data?.tokenCreate?.errors?.length > 0) {
@@ -76,6 +76,9 @@ const LoginBoxed = () => {
             localStorage.setItem('userEmail', data?.tokenCreate?.user?.email);
             localStorage.setItem('userName', data?.tokenCreate?.user?.firstName);
             localStorage.setItem('refreshToken', data?.tokenCreate?.refreshToken);
+            localStorage.setItem('isAdmin', data?.tokenCreate?.user?.isSuperUser);
+
+            
 
             // notifySuccess("Login successfully");
             const checkoutToken: any = await getCheckoutToken(data?.data?.data?.tokenCreate?.user?.email);

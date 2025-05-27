@@ -161,7 +161,7 @@ const Coupon = () => {
                         <button type="button" className="btn btn-primary  w-full md:mb-0 md:w-auto" onClick={() => window.open('/createZone', '_blank')}>
                             + Create
                         </button>
-                    </div> 
+                    </div>
                 </div>
                 {/* <div className="mb-5 flex-col justify-end gap-5 md:flex md:flex-row md:items-center">
                     <input type="text" className="form-input mb-3 mr-2 h-[40px] w-[400px] " placeholder="Search..." value={search} onChange={(e) => handleSearchChange(e.target.value)} />
@@ -175,11 +175,13 @@ const Coupon = () => {
                             records={recordsData}
                             columns={[
                                 { accessor: 'name', sortable: true },
+                                { accessor: 'price', sortable: true },
+
 
                                 {
                                     accessor: 'actions',
                                     title: 'Actions',
-                                    render: (row:any ) => {
+                                    render: (row: any) => {
                                         return (
                                             <>
                                                 <div className=" flex w-max  gap-4">
@@ -234,7 +236,7 @@ const tableFormat = (products) => {
     return products.map((product) => ({
         name: product?.node?.name,
         id: product?.node?.id,
-
+        price: product?.node?.shippingMethods?.length > 0 ? product?.node?.shippingMethods[0]?.channelListings[0]?.price?.amount : 0,
     }));
 };
 

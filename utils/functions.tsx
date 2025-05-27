@@ -20,7 +20,12 @@ export const CHANNEL_INR = 'Q2hhbm5lbDoy';
 
 export const PRODUCT_TYPE = 'UHJvZHVjdFR5cGU6Mw==';
 
-export const TAX_CLASS = 'VGF4Q2xhc3M6NA==';
+export const TAX_CLASS = 'VGF4Q2xhc3M6NQ==';
+
+export const SERVER_URL = 'http://noblesetsbkend.irepute.co.in';
+
+export const FRONTEND_URL = 'http://localhost:3000';
+
 
 export const capitalizeFLetter = (string = '') => {
     if (string.length > 0) {

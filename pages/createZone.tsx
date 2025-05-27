@@ -209,10 +209,9 @@ const CreateCoupon = () => {
 
             const body = {
                 name: state.zoneName,
-                countries:["IN"],
+                countries:state.exceptIndia,
                 default: false,
                 addChannels: [CHANNEL_USD],
-                // addChannels: [CHANNEL_INR, CHANNEL_USD],
 
             };
 

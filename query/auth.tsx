@@ -8,12 +8,16 @@ export const LOGIN = gql`
             errors {
                 field
                 message
+                __typename
             }
             user {
                 email
                 firstName
                 id
+                __typename
+                isSuperUser
             }
+            __typename
         }
     }
 `;

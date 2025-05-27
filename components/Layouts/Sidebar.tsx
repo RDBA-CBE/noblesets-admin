@@ -57,6 +57,7 @@ const Sidebar = () => {
     const [currentMenu, setCurrentMenu] = useState<string>('');
     const [lowStockCount, setLowStockCount] = useState(0);
     const [lastUpdateCount, setLastUpdateCount] = useState(0);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const themeConfig = useSelector((state: any) => state.themeConfig);
     const semidark = useSelector((state: any) => state.themeConfig.semidark);
@@ -73,6 +74,10 @@ const Sidebar = () => {
         getLowStockCount();
         lastUpdate();
     }, [router.pathname]);
+
+    useEffect(() => {
+        checkIsAdmin();
+    }, [router]);
 
     useEffect(() => {
         const selector = document.querySelector('.sidebar ul a[href="' + window.location.pathname + '"]');
@@ -102,6 +107,18 @@ const Sidebar = () => {
         try {
             const res = await lastUpdateData();
             setLastUpdateCount(res.data?.stockUpdate?.total);
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    };
+
+    const checkIsAdmin = async () => {
+        try {
+            const isAdmin = localStorage?.getItem('isAdmin');
+            if (isAdmin) {
+                const data = JSON.parse(isAdmin);
+                setIsAdmin(data);
+            }
         } catch (error) {
             console.log('error: ', error);
         }
@@ -226,7 +243,9 @@ const Sidebar = () => {
                                                     <Link href="/">{t('All Products')}</Link>
                                                 </li>
                                                 <li>
-                                                    <Link href="/apps/product/add" target='_blank'>{t('Add New')}</Link>
+                                                    <Link href="/apps/product/add" target="_blank">
+                                                        {t('Add New')}
+                                                    </Link>
                                                 </li>
                                                 <li>
                                                     <Link href="/product/category">{t('Categories')}</Link>
@@ -244,19 +263,27 @@ const Sidebar = () => {
                                                 <li>
                                                     <Link href="/apps/sizeGuide/sizeGuide">{t('Size Guide')}</Link>
                                                 </li>
+                                                {isAdmin && (
+                                                    <li>
+                                                        <Link href="/product/reviews">{t('Reviews')}</Link>
+                                                    </li>
+                                                )}
                                                 <li>
-                                                    <Link href="/product/reviews">{t('Reviews')}</Link>
+                                                    <Link href="/apps/pincode" target="_blank">
+                                                        {t('Pincode')}
+                                                    </Link>
                                                 </li>
                                                 <li>
-                                                    <Link href="/apps/pincode" target='_blank'>{t('Pincode')}</Link>
+                                                    <Link href="/apps/custom_reports" target="_blank">
+                                                        {t('Custom Products')}
+                                                    </Link>
                                                 </li>
                                                 <li>
-                                                    <Link href="/apps/custom_reports" target='_blank'>{t('Custom Products')}</Link>
+                                                    <Link href="/apps/tax" target="_blank">
+                                                        {t('Tax')}
+                                                    </Link>
                                                 </li>
                                                 <li>
-                                                    <Link href="/apps/tax" target='_blank'>{t('Tax')}</Link>
-                                                </li>
-                                                 <li>
                                                     <Link href="/product/warehouse">{t('Warehouse')}</Link>
                                                 </li>
 
@@ -273,10 +300,10 @@ const Sidebar = () => {
                                                             <IconCaretDown />
                                                         </div>
                                                     </button> */}
-                                                    {/* <Link href="#" onClick={() => setMenuOpen(!menuOpen)}>
+                                                {/* <Link href="#" onClick={() => setMenuOpen(!menuOpen)}>
                                                         {t('Attributes')}
                                                     </Link> */}
-                                                    {/* {menuOpen && (
+                                                {/* {menuOpen && (
                                                         <ul>
                                                             <li>
                                                                 <Link href="/product/finish">{t('Finishes')}</Link>
@@ -313,24 +340,36 @@ const Sidebar = () => {
                                             </div>
                                         </Link>
                                     </li> */}
-                                    <li className="nav-item">
-                                        <Link href="/orders/orders" className="group">
-                                            <div className="flex items-center">
-                                                {/* <IconMenuChat className="shrink-0 group-hover:!text-primary" /> */}
-                                                <Image src={OrderImage.src} alt="Order" className="h-5 w-5 shrink-0 object-cover group-hover:!text-primary rtl:mr-3" width={20} height={20} />
-                                                <span className="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{t('Orders')}</span>
-                                            </div>
-                                        </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                        <Link href="/customer/customer" className="group">
-                                            <div className="flex items-center">
-                                                {/* <IconMenuChat className="shrink-0 group-hover:!text-primary" /> */}
-                                                <Image src={CustomerImage.src} alt="Customer" className="h-5 w-5 shrink-0 object-cover group-hover:!text-primary rtl:mr-3" width={20} height={20} />
-                                                <span className="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{t('Customers')}</span>
-                                            </div>
-                                        </Link>
-                                    </li>
+                                    {isAdmin && (
+                                        <>
+                                            <li className="nav-item">
+                                                <Link href="/orders/orders" className="group">
+                                                    <div className="flex items-center">
+                                                        {/* <IconMenuChat className="shrink-0 group-hover:!text-primary" /> */}
+                                                        <Image src={OrderImage.src} alt="Order" className="h-5 w-5 shrink-0 object-cover group-hover:!text-primary rtl:mr-3" width={20} height={20} />
+                                                        <span className="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{t('Orders')}</span>
+                                                    </div>
+                                                </Link>
+                                            </li>
+
+                                            <li className="nav-item">
+                                                <Link href="/customer/customer" className="group">
+                                                    <div className="flex items-center">
+                                                        {/* <IconMenuChat className="shrink-0 group-hover:!text-primary" /> */}
+                                                        <Image
+                                                            src={CustomerImage.src}
+                                                            alt="Customer"
+                                                            className="h-5 w-5 shrink-0 object-cover group-hover:!text-primary rtl:mr-3"
+                                                            width={20}
+                                                            height={20}
+                                                        />
+                                                        <span className="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{t('Customers')}</span>
+                                                    </div>
+                                                </Link>
+                                            </li>
+                                        </>
+                                    )}
+
                                     {/* <li className="nav-item">
                                         <Link href="/shipping/shippingprovider" className="group">
                                             <div className="flex items-center">
@@ -355,17 +394,17 @@ const Sidebar = () => {
                                             </div>
                                         </Link>
                                     </li>
-
-                                    <li className="nav-item">
-                                        <Link href="/reports" className="group">
-                                            <div className="flex items-center">
-                                                {/* <IconMenuReport className="shrink-0 group-hover:!text-primary" /> */}
-                                                <Image src={ReportsImage.src} alt="Reports" className="h-5 w-5 shrink-0 object-cover group-hover:!text-primary rtl:mr-3" width={20} height={20} />
-                                                <span className="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{t('Reports')}</span>
-                                            </div>
-                                        </Link>
-                                    </li>
-
+                                    {isAdmin && (
+                                        <li className="nav-item">
+                                            <Link href="/reports" className="group">
+                                                <div className="flex items-center">
+                                                    {/* <IconMenuReport className="shrink-0 group-hover:!text-primary" /> */}
+                                                    <Image src={ReportsImage.src} alt="Reports" className="h-5 w-5 shrink-0 object-cover group-hover:!text-primary rtl:mr-3" width={20} height={20} />
+                                                    <span className="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{t('Reports')}</span>
+                                                </div>
+                                            </Link>
+                                        </li>
+                                    )}
                                     <li className="menu nav-item">
                                         <button type="button" className={`${currentMenu === 'product' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Stock Management')}>
                                             <div className="flex items-center">
@@ -395,7 +434,7 @@ const Sidebar = () => {
                                                             <span className="flex items-center">{t('Out Of Stocks')}</span>
                                                         </div>
                                                         <div className=" h-8 w-8 ">
-                                                            <span className="flex items-center w-full justify-center rounded-full bg-red-500 p-2 text-xs font-bold text-white">{lowStockCount}</span>
+                                                            <span className="flex w-full items-center justify-center rounded-full bg-red-500 p-2 text-xs font-bold text-white">{lowStockCount}</span>
                                                         </div>
                                                     </Link>
                                                 </li>
@@ -405,7 +444,7 @@ const Sidebar = () => {
                                                             <span className="flex items-center">{t('Last updated details')}</span>
                                                         </div>
                                                         <div className=" h-8 w-8">
-                                                            <span className="flex items-center justify-center p-2 w-full rounded-full bg-red-500 text-xs font-bold text-white">{lastUpdateCount}</span>
+                                                            <span className="flex w-full items-center justify-center rounded-full bg-red-500 p-2 text-xs font-bold text-white">{lastUpdateCount}</span>
                                                         </div>
                                                     </Link>
                                                 </li>
@@ -490,8 +529,23 @@ const Sidebar = () => {
                                             </div>
                                         </Link>
                                     </li>
-                                   
-
+                                    {isAdmin && (
+                                        <li className="nav-item">
+                                            <Link href="/apps/staffManager" className="group">
+                                                <div className="flex items-center">
+                                                    {/* <IconMenuChat className="shrink-0 group-hover:!text-primary" /> */}
+                                                    <Image
+                                                        src={DiscountImage.src}
+                                                        alt="Discounts"
+                                                        className="h-5 w-5 shrink-0 object-cover group-hover:!text-primary rtl:mr-3"
+                                                        width={20}
+                                                        height={20}
+                                                    />
+                                                    <span className="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{t('Staff Manager')}</span>
+                                                </div>
+                                            </Link>
+                                        </li>
+                                    )}
                                     {/* <li className="nav-item">
                                         <Link href="/shipping/shipping" className="group">
                                             <div className="flex items-center">

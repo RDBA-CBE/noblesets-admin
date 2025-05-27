@@ -249,18 +249,15 @@ const Category = () => {
                 setSlugError('Slug is required');
             } else {
                 const body = {
-                    availableInGrid: true,
-                    entityType: null,
                     filterableInDashboard: true,
                     filterableInStorefront: true,
                     inputType: 'MULTISELECT',
                     name: attributeName,
                     slug: slug.trim(),
-                    storefrontSearchPosition: null,
-                    type: 'PRODUCT_TYPE',
+                    storefrontSearchPosition: 1,
+                    type: "PRODUCT_TYPE",
                     valueRequired: false,
-                    visibleInStorefront: false,
-                    values: [],
+                    visibleInStorefront: true,
                 };
 
                 const res = await createAttribute({

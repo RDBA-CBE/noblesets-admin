@@ -145,10 +145,10 @@ export default function createAttribute() {
                         filterableInStorefront: true,
                         name: state.attributeName,
                         slug: state.slug.trim(),
-                        storefrontSearchPosition: 0,
+                        storefrontSearchPosition: 1,
                         valueRequired: false,
                         visibleInStorefront: state.visibleInStorefront,
-                        unit: null,
+                        // unit: null,
                     },
                 },
             });

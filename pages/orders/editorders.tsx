@@ -49,6 +49,7 @@ import {
     FullfillQuantity,
     NotesMsg,
     Quantity,
+    SERVER_URL,
     Success,
     WAREHOUSE_ID,
     addCommasToNumber,
@@ -809,7 +810,7 @@ const Editorder = () => {
             });
             localStorage.setItem('channel', selectedCurrency);
             setCurrencyLoading(false);
-            setSelectedCurrency("")
+            setSelectedCurrency('');
             setIsOpenChannel(false);
             window.open(`/orders/new-order?orderId=${data?.draftOrderCreate?.order?.id}`);
             // router.push({
@@ -1418,6 +1419,9 @@ const Editorder = () => {
         let without_shipping_amount = Number(data?.total?.gross?.amount) - (Number(data?.shippingPrice?.gross?.amount) + Number(data?.codAmount) + Number(data?.giftWrapAmount));
         let totalRefunded = data?.totalRefunded?.amount;
         let show = false;
+        console.log('✌️totalRefunded --->', totalRefunded);
+
+        console.log('✌️without_shipping_amount --->', without_shipping_amount);
 
         if (totalRefunded < without_shipping_amount && (data?.paymentStatus == 'FULLY_CHARGED' || data?.paymentStatus == 'PARTIALLY_REFUNDED' || data.isPaid)) {
             show = true;
@@ -2507,7 +2511,7 @@ const Editorder = () => {
                                         <button type="submit" className="btn btn-primary" onClick={() => payslipSend()}>
                                             {sendPayslipLoading ? <IconLoader /> : 'Send'}
                                         </button>
-                                        <button type="submit" className="btn btn-outline-primary" onClick={() => window.open('http://file.prade.in' + orderData?.metadata[2]?.value, '_blank')}>
+                                        <button type="submit" className="btn btn-outline-primary" onClick={() => window.open(SERVER_URL + orderData?.metadata[2]?.value, '_blank')}>
                                             <IconDownload />
                                         </button>
                                     </div>

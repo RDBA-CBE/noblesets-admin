@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import IconLoader from '@/components/Icon/IconLoader';
 import axios from 'axios';
-import { Failure, Success, useSetState } from '@/utils/functions';
+import { Failure, SERVER_URL, Success, useSetState } from '@/utils/functions';
 import { error } from 'console';
 import { useRouter } from 'next/router';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
@@ -51,7 +51,7 @@ const ProductImport = () => {
             let config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: 'https://file.prade.in/import_data1/',
+                url: SERVER_URL + 'import_data1/',
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: 'JWT ' + token,

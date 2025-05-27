@@ -22,10 +22,11 @@ import CommonLoader from '../elements/commonLoader';
 import IconArrowBackward from '@/components/Icon/IconArrowBackward';
 import IconArrowForward from '@/components/Icon/IconArrowForward';
 import {} from '@/utils/constant';
-import { REVIEWS_LIST } from '@/query/reviews';
+import { REVIEW_DETAILS } from '@/query/reviews';
 
 const CustomerList = () => {
     const router = useRouter();
+    console.log('✌️router --->', router?.query?.id);
     const PAGE_SIZE = 20;
 
     const isRtl = useSelector((state: any) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -60,8 +61,9 @@ const CustomerList = () => {
         data: customerData,
         loading: getLoading,
         refetch: customerListRefetch,
-    } = useQuery(REVIEWS_LIST, {
+    } = useQuery(REVIEW_DETAILS, {
         variables: {
+            id:router?.query?.id,
             first: PAGE_SIZE,
             after: null,
             // filter: {
@@ -69,6 +71,7 @@ const CustomerList = () => {
             //     numberOfOrders: null,
             //     search: search,
             // },
+            productId: router?.query?.id ? [router?.query?.id] : [],
             sort: {
                 direction: 'DESC',
                 field: 'CREATED_AT',
@@ -82,7 +85,7 @@ const CustomerList = () => {
         },
     });
 
-    const {} = useQuery(REVIEWS_LIST, {
+    const {} = useQuery(REVIEW_DETAILS, {
         variables: {
             first: PAGE_SIZE,
             after: null,
@@ -91,6 +94,8 @@ const CustomerList = () => {
             //     numberOfOrders: null,
             //     search: '',
             // },
+            productId: router?.query?.id ? [router?.query?.id] : [],
+
             sort: {
                 direction: 'DESC',
                 field: 'CREATED_AT',
@@ -103,13 +108,13 @@ const CustomerList = () => {
         },
     });
 
-    const [fetchNextPage] = useLazyQuery(REVIEWS_LIST, {
+    const [fetchNextPage] = useLazyQuery(REVIEW_DETAILS, {
         onCompleted: (data) => {
             commonPagination(data);
         },
     });
 
-    const [fetchPreviousPage] = useLazyQuery(REVIEWS_LIST, {
+    const [fetchPreviousPage] = useLazyQuery(REVIEW_DETAILS, {
         onCompleted: (data) => {
             commonPagination(data);
         },
@@ -144,6 +149,8 @@ const CustomerList = () => {
                 //     numberOfOrders: null,
                 //     search: search,
                 // },
+                productId: router?.query?.id ? [router?.query?.id] : [],
+
                 sort: {
                     direction: 'DESC',
                     field: 'CREATED_AT',
@@ -164,6 +171,8 @@ const CustomerList = () => {
                 //     numberOfOrders: null,
                 //     search: search,
                 // },
+                productId: router?.query?.id ? [router?.query?.id] : [],
+
                 sort: {
                     direction: 'DESC',
                     field: 'CREATED_AT',
@@ -186,6 +195,8 @@ const CustomerList = () => {
                     //     dateJoined: null,
                     //     numberOfOrders: null,
                     // },
+                    productId: router?.query?.id ? [router?.query?.id] : [],
+
                     sort: {
                         direction: 'DESC',
                         field: 'CREATED_AT',
@@ -209,6 +220,8 @@ const CustomerList = () => {
                 //     numberOfOrders: null,
                 //     search: search,
                 // },
+                productId: router?.query?.id ? [router?.query?.id] : [],
+
                 sort: {
                     direction: 'DESC',
                     field: 'CREATED_AT',
@@ -229,7 +242,7 @@ const CustomerList = () => {
                     </div>
                 </div>
 
-                <div className="datatables">{getLoading || removeloading ? <CommonLoader /> : <ReviewSection reviewList={() => {}} />}</div>
+                <div className="datatables">{getLoading || removeloading ? <CommonLoader /> : <ReviewSection reviewList={recordsData} />}</div>
                 <div className="mt-5 flex justify-end gap-3">
                     <button disabled={!hasPreviousPage} onClick={handlePreviousPage} className={`btn ${!hasPreviousPage ? 'btn-disabled' : 'btn-primary'}`}>
                         <IconArrowBackward />

@@ -13,14 +13,14 @@ import IconCaretDown from '@/components/Icon/IconCaretDown';
 
 import Swal from 'sweetalert2';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { ATTRIBUTE_LIST, DELETE_ATTRIBUTE} from '@/query/product';
+import { ATTRIBUTE_LIST, DELETE_ATTRIBUTE } from '@/query/product';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import { useRouter } from 'next/router';
 import CommonLoader from '../elements/commonLoader';
 import IconArrowBackward from '@/components/Icon/IconArrowBackward';
 import IconArrowForward from '@/components/Icon/IconArrowForward';
 import Modal from '@/components/Modal';
-import { Failure, PRODUCT_TYPE, Success } from '@/utils/functions';
+import { ConvertToSlug, Failure, PRODUCT_TYPE, Success } from '@/utils/functions';
 import IconLoader from '@/components/Icon/IconLoader';
 import { CREATE_ATTRIBUTE, UPDATE_PRODUCT_TYPE } from '@/query/attribute';
 
@@ -253,9 +253,9 @@ const Category = () => {
                     filterableInStorefront: true,
                     inputType: 'MULTISELECT',
                     name: attributeName,
-                    slug: slug.trim(),
+                    slug: ConvertToSlug(slug),
                     storefrontSearchPosition: 1,
-                    type: "PRODUCT_TYPE",
+                    type: 'PRODUCT_TYPE',
                     valueRequired: false,
                     visibleInStorefront: true,
                 };

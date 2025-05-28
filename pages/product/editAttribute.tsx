@@ -1,5 +1,5 @@
 import IconTrashLines from '@/components/Icon/IconTrashLines';
-import { Failure, Success, useSetState } from '@/utils/functions';
+import { ConvertToSlug, Failure, Success, useSetState } from '@/utils/functions';
 import { DataTable } from 'mantine-datatable';
 import React, { useEffect } from 'react';
 import Select from 'react-select';
@@ -144,7 +144,7 @@ export default function createAttribute() {
                         filterableInDashboard: true,
                         filterableInStorefront: true,
                         name: state.attributeName,
-                        slug: state.slug.trim(),
+                        slug: ConvertToSlug(state.slug),
                         storefrontSearchPosition: 1,
                         valueRequired: false,
                         visibleInStorefront: state.visibleInStorefront,
@@ -293,15 +293,7 @@ export default function createAttribute() {
                 close={() => setState({ isOpen: false, manualCode: '', manualCodeErr: '' })}
                 renderComponent={() => (
                     <div className=" p-5">
-                        <input
-                            type="text"
-                            value={state.manualCode}
-                            onChange={(e) => setState({ manualCode: e.target.value })}
-                            placeholder="Enter Name"
-                            name="name"
-                            className="form-input"
-                            required
-                        />
+                        <input type="text" value={state.manualCode} onChange={(e) => setState({ manualCode: e.target.value })} placeholder="Enter Name" name="name" className="form-input" required />
                         {state.manualCodeErr && <p className="error-message mt-1 text-red-500">{state.manualCodeErr}</p>}
 
                         <div className="flex items-center justify-end gap-5 pt-5">

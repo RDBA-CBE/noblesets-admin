@@ -58,6 +58,7 @@ import {
 } from '@/query/product';
 import {
     CHANNEL_USD,
+    ConvertToSlug,
     Failure,
     PRODUCT_TYPE,
     Success,
@@ -746,7 +747,7 @@ const ProductAdd = () => {
                                     description: seoDesc,
                                     title: seoTittle,
                                 },
-                                slug: slug,
+                                slug: slug ? ConvertToSlug(slug) : '',
                                 order_no: menuOrder,
                                 brand: selectedBrand?.value,
                                 size_guide: selectedSizeGuide?.value,
@@ -808,7 +809,8 @@ const ProductAdd = () => {
                                     description: seoDesc,
                                     title: seoTittle,
                                 },
-                                slug: slug,
+                                slug: slug ? ConvertToSlug(slug) : '',
+
                                 // ...(menuOrder && menuOrder > 0 && { order_no: menuOrder }),
                                 order_no: menuOrder,
                                 brand: selectedBrand?.value,

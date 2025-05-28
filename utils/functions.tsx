@@ -26,7 +26,6 @@ export const SERVER_URL = 'https://file.prade.in';
 
 export const FRONTEND_URL = 'https://noblesets.irepute.co.in';
 
-
 export const capitalizeFLetter = (string = '') => {
     if (string.length > 0) {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -1536,4 +1535,9 @@ export const formatKeysArray = (arr) => {
         });
         return formattedObj;
     });
+};
+
+export const ConvertToSlug = (text :string) => {
+    const slug = text?.split(' ')?.join('-');
+    return slug;
 };

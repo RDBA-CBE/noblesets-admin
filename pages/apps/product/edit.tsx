@@ -45,6 +45,7 @@ import {
 } from '@/query/product';
 import {
     CHANNEL_USD,
+    ConvertToSlug,
     Failure,
     Success,
     TAX_CLASS,
@@ -890,7 +891,8 @@ const ProductEdit = (props: any) => {
                                 },
                                 upsells,
                                 crosssells,
-                                slug: slug,
+                                slug: slug ? ConvertToSlug(slug) : '',
+
                                 order_no: menuOrder,
                                 attributes: att,
                                 brand: selectedBrand?.value,
@@ -944,7 +946,7 @@ const ProductEdit = (props: any) => {
                                 },
                                 upsells,
                                 crosssells,
-                                slug: slug,
+                                slug: slug ? ConvertToSlug(slug) : '',
                                 order_no: menuOrder,
                                 brand: selectedBrand?.value,
                                 size_guide: selectedSizeGuide?.value,

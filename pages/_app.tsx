@@ -26,7 +26,7 @@ type AppPropsWithLayout = AppProps & {
 
 const App = ({ Component, pageProps }: AppPropsWithLayout) => {
     const httpLink = createHttpLink({
-        uri: 'http://noblesetsbkend.irepute.co.in/graphql/',
+        uri: 'https://noblesetsbkend.irepute.co.in/graphql/',
     });
 
     const authLink = new ApolloLink((operation, forward) => {

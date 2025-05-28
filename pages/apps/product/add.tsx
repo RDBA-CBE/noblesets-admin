@@ -411,7 +411,31 @@ const ProductAdd = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [selectedImages, setSelectedImages] = useState([]);
-    const [tableHtml, setTableHtml] = useState(null);
+
+    const [tableHtml, setTableHtml] = useState(`
+        <table>
+      <thead>
+        <tr>
+          <th>Metal Cost</th>
+          <th>Making Charge</th>
+          <th>Stone Value</th>
+          <th>Gross Value</th>
+          <th>GST(3%)</th>
+          <th>Final Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td>
+          <td></td>
+           <td></td>
+          <td></td> 
+          <td></td>
+          <td></td>
+        </tr>
+        
+      </tbody>
+    </table>`);
     const [columns, setColumns] = useState([]);
     const [rows, SetRows] = useState([]);
 
@@ -542,7 +566,6 @@ const ProductAdd = () => {
             }
         };
     }, [editorInstance, value]);
-      
 
     const selectedCollections = (data: any) => {
         setSelectedCollection(data);
@@ -829,13 +852,13 @@ const ProductAdd = () => {
                 shortDescription: shortDescription?.trim() === '' ? 'Short description cannot be empty' : '',
                 category: selectedCat?.length === 0 ? 'Category cannot be empty' : '',
                 priceBreakup:
-                columns.length == 0
-                    ? 'At least column is required'
-                    : columns.length > 0 && rows.length == 0
-                    ? 'At least one row is required if columns are added.'
-                    : hasEmptyCells
-                    ? 'All row cells must be filled.'
-                    : '',
+                    columns.length == 0
+                        ? 'At least column is required'
+                        : columns.length > 0 && rows.length == 0
+                        ? 'At least one row is required if columns are added.'
+                        : hasEmptyCells
+                        ? 'All row cells must be filled.'
+                        : '',
             };
         } else {
             errors = {
@@ -1539,6 +1562,7 @@ const ProductAdd = () => {
         setTableHtml(tableHTML);
         setColumns(columns);
         SetRows(rows);
+        Success('Price Breakup submitted!');
     };
 
     return (
@@ -1608,7 +1632,7 @@ const ProductAdd = () => {
                             <label htmlFor="editor" className="block text-sm font-medium text-gray-700">
                                 Price Breakup
                             </label>
-                            <DynamicSizeTable tableData={tableData} />
+                            <DynamicSizeTable tableData={tableData} htmlTableString={tableHtml} />
                             {priceBreakUpError && <p className="error-message mt-1 text-red-500 ">{priceBreakUpError}</p>}
                         </div>
 
@@ -2147,7 +2171,6 @@ const ProductAdd = () => {
                                     placeholder="Select brands"
                                 />
                                 {/* <Select isMulti value={selectedCat} onChange={(e) => setselectedCat(e)} options={parentLists} placeholder="Select categories..." className="form-select" /> */}
-
                             </div>
                             <p className="mt-5 cursor-pointer text-primary underline" onClick={() => setIsOpenBrand(true)}>
                                 Add a new brand

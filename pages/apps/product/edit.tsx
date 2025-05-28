@@ -1680,6 +1680,7 @@ const ProductEdit = (props: any) => {
         setTableHtml(tableHTML);
         setColumns(columns);
         SetRows(rows);
+        Success('Price Breakup submitted!');
     };
 
     return (

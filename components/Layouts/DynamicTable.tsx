@@ -1,3 +1,4 @@
+import { Failure } from '@/utils/functions';
 import React, { useEffect, useState } from 'react';
 
 export default function DynamicSizeTable(props) {
@@ -31,10 +32,6 @@ export default function DynamicSizeTable(props) {
             }
         }
     }, [htmlTableString]);
-
-    useEffect(() => {
-        tableData(columns, rows);
-    }, [columns, rows]);
 
     const createTable = () => {
         const heading = prompt('Enter first heading (e.g., Size):');
@@ -103,6 +100,19 @@ export default function DynamicSizeTable(props) {
         const updatedRows = [...rows];
         updatedRows[rowIndex][key] = value;
         setRows(updatedRows);
+    };
+
+    const handleSubmit = () => {
+        const hasEmptyCells = rows.some((row) => columns.some((col) => !row[col] || row[col].trim() === ''));
+        if (columns.length == 0) {
+            Failure('At least column is required');
+        } else if (columns.length > 0 && rows.length == 0) {
+            Failure('At least one row is required if columns are added.');
+        } else if (hasEmptyCells) {
+            Failure('All row cells must be filled.');
+        } else {
+            tableData(columns, rows);
+        }
     };
 
     const generateHTML = () => {
@@ -174,7 +184,10 @@ export default function DynamicSizeTable(props) {
                             Add Column
                         </button>
                         <button onClick={addRow} className="rounded bg-green-500 px-3 py-1 text-white">
-                            Add Row
+                            Add Rows
+                        </button>
+                        <button onClick={() => handleSubmit()} className="rounded bg-[#c2882b] bg-green-500 px-3 py-1 text-white">
+                            Submit
                         </button>
                     </div>
                 </>

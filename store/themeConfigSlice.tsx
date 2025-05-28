@@ -101,7 +101,7 @@ const themeConfigSlice = createSlice({
         },
 
         setPageTitle(state, { payload }) {
-            document.title = `${payload} | PRADE ADMIN`;
+            document.title = `${payload} | NOBLESETS ADMIN`;
         },
     },
 });

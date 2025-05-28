@@ -28,7 +28,7 @@ import IconEdit from '@/components/Icon/IconEdit';
 import { useMutation, useQuery } from '@apollo/client';
 import { DELETE_PRODUCTS, PRODUCT_LIST, PARENT_CATEGORY_LIST, CATEGORY_FILTER_LIST } from '@/query/product';
 import moment from 'moment';
-import { Failure, formatCurrency, roundOff } from '@/utils/functions';
+import { Failure, formatCurrency, FRONTEND_URL, roundOff } from '@/utils/functions';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 
 const ProductList = () => {
@@ -464,7 +464,7 @@ const ProductList = () => {
                                                     if (row.status == 'Draft') {
                                                         Failure('Product is Draft !');
                                                     } else {
-                                                        window.open(`http://www1.prade.in/product-details/${row.id}`, '_blank'); // '_blank' parameter opens the link in a new tab
+                                                        window.open(`${FRONTEND_URL}/product-details/${row.id}`, '_blank'); // '_blank' parameter opens the link in a new tab
                                                     }
                                                 }}
                                             >

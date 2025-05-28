@@ -278,15 +278,15 @@ const Sidebar = () => {
                                                         {t('Custom Products')}
                                                     </Link>
                                                 </li>
-                                                <li>
+                                                {/* <li>
                                                     <Link href="/apps/tax" target="_blank">
                                                         {t('Tax')}
                                                     </Link>
-                                                </li>
+                                                </li> */}
                                                 {/* <li>
                                                     <Link href="/product/warehouse">{t('Warehouse')}</Link>
                                                 </li> */}
-{/* 
+                                                {/* 
                                                 <li>
                                                     <Link href="/product/channel">{t('Channels')}</Link>
                                                 </li> */}

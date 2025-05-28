@@ -10,6 +10,7 @@ import IconArrowBackward from '@/components/Icon/IconArrowBackward';
 import IconArrowForward from '@/components/Icon/IconArrowForward';
 import { useRouter } from 'next/router';
 import IconEdit from '@/components/Icon/IconEdit';
+import { FRONTEND_URL } from '@/utils/functions';
 
 const PAGE_SIZE = 20;
 
@@ -115,7 +116,7 @@ const AbandonedCarts = () => {
                                     accessor: 'product',
                                     sortable: true,
                                     render: (row) => (
-                                        <button className="flex text-info underline" onClick={() => window.open(`http://www1.prade.in/product-details/${row.productId}`, '_blank')}>
+                                        <button className="flex text-info underline" onClick={() => window.open(`${FRONTEND_URL}/product-details/${row.productId}`, '_blank')}>
                                             {row.product}
                                         </button>
                                     ),

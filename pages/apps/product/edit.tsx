@@ -1064,25 +1064,22 @@ const ProductEdit = (props: any) => {
 
             // const NewAddedVariant = arrayOfVariants.filter((item) => item.id == undefined);
             const NewAddedVariant = variants.filter((item) => item.id == undefined || item.id == '');
-console.log('✌️variants --->', variants);
 
             const updateArr = arrayOfVariants.filter((item) => item.id != undefined || item.id != '');
-            console.log('✌️updateArr --->', updateArr);
 
             if (NewAddedVariant?.length > 0) {
                 bulkVariantCreate(NewAddedVariant);
             } else {
-console.log('✌️else --->', );
                 if (updateArr?.length > 0) {
                     variants?.map(async (variant: any) => {
                         const { data } = await updateSingleVariant({
                             variables: {
-                                variantId:variant?.id,
+                                variantId: variant?.id,
 
                                 // variantId: variant?.id, // Replace with actual variant global ID
                                 channelId: CHANNEL_USD, // Replace with actual channel global ID
                                 price: Number(variant?.regularPrice),
-                                costPrice: Number(variant?.regularPrice)
+                                costPrice: Number(variant?.regularPrice),
                             },
                         });
                         console.log('✌️data --->', data);

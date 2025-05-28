@@ -54,6 +54,7 @@ import {
 import { CHANNEL_USD, PRODUCT_TYPE, sampleParams } from '@/utils/functions';
 import IconRestore from '@/components/Icon/IconRestore';
 import { cA } from '@fullcalendar/core/internal-common';
+import PrivateRouter from '@/components/Layouts/PrivateRouter';
 const AddCoupon = () => {
     const router = useRouter();
     const isRtl = useSelector((state:any) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -1466,4 +1467,4 @@ const AddCoupon = () => {
     );
 };
 
-export default AddCoupon;
+export default PrivateRouter(AddCoupon);

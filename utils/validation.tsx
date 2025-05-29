@@ -60,9 +60,10 @@ export const AddressValidation = (state: any) => {
 
     if (!state?.billingAddress?.phone) {
         newBillingErrMsg.phone = 'Required this field';
-    } else if (!phoneRegex.test(state.billingAddress.phone)) {
-        newBillingErrMsg.phone = 'Invalid phone number';
-    }
+    } 
+    // else if (!phoneRegex.test(state.billingAddress.phone)) {
+    //     newBillingErrMsg.phone = 'Invalid phone number';
+    // }
 
     // if (!state?.billingAddress?.email) {
     //     newBillingErrMsg.email = 'Required this field';
@@ -72,15 +73,17 @@ export const AddressValidation = (state: any) => {
 
     if (!state?.shippingAddress?.pincode) {
         newShippingErrMsg.pincode = 'Required this field';
-    } else if (!pincodeRegex.test(state.shippingAddress.pincode)) {
+    } 
+    else if (!pincodeRegex.test(state.shippingAddress.pincode)) {
         newShippingErrMsg.pincode = 'invalid pincode';
     }
 
     if (!state?.shippingAddress?.phone) {
         newShippingErrMsg.phone = 'Required this field';
-    } else if (!phoneRegex.test(state.shippingAddress.phone)) {
-        newShippingErrMsg.phone = 'Invalid phone number';
-    }
+    } 
+    // else if (!phoneRegex.test(state.shippingAddress.phone)) {
+    //     newShippingErrMsg.phone = 'Invalid phone number';
+    // }
 
     // if (!state?.shippingAddress?.email) {
     //     newShippingErrMsg.email = 'Required this field';

@@ -179,6 +179,13 @@ const NewOrder = () => {
         },
     });
 
+    const { refetch: getOrderDatas } = useQuery(GET_ORDER_DETAILS, {
+        variables: {
+            id: orderId,
+            isStaffUser: true,
+        },
+    });
+
     const channels = () => {
         let channel = '';
         if (typeof window !== 'undefined') {
@@ -293,6 +300,7 @@ const NewOrder = () => {
     }, [productDetails]);
 
     const getOrderDetails = () => {
+console.log('✌️getOrderDetails --->', );
         setState({ loading: true });
         if (productDetails) {
             if (productDetails && productDetails?.order && productDetails?.order?.lines?.length > 0) {
@@ -451,22 +459,27 @@ const NewOrder = () => {
             const channel = channels();
             const isINR = channel === 'INR';
             const shippingCountry = state.shippingAddress.country;
+            const shippingState = state.shippingAddress.state;
+
             const isIndia = shippingCountry === 'IN';
 
             let shippingMethod = '';
 
             if (state.isFreeShipping) {
                 if (isINR) {
-                    shippingMethod = 'U2hpcHBpbmdNZXRob2Q6MTk=';
+                    shippingMethod = 'U2hpcHBpbmdNZXRob2Q6OTA=';
                 } else {
-                    shippingMethod = 'U2hpcHBpbmdNZXRob2Q6MjA=';
+                    shippingMethod = 'U2hpcHBpbmdNZXRob2Q6OTA=';
                 }
             } else {
                 if (isINR) {
-                    shippingMethod = isIndia ? 'U2hpcHBpbmdNZXRob2Q6Mw==' : 'U2hpcHBpbmdNZXRob2Q6NA==';
+                    shippingMethod = isIndia ? (shippingState == 'Tamil Nadu' ? 'U2hpcHBpbmdNZXRob2Q6ODg=' : 'U2hpcHBpbmdNZXRob2Q6ODk=') : 'U2hpcHBpbmdNZXRob2Q6OTI=';
                 } else {
-                    shippingMethod = isIndia ? 'U2hpcHBpbmdNZXRob2Q6OA==' : 'U2hpcHBpbmdNZXRob2Q6OQ==';
+                    shippingMethod = 'U2hpcHBpbmdNZXRob2Q6OTI=';
                 }
+                // else {
+                //     shippingMethod = isIndia ? 'U2hpcHBpbmdNZXRob2Q6OA==' : 'U2hpcHBpbmdNZXRob2Q6OQ==';
+                // }
             }
 
             const res = await updateShippingCost({
@@ -477,12 +490,54 @@ const NewOrder = () => {
                     },
                 },
             });
-            await getOrderData({
-                variables: {
-                    id: orderId,
-                    isStaffUser: true,
-                },
-            });
+            console.log('✌️res --->', res?.data);
+
+            if (res?.data?.orderUpdateShipping
+                ?.errors?.length > 0) {
+            } else {
+                 getOrderDatas()
+                 
+                // const res = await getOrderData({
+                //     variables: {
+                //         id: orderId,
+                //         isStaffUser: true,
+                //     },
+                // });
+                // console.log('getOrderData --->', res);
+                // let productDetails = res?.data;
+
+                // if (productDetails) {
+                //     if (productDetails && productDetails?.order && productDetails?.order?.lines?.length > 0) {
+                //         const list = productDetails?.order?.lines;
+                //         setState({ lineList: list, loading: false });
+                //     } else {
+                //         setState({ loading: false, lineList: [] });
+                //     }
+
+                //     if (productDetails && productDetails?.order && productDetails?.order?.events?.length > 0) {
+                //         const list = productDetails?.order?.events;
+                //         const filteredArray = list.filter(
+                //             (item: any) => item.type === 'CONFIRMED' || item.type === 'FULFILLMENT_FULFILLED_ITEMS' || item.type === 'NOTE_ADDED' || item.type === 'ORDER_MARKED_AS_PAID'
+                //         );
+
+                //         const result = filteredArray?.map((item: any) => {
+                //             const secondItem: any = NotesMsg.find((i) => i.type === item.type);
+                //             return {
+                //                 type: item.type,
+                //                 message: item.type === 'NOTE_ADDED' ? item.message : secondItem.message,
+                //                 id: item.id,
+                //                 date: item.date,
+                //             };
+                //         });
+
+                //         setState({ notesList: result, loading: false });
+                //     } else {
+                //         setState({ loading: false });
+                //     }
+                // } else {
+                //     setState({ loading: false });
+                // }
+            }
         } catch (error) {
             console.error(error);
         }
@@ -892,7 +947,7 @@ const NewOrder = () => {
                 Failure(res?.data?.draftOrderUpdate?.errors[0]?.message);
             } else {
                 updateShippingAmount();
-                await getOrderData();
+                // await getOrderData();
 
                 Success('Address updated successfully');
             }
@@ -1263,7 +1318,6 @@ const NewOrder = () => {
                                                 className={`form-input ${state.billingAddress['billing.phone'] && 'border border-danger focus:border-danger'}`}
                                                 name="billing.phone"
                                                 value={state.billingAddress?.phone}
-                                                maxLength={10}
                                                 onChange={handleChange}
                                             />
                                             {/* {billingErrMsg.phone && <div className="mt-1 text-danger">{billingErrMsg.phone}</div>} */}
@@ -1553,7 +1607,6 @@ const NewOrder = () => {
                                                 className={`form-input ${state.shippingAddress['shipping.phone'] && 'border border-danger focus:border-danger'}`}
                                                 name="shipping.phone"
                                                 value={state.shippingAddress.phone}
-                                                maxLength={10}
                                                 onChange={handleShippingChange}
                                             />
                                             {shippingErrMsg.phone && <div className="mt-1 text-danger">{shippingErrMsg.phone}</div>}

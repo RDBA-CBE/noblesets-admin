@@ -59,6 +59,7 @@ import {
     getImageDimensions,
     getKey,
     getMonthNumber,
+    getRowsAndColumnss,
     getValueByKey,
     months,
     objIsEmpty,
@@ -409,6 +410,7 @@ const ProductEdit = (props: any) => {
             if (productDetails) {
                 if (productDetails && productDetails?.product) {
                     const data = productDetails?.product;
+                    console.log('✌️data --->', data);
                     setProductData(data);
                     setSlug(data?.slug);
                     setSeoTittle(data?.seoTitle);
@@ -439,6 +441,16 @@ const ProductEdit = (props: any) => {
                     if (!objIsEmpty(data?.priceBreakup)) {
                         setPriceBreackupId(data?.priceBreakup?.id);
                         setTableHtml(data?.priceBreakup?.breakupDetails);
+
+
+                        const getData = getRowsAndColumnss(data?.priceBreakup?.breakupDetails);
+                        console.log('✌️getData --->', getData);
+                        if (getData?.columns?.length > 0) {
+                            setColumns(getData?.columns);
+                        }
+                        if (getData?.rows?.length > 0) {
+                            SetRows(getData?.rows);
+                        }
                     }
 
                     if (data?.tags?.length > 0) {
@@ -830,6 +842,7 @@ const ProductEdit = (props: any) => {
                         : null;
                 })
                 .filter(Boolean); // Filters out any null values where no selections were made
+            console.log('✌️descr --->', descr);
 
             setProductNameErrMsg('');
             setSlugErrMsg('');
@@ -2355,7 +2368,6 @@ const ProductEdit = (props: any) => {
                                 />
                                 {/* <Select isMulti value={selectedCat} onChange={(e) => setselectedCat(e)} options={parentLists} placeholder="Select categories..." className="form-select" /> */}
 
-                                {categoryErrMsg && <p className="error-message mt-1 text-red-500 ">{categoryErrMsg}</p>}
                             </div>
                             {/* <p className="mt-5 cursor-pointer text-primary underline" onClick={() => setIsOpenBrand(true)}>
                                 Add a new brand

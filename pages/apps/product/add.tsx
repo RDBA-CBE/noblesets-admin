@@ -1630,13 +1630,7 @@ const ProductAdd = () => {
                             {shortDesErrMsg && <p className="error-message mt-1 text-red-500 ">{shortDesErrMsg}</p>}
                         </div>
 
-                        <div className="panel mb-5 mt-5">
-                            <label htmlFor="editor" className="block text-sm font-medium text-gray-700">
-                                Price Breakup
-                            </label>
-                            <DynamicSizeTable tableData={tableData} htmlTableString={tableHtml} />
-                            {priceBreakUpError && <p className="error-message mt-1 text-red-500 ">{priceBreakUpError}</p>}
-                        </div>
+                      
 
                         <div className="panel mb-5">
                             <label htmlFor="editor" className="block text-sm font-medium text-gray-700">
@@ -1647,6 +1641,14 @@ const ProductAdd = () => {
                             </div>
 
                             {descriptionErrMsg && <p className="error-message mt-1 text-red-500 ">{descriptionErrMsg}</p>}
+                        </div>
+
+                        <div className="panel mb-5 mt-5">
+                            <label htmlFor="editor" className="block text-sm font-medium text-gray-700">
+                                Price Breakup
+                            </label>
+                            <DynamicSizeTable tableData={tableData} htmlTableString={tableHtml} />
+                            {priceBreakUpError && <p className="error-message mt-1 text-red-500 ">{priceBreakUpError}</p>}
                         </div>
 
                         <div className="panel mb-5 ">

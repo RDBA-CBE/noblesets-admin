@@ -186,7 +186,7 @@ export default function DynamicSizeTable(props) {
                         <button onClick={addRow} className="rounded bg-green-500 px-3 py-1 text-white">
                             Add Rows
                         </button>
-                        <button onClick={() => handleSubmit()} className="rounded bg-[#c2882b] bg-green-500 px-3 py-1 text-white">
+                        <button onClick={() => handleSubmit()} className="rounded bg-[#c2882b]  px-3 py-1 text-white">
                             Submit
                         </button>
                     </div>

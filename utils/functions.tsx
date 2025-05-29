@@ -1537,7 +1537,34 @@ export const formatKeysArray = (arr) => {
     });
 };
 
-export const ConvertToSlug = (text :string) => {
+export const ConvertToSlug = (text: string) => {
     const slug = text?.split(' ')?.join('-');
     return slug;
+};
+
+export const getRowsAndColumnss = (htmlTableString: any) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlTableString, 'text/html');
+    const table = doc.querySelector('table');
+
+    let columns = [];
+    let rows = [];
+
+    if (table) {
+        // Get column headers
+        const headers = Array.from(table.querySelectorAll('thead th')).map((th) => th.textContent.trim());
+        columns = headers;
+
+        // Get row data
+        const rowElements = table.querySelectorAll('tbody tr');
+        rows = Array.from(rowElements).map((tr) => {
+            const cells = tr.querySelectorAll('td');
+            const rowObj = {};
+            headers.forEach((header, index) => {
+                rowObj[header] = cells[index]?.textContent?.trim() || '';
+            });
+            return rowObj;
+        });
+    }
+    return { columns, rows };
 };

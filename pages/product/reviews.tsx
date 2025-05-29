@@ -128,13 +128,12 @@ const CustomerList = () => {
     });
 
     const commonPagination = (data) => {
-        console.log('data: ', data);
         const customers = data?.productReviews?.edges;
         const pageInfo = data?.productReviews?.pageInfo;
         setRecordsData(
             customers?.map((item) => ({
                 ...item.node,
-                image: item?.node.thumbnail,
+                image: item?.node.product?.thumbnail?.url,
                 name: `${item.node.product?.name} `,
                 productId:item.node.product?.id,
                 created_at: moment(item.node.created_at).format('YYYY-MM-DD'),

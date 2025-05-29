@@ -804,7 +804,7 @@ const Editorder = () => {
             const { data } = await draftOrder({
                 variables: {
                     input: {
-                        channelId: selectedCurrency == 'USD' ? CHANNEL_INR : CHANNEL_USD,
+                        channelId: CHANNEL_USD,
                     },
                 },
             });
@@ -1467,7 +1467,7 @@ const Editorder = () => {
             <>
                 <div className="panel mb-5 flex items-center justify-between gap-3 p-5 ">
                     <h3 className="text-lg font-semibold dark:text-white-light">Edit Order</h3>
-                    <button type="button" className="btn btn-primary" onClick={() => setIsOpenChannel(true)}>
+                    <button type="button" className="btn btn-primary" onClick={() => createDraftOrder()}>
                         Add Order
                     </button>
                 </div>

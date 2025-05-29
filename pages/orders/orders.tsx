@@ -270,7 +270,7 @@ const AbandonedCarts = () => {
             const { data } = await draftOrder({
                 variables: {
                     input: {
-                        channelId: selectedCurrency == 'USD' ? CHANNEL_INR : CHANNEL_USD,
+                        channelId: CHANNEL_USD,
                     },
                 },
             });
@@ -411,7 +411,7 @@ const AbandonedCarts = () => {
             <div className="panel mb-5 flex flex-col gap-5 md:flex-row md:items-center">
                 <h5 className="text-lg font-semibold dark:text-white-light">Orders</h5>
                 <div className="flex gap-3 ltr:ml-auto rtl:mr-auto">
-                    <button type="button" className="btn btn-primary" onClick={() => setIsOpenChannel(true)}>
+                    <button type="button" className="btn btn-primary" onClick={() => createDraftOrder()}>
                         + Create
                     </button>
                     <button type="button" className="btn btn-primary" onClick={() => window.open('/orders/export', '_blank')}>

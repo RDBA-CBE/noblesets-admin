@@ -1261,7 +1261,10 @@ const Editorder = () => {
         let without_shipping_amount = Number(data?.total?.gross?.amount) - (Number(data?.shippingPrice?.gross?.amount) + Number(data?.codAmount) + Number(data?.giftWrapAmount));
         let totalRefunded = data?.totalRefunded?.amount;
         let show = false;
-        if (data?.paymentMethod?.name == 'Case On Delivery' || data?.paymentMethod == null) {
+        if (data?.paymentMethod?.name == 'Cash On Delivery') {
+
+            show = false;
+        } else if (data?.paymentMethod == null) {
             show = false;
         } else {
             if (totalRefunded < without_shipping_amount && (data?.paymentStatus == 'FULLY_CHARGED' || data?.paymentStatus == 'PARTIALLY_REFUNDED' || data.isPaid)) {

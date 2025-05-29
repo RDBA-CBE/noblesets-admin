@@ -5,7 +5,7 @@ export const CREATE_PINCODE = gql`
         pincodeCreate(input: $input) {
             pincode {
                 id
-                code
+                codes
                 name
                 slug
             }
@@ -18,25 +18,38 @@ export const CREATE_PINCODE = gql`
 `;
 
 export const PINCODE_LIST = gql`
-    query MyQuery($after: String, $before: String, $first: Int, $last: Int, $filter: PincodeFilterInput) {
-        pincodes(after: $after, before: $before, first: $first, last: $last, filter: $filter) {
-            pageInfo {
-                endCursor
-                hasNextPage
-                hasPreviousPage
-                startCursor
-            }
-            totalCount
-            edges {
-                node {
-                    code
-                    name
-                    slug
-                    id
-                }
-            }
-        }
+   query MyQuery(
+  $after: String
+  $before: String
+  $first: Int
+  $last: Int
+  $filter: PincodeFilterInput
+) {
+  pincodes(
+    after: $after
+    before: $before
+    first: $first
+    last: $last
+    filter: $filter
+  ) {
+    edges {
+      node {
+        name
+        codes
+        id
+        slug
+      }
     }
+    totalCount
+    pageInfo {
+      endCursor
+      hasNextPage
+      hasPreviousPage
+      startCursor
+    }
+  }
+}
+
 `;
 
 export const UPDATE_PINCODE = gql`
@@ -44,7 +57,7 @@ export const UPDATE_PINCODE = gql`
         pincodeUpdate(id: $id, input: $input) {
             pincode {
                 id
-                code
+                codes
                 name
                 slug
             }

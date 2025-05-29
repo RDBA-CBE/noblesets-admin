@@ -55,7 +55,7 @@ const Pincode = () => {
             first: PAGE_SIZE,
             after: null,
             filter: {
-                search: search !== '' ? search : '',
+                code: search !== '' ? [search] : [],
             },
         },
         onCompleted: (data) => {
@@ -70,7 +70,7 @@ const Pincode = () => {
             first: PAGE_SIZE,
             after: null,
             filter: {
-                search: '',
+                code: [],
             },
         },
         onCompleted: (data) => {
@@ -84,7 +84,7 @@ const Pincode = () => {
             first: PAGE_SIZE,
             after: null,
             filter: {
-                search: '',
+                code: [],
             },
         },
     });
@@ -106,10 +106,11 @@ const Pincode = () => {
         const pageInfo = data.pincodes?.pageInfo;
 
         const newData = customers?.map((item: any) => {
+            console.log('✌️item --->', item);
             return {
                 name: item.node?.name,
                 id: item.node?.id,
-                code: item.node?.code,
+                code: item.node?.codes,
             };
         });
         setRecordsData(newData);
@@ -127,7 +128,7 @@ const Pincode = () => {
                 after: endCursor,
                 before: null,
                 filter: {
-                    search: search,
+                    code: [search],
                 },
             },
         });
@@ -140,7 +141,7 @@ const Pincode = () => {
                 last: PAGE_SIZE,
                 before: startCursor,
                 filter: {
-                    search: search,
+                    code: [search],
                 },
             },
         });
@@ -154,7 +155,7 @@ const Pincode = () => {
                 after: null,
 
                 filter: {
-                    search: '',
+                    code: [],
                 },
             });
             setTotalCount(data?.pincodes?.totalCount);
@@ -173,7 +174,7 @@ const Pincode = () => {
                     channel: 'india-channel',
 
                     filter: {
-                        search: e,
+                        code: [e],
                     },
                     last: PAGE_SIZE,
                     before: startCursor,
@@ -185,18 +186,29 @@ const Pincode = () => {
 
     const SubmittedForm = Yup.object().shape({
         name: Yup.string().required('Name is required'),
-        pincode: Yup.string()
-            .required('Pincode is required')
-            .matches(/^\d{6}$/, 'Pincode must be exactly 6 digits'),
+        pincode: Yup.lazy((value) => {
+            if (Array.isArray(value)) {
+              return Yup.array()
+                .of(Yup.string().required('Each pincode must be a string'))
+                .min(1, 'At least one pincode is required');
+            } else {
+              return Yup.string().required('Pincode is required');
+            }
+          }),
+
+
+        // pincode: Yup.array().of(Yup.string().required('Each pincode must be a string')).min(1, 'At least one pincode is required').required('Pincode is required'),
     });
+    console.log('✌️SubmittedForm --->', SubmittedForm);
 
     // form submit
     const onSubmit = async (record: any, { resetForm }: any) => {
+        console.log('✌️record --->', record);
         try {
             const variables = {
                 input: {
                     name: record.name,
-                    code: record.pincode,
+                    codes: Array.isArray(record?.pincode) ? record?.pincode : record?.pincode?.split(','),
                 },
             };
 
@@ -337,7 +349,7 @@ const Pincode = () => {
                             records={recordsData}
                             columns={[
                                 { accessor: 'name', sortable: true },
-                                { accessor: 'code', sortable: true },
+                                { accessor: 'code', sortable: true, render: (row: any) => <div>{row?.code?.join(', ')}</div> },
 
                                 {
                                     accessor: 'actions',
@@ -428,8 +440,8 @@ const Pincode = () => {
 
                                                     <div className={submitCount ? (errors.name ? 'has-error' : 'has-success') : ''}>
                                                         <label htmlFor="pincode">Pincode</label>
-                                                        <Field name="pincode" type="number" id="pincode" placeholder="Enter Pincode" className="form-input" />
-                                                        <div className='text-sm'>Minimum 6 digits</div>
+                                                        <Field name="pincode" type="text" id="pincode" placeholder="Enter Pincode" className="form-input" />
+                                                        {/* <div className="text-sm">Minimum 6 digits</div> */}
                                                         {submitCount ? errors.pincode ? <div className="mt-1 text-danger">{errors.pincode}</div> : <div className="mt-1 text-success"></div> : ''}
                                                     </div>
 

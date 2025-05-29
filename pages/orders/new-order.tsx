@@ -490,12 +490,34 @@ console.log('✌️getOrderDetails --->', );
                     },
                 },
             });
-            console.log('✌️res --->', res?.data);
 
-            if (res?.data?.orderUpdateShipping
-                ?.errors?.length > 0) {
-            } else {
-                 getOrderDatas()
+           await updateDraftOrder({
+                variables: {
+                    id: orderId,
+                    input: {
+                        shippingAddress: {
+                            city: state.shippingAddress.city,
+                            cityArea: '',
+                            companyName: state.shippingAddress.company,
+                            country: state.shippingAddress.country,
+                            countryArea: state.shippingAddress.state,
+                            firstName: state.shippingAddress.firstName,
+                            lastName: state.shippingAddress.lastName,
+                            phone: state.shippingAddress.phone,
+                            postalCode: state.shippingAddress.pincode,
+                            streetAddress1: state.shippingAddress.address_1,
+                            // streetAddress2: state.shippingAddress.address_2,
+                        },
+                    },
+                },
+            });
+
+            // if (res?.data?.orderUpdateShipping
+            //     ?.errors?.length > 0) {
+            // } else {
+                 await getOrderDatas()
+            //    await  updateAddress()
+
                  
                 // const res = await getOrderData({
                 //     variables: {
@@ -537,7 +559,7 @@ console.log('✌️getOrderDetails --->', );
                 // } else {
                 //     setState({ loading: false });
                 // }
-            }
+            // }
         } catch (error) {
             console.error(error);
         }

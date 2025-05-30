@@ -33,6 +33,7 @@ import {
     addNewMediaFile,
     categoryImageUpload,
     deleteImagesFromS3,
+    encodeUrlPathOnly,
     fetchImagesFromS3,
     filterImages,
     formatOptions,
@@ -190,7 +191,7 @@ const EditCategory = () => {
                 input: {
                     name: name,
                     description: Description,
-                    backgroundImageUrl: previewUrl ? previewUrl : '',
+                    backgroundImageUrl: previewUrl ? encodeUrlPathOnly(previewUrl) : '',
                     menuOrder: menuOrder,
                 },
                 id: catId,
@@ -550,44 +551,44 @@ const EditCategory = () => {
                                     </div>
                                     <div className="m-5">
                                         <div className="flex justify-between">
-                                        <div className="flex gap-5">
-                                            <button
-                                                onClick={() => {
-                                                    setMediaTab(0);
-                                                    setMediaMonth('all'), setMediaSearch('');
-                                                }}
-                                                className={`${mediaTab == 0 ? 'bg-primary text-white !outline-none' : ''}
+                                            <div className="flex gap-5">
+                                                <button
+                                                    onClick={() => {
+                                                        setMediaTab(0);
+                                                        setMediaMonth('all'), setMediaSearch('');
+                                                    }}
+                                                    className={`${mediaTab == 0 ? 'bg-primary text-white !outline-none' : ''}
                                                     -mb-[1px] flex items-center rounded p-3.5 py-2 before:inline-block `}
-                                            >
-                                                Upload Files
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    setMediaTab(1);
-                                                    setMediaMonth('all'), setMediaSearch('');
-                                                }}
-                                                className={`${mediaTab == 1 ? 'bg-primary text-white !outline-none' : ''}
+                                                >
+                                                    Upload Files
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setMediaTab(1);
+                                                        setMediaMonth('all'), setMediaSearch('');
+                                                    }}
+                                                    className={`${mediaTab == 1 ? 'bg-primary text-white !outline-none' : ''}
                                                     -mb-[1px] flex items-center rounded p-3.5 py-2 before:inline-block `}
-                                            >
-                                                Media Library
-                                            </button>
-                                        </div>
+                                                >
+                                                    Media Library
+                                                </button>
+                                            </div>
 
                                             <button
-                                                        type="button"
-                                                        className="btn btn-primary"
-                                                        onClick={() => {
-                                                            if (selectedImg == null) {
-                                                                Failure('Please select an image');
-                                                            } else {
-                                                                setPreviewUrl(selectedImg);
-                                                                setMediaOpen(false);
-                                                                setSelectedImg(null);
-                                                            }
-                                                        }}
-                                                    >
-                                                        Set Product Image
-                                                    </button>
+                                                type="button"
+                                                className="btn btn-primary"
+                                                onClick={() => {
+                                                    if (selectedImg == null) {
+                                                        Failure('Please select an image');
+                                                    } else {
+                                                        setPreviewUrl(selectedImg);
+                                                        setMediaOpen(false);
+                                                        setSelectedImg(null);
+                                                    }
+                                                }}
+                                            >
+                                                Set Product Image
+                                            </button>
                                         </div>
 
                                         {mediaTab == 0 ? (

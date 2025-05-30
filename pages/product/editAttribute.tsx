@@ -140,13 +140,8 @@ export default function createAttribute() {
                 variables: {
                     id: id,
                     input: {
-                        availableInGrid: true,
-                        filterableInDashboard: true,
-                        filterableInStorefront: true,
                         name: state.attributeName,
                         slug: ConvertToSlug(state.slug),
-                        storefrontSearchPosition: 1,
-                        valueRequired: false,
                         visibleInStorefront: state.visibleInStorefront,
 
                         // unit: null,

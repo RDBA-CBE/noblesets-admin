@@ -101,9 +101,9 @@ const UpdateSizeGuide = () => {
         if (isImage) {
             if (files.size > 300 * 1024) {
                 files = await resizingImage(files);
-                files = await resizeImage(files, 1160, 1340);
+                files = await resizeImage(files, 700, 1050);
             } else {
-                files = await resizeImage(files, 1160, 1340);
+                files = await resizeImage(files, 700, 1050);
             }
             const { width, height } = await getImageDimensions(files);
         }
@@ -144,9 +144,9 @@ const UpdateSizeGuide = () => {
 
         if (file.size > 300 * 1024) {
             file = await resizingImage(file);
-            file = await resizeImage(file, 1160, 1340);
+            file = await resizeImage(file, 700, 1050);
         } else {
-            file = await resizeImage(file, 1160, 1340);
+            file = await resizeImage(file, 700, 1050);
         }
 
         const reader = new FileReader();

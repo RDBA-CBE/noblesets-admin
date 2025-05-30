@@ -931,9 +931,9 @@ export const addNewFile = async (e: any) => {
         if (isImage) {
             if (file.size > 300 * 1024) {
                 file = await resizingImage(file);
-                file = await resizeImage(file, 1160, 1340);
+                file = await resizeImage(file, 700, 1050);
             } else {
-                file = await resizeImage(file, 1160, 1340);
+                file = await resizeImage(file, 700, 1050);
             }
             const { width, height } = await getImageDimensions(file);
             console.log('Image width, height: ', width, height);
@@ -978,9 +978,9 @@ export const addNewMediaFile = async (file: any, uniqueFilename: any) => {
         if (isImage) {
             if (file.size > 300 * 1024) {
                 file = await resizingImage(file);
-                file = await resizeImage(file, 1160, 1340);
+                file = await resizeImage(file, 700, 1050);
             } else {
-                file = await resizeImage(file, 1160, 1340);
+                file = await resizeImage(file, 700, 1050);
             }
             const { width, height } = await getImageDimensions(file);
             console.log('Image width, height: ', width, height);

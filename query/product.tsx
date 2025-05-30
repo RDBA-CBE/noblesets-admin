@@ -404,6 +404,13 @@ export const CATEGORY_DETAILS = gql`
             level
             updatedAt
             slug
+            __typename
+            parent {
+                id
+                name
+                slug
+                backgroundImageUrl
+            }
         }
     }
 `;
@@ -519,6 +526,30 @@ export const UPDATE_CATEGORY_NEW = gql`
             __typename
         }
     }
+`;
+
+export const ASSIGN_PARENT_CATEGORY = gql`
+    mutation CategoryParentUpdate($id: ID!, $input: CategoryInput!, $parentId: ID) {
+  categoryParentUpdate(id: $id, input: $input, parentId: $parentId) {
+    category {
+      id
+      name
+      parent {
+        id
+        name
+        slug
+        __typename
+      }
+      __typename
+    }
+    __typename
+    errors {
+      values
+      message
+      code
+    }
+  }
+}
 `;
 
 export const CREATE_TAG = gql`
@@ -19936,9 +19967,3 @@ export const MEDIA_PAGINATION = gql`
         }
     }
 `;
-
-
-
-
-
-  

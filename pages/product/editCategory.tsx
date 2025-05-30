@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import {
     ADD_NEW_MEDIA_IMAGE,
+    ASSIGN_PARENT_CATEGORY,
     CATEGORY_DETAILS,
     CATEGORY_LIST,
     CREATE_CATEGORY,
@@ -114,6 +115,8 @@ const EditCategory = () => {
 
     const [updateCategory, { loading }] = useMutation(UPDATE_CATEGORY_NEW);
 
+    const [assignParentCategory, { loading: assignLoading }] = useMutation(ASSIGN_PARENT_CATEGORY);
+
     const [addNewImages] = useMutation(ADD_NEW_MEDIA_IMAGE);
 
     const [updateImages, { loading: mediaUpdateLoading }] = useMutation(UPDATE_MEDIA_IMAGE);
@@ -202,13 +205,51 @@ const EditCategory = () => {
             if (data?.categoryUpdate?.errors?.length > 0) {
                 Failure(data?.categoryUpdate?.errors[0].message);
             } else {
-                router.replace('/product/category');
-                Success('Category updated successfully');
+                if (selectedCat?.value) {
+                    await assignParentCategorys();
+                } else {
+                    router.replace('/product/category');
+
+                    Success('Category updated successfully');
+                }
             }
         } catch (error) {
             console.log('error: ', error);
         }
     };
+
+    console.log('✌️selectedCat --->', selectedCat);
+
+    const assignParentCategorys = async () => {
+        try {
+          const res = await assignParentCategory({
+            variables: {
+              id: catId,
+              input: {},
+              parentId: selectedCat?.value,
+            },
+          });
+      
+          Success('Category updated successfully');
+          router.replace('/product/category');
+        } catch (error) {
+          // Handle GraphQL errors
+          if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+            const message = error.graphQLErrors[0].message;
+            console.error('GraphQL Error:', message);
+            Failure(message)
+            // Error(message); // You can show this in a toast or alert
+          } 
+        //   else if (error.networkError) {
+        //     console.error('Network Error:', error.networkError);
+        //     Error('Network error occurred. Please try again.');
+        //   } else {
+        //     console.error('Unknown Error:', error);
+        //     Error('Something went wrong. Please try again.');
+        //   }
+        }
+      };
+      
 
     const searchMediaByName = async (e) => {
         setMediaSearch(e);
@@ -508,7 +549,7 @@ const EditCategory = () => {
                     </div>
 
                     <button type="button" className="btn btn-primary !mt-6" onClick={() => onSubmit()}>
-                        {loading ? <IconLoader className="mr-2 h-4 w-4 animate-spin" /> : 'Submit'}
+                        {loading || assignLoading ? <IconLoader className="mr-2 h-4 w-4 animate-spin" /> : 'Submit'}
                     </button>
                 </div>
             </div>

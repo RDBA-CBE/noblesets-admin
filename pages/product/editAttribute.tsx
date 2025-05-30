@@ -148,6 +148,7 @@ export default function createAttribute() {
                         storefrontSearchPosition: 1,
                         valueRequired: false,
                         visibleInStorefront: state.visibleInStorefront,
+
                         // unit: null,
                     },
                 },

@@ -36,6 +36,7 @@ import {
     addNewMediaFile,
     categoryImageUpload,
     deleteImagesFromS3,
+    encodeUrlPathOnly,
     fetchImagesFromS3,
     filterImages,
     generatePresignedPost,
@@ -154,7 +155,7 @@ const Category = () => {
                 input: {
                     name: record.name,
                     description: Description,
-                    backgroundImageUrl: previewUrl ? previewUrl : '',
+                    backgroundImageUrl: previewUrl ? encodeUrlPathOnly(previewUrl) : '',
                     menuOrder: record.menuOrder == '' ? null : record.menuOrder,
                 },
                 parent: record.parentCategory,

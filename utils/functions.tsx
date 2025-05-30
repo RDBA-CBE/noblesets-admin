@@ -1568,3 +1568,10 @@ export const getRowsAndColumnss = (htmlTableString: any) => {
     }
     return { columns, rows };
 };
+
+
+export const encodeUrlPathOnly = (url) => {
+    const urlObj = new URL(url);
+    const cleanedPath = urlObj.pathname.replace(/ /g, '%20');
+    return `${urlObj.origin}${cleanedPath}`;
+  };

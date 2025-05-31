@@ -183,24 +183,19 @@ const Pincode = () => {
             commonPagination(res?.data);
         }
     };
-
     const SubmittedForm = Yup.object().shape({
         name: Yup.string().required('Name is required'),
+      
         pincode: Yup.string()
-        .required('Pincode is required')
-        .matches(
-          /^(\d+)(,\d+)*$/,
-          'Only comma-separated numbers are allowed (e.g., 12345,67890)'
-        ),
-
-
-        // pincode: Yup.array().of(Yup.string().required('Each pincode must be a string')).min(1, 'At least one pincode is required').required('Pincode is required'),
-    });
-    console.log('✌️SubmittedForm --->', SubmittedForm);
+          .required('Pincode is required')
+          .matches(
+            /^(\d{1,10})(,\d{1,10})*$/,
+            'Only comma-separated numbers are allowed, each up to 10 digits (e.g., 641701,621704)'
+          ),
+      });
 
     // form submit
     const onSubmit = async (record: any, { resetForm }: any) => {
-        console.log('✌️record --->', record);
         try {
             const variables = {
                 input: {
@@ -208,7 +203,6 @@ const Pincode = () => {
                     codes: Array.isArray(record?.pincode) ? record?.pincode : record?.pincode?.split(','),
                 },
             };
-            console.log('✌️variables --->', variables);
 
             const res = await (modalTitle ? updateTag({ variables: { ...variables, id: modalContant.id } }) : addTag({ variables }));
             if (modalTitle) {

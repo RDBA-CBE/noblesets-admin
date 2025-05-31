@@ -157,11 +157,11 @@ const Coupon = () => {
                     <div className="flex items-center gap-5">
                         <h5 className="text-lg font-semibold dark:text-white-light">Shipping Zone</h5>
                     </div>
-                    <div>
+                    {/* <div>
                         <button type="button" className="btn btn-primary  w-full md:mb-0 md:w-auto" onClick={() => window.open('/createZone', '_blank')}>
                             + Create
                         </button>
-                    </div>
+                    </div> */}
                 </div>
                 {/* <div className="mb-5 flex-col justify-end gap-5 md:flex md:flex-row md:items-center">
                     <input type="text" className="form-input mb-3 mr-2 h-[40px] w-[400px] " placeholder="Search..." value={search} onChange={(e) => handleSearchChange(e.target.value)} />

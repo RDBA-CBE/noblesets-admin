@@ -342,24 +342,24 @@ const Pincode = () => {
                                 },
 
                                 { accessor: 'created_at' },
-                                {
-                                    accessor: 'actions',
-                                    title: 'Actions',
-                                    render: (row: any) => (
-                                        <>
-                                            <Tippy content="Edit">
-                                                <button type="button" onClick={() => EditCategory(row)}>
-                                                    <IconPencil className="ltr:mr-2 rtl:ml-2" />
-                                                </button>
-                                            </Tippy>
-                                            <Tippy content="Delete">
-                                                <button type="button" onClick={() => DeleteCategory(row)}>
-                                                    <IconTrashLines />
-                                                </button>
-                                            </Tippy>
-                                        </>
-                                    ),
-                                },
+                                // {
+                                //     accessor: 'actions',
+                                //     title: 'Actions',
+                                //     render: (row: any) => (
+                                //         <>
+                                //             <Tippy content="Edit">
+                                //                 <button type="button" onClick={() => EditCategory(row)}>
+                                //                     <IconPencil className="ltr:mr-2 rtl:ml-2" />
+                                //                 </button>
+                                //             </Tippy>
+                                //             <Tippy content="Delete">
+                                //                 <button type="button" onClick={() => DeleteCategory(row)}>
+                                //                     <IconTrashLines />
+                                //                 </button>
+                                //             </Tippy>
+                                //         </>
+                                //     ),
+                                // },
                             ]}
                             highlightOnHover
                             totalRecords={recordsData?.length}

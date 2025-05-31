@@ -186,15 +186,12 @@ const Pincode = () => {
 
     const SubmittedForm = Yup.object().shape({
         name: Yup.string().required('Name is required'),
-        pincode: Yup.lazy((value) => {
-            if (Array.isArray(value)) {
-              return Yup.array()
-                .of(Yup.string().required('Each pincode must be a string'))
-                .min(1, 'At least one pincode is required');
-            } else {
-              return Yup.string().required('Pincode is required');
-            }
-          }),
+        pincode: Yup.string()
+        .required('Pincode is required')
+        .matches(
+          /^(\d+)(,\d+)*$/,
+          'Only comma-separated numbers are allowed (e.g., 12345,67890)'
+        ),
 
 
         // pincode: Yup.array().of(Yup.string().required('Each pincode must be a string')).min(1, 'At least one pincode is required').required('Pincode is required'),
@@ -211,6 +208,7 @@ const Pincode = () => {
                     codes: Array.isArray(record?.pincode) ? record?.pincode : record?.pincode?.split(','),
                 },
             };
+            console.log('✌️variables --->', variables);
 
             const res = await (modalTitle ? updateTag({ variables: { ...variables, id: modalContant.id } }) : addTag({ variables }));
             if (modalTitle) {

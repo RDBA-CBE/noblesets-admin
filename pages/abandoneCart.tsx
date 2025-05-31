@@ -116,7 +116,7 @@ const AbandonedCarts = () => {
                                     accessor: 'product',
                                     sortable: true,
                                     render: (row) => (
-                                        <button className="flex text-info underline" onClick={() => window.open(`${FRONTEND_URL}/product-details/${row.productId}`, '_blank')}>
+                                        <button className="flex text-info underline" onClick={() => window.open(`${FRONTEND_URL}/product-details/${row.slug}`, '_blank')}>
                                             {row.product}
                                         </button>
                                     ),
@@ -163,6 +163,7 @@ const tableFormat = (products) => {
         customerId: product?.node?.customer?.id,
         product: product?.node?.productName,
         productId: product?.node?.productId,
+        slug:product?.node?.productSlug
     }));
 };
 

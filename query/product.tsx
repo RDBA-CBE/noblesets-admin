@@ -530,26 +530,26 @@ export const UPDATE_CATEGORY_NEW = gql`
 
 export const ASSIGN_PARENT_CATEGORY = gql`
     mutation CategoryParentUpdate($id: ID!, $input: CategoryInput!, $parentId: ID) {
-  categoryParentUpdate(id: $id, input: $input, parentId: $parentId) {
-    category {
-      id
-      name
-      parent {
-        id
-        name
-        slug
-        __typename
-      }
-      __typename
+        categoryParentUpdate(id: $id, input: $input, parentId: $parentId) {
+            category {
+                id
+                name
+                parent {
+                    id
+                    name
+                    slug
+                    __typename
+                }
+                __typename
+            }
+            __typename
+            errors {
+                values
+                message
+                code
+            }
+        }
     }
-    __typename
-    errors {
-      values
-      message
-      code
-    }
-  }
-}
 `;
 
 export const CREATE_TAG = gql`
@@ -2095,6 +2095,7 @@ export const ABANDONT_CART_LIST = gql`
                     __typename
                     productName
                     productId
+                    productSlug
                 }
                 __typename
             }
@@ -2209,6 +2210,21 @@ export const PRODUCT_EXPORT = gql`
                                 name
                                 slug
                             }
+                        }
+                        brand {
+                            name
+                            slug
+                            id
+                        }
+                        priceBreakup {
+                            breakupDetails
+                            id
+                        }
+                        sizeGuide {
+                            slug
+                            sizeimg
+                            sizedetail
+                            name
                         }
                     }
                 }

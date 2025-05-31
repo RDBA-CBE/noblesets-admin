@@ -166,7 +166,7 @@ const CreateCoupon = () => {
             // );
 
             router.push('/shipping_zone');
-            Success('Shipping Zone updated succssfully');
+            Success('Shipping Zone updated successfully');
         } catch (error) {
             console.error('updateChannelLists error: ', error);
         }

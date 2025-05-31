@@ -310,7 +310,7 @@ const CreateCoupon = () => {
                 },
             });
             router.push('/shipping_zone');
-            Success('Shipping Zone Created succssfully');
+            Success('Shipping Zone Created successfully');
 
             console.log('Channel listing updated:', res);
         } catch (error) {

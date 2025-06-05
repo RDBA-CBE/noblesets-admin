@@ -136,7 +136,7 @@ const CustomerList = () => {
                 image: item?.node.product?.thumbnail?.url,
                 name: `${item.node.product?.name} `,
                 productId:item.node.product?.id,
-                created_at: moment(item.node.created_at).format('YYYY-MM-DD'),
+                created_at: moment(item.node.createdAt).format('DD-MM-YYYY'),
             }))
         );
         setStartCursor(pageInfo?.startCursor || null);

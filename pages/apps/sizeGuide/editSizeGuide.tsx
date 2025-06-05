@@ -8,6 +8,7 @@ import {
     generateRandomCode,
     getFileType,
     getImageDimensions,
+    getRowsAndColumnss,
     resizeImage,
     resizingImage,
     useSetState,
@@ -28,6 +29,7 @@ import IconLoader from '@/components/Icon/IconLoader';
 import DynamicSizeTable from '@/components/Layouts/DynamicTable';
 import { CREATE_SIZEGUIDE, SIZEGUIDE_DETAIL, UPDATE_SIZEGUIDE } from '@/query/sizeGuide';
 import * as Yup from 'yup';
+import CommonLoader from '@/pages/elements/commonLoader';
 
 const UpdateSizeGuide = () => {
     const router = useRouter();
@@ -48,11 +50,12 @@ const UpdateSizeGuide = () => {
         imagePreview: null,
         columns: [],
         rows: [],
+        loading: false,
+        tableHtml: null,
     });
 
     useEffect(() => {
         getDetails();
-        // categoryList();
     }, [id, detail]);
 
     const getDetails = async () => {
@@ -60,8 +63,38 @@ const UpdateSizeGuide = () => {
             const res = await coupenRefetch({
                 id,
             });
+
+            const sampleData = `
+            <table>
+          <thead>
+            <tr>
+              <th>Ring Size (Indian)</th>
+              <th>Circumference (Inches)</th>
+              <th>Circumference (MM)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td></td>
+              <td></td>
+               <td></td>
+          
+            </tr>
+            
+          </tbody>
+        </table>`;
+            console.log('✌️getDetails --->', res?.data?.sizeGuid?.sizedetail);
+            const getColumnsandRows = getRowsAndColumnss(res?.data?.sizeGuid?.sizedetail ? res?.data?.sizeGuid?.sizedetail : sampleData);
+            console.log('✌️getColumnsandRows --->', getColumnsandRows);
+
             console.log('✌️res --->', res);
-            setState({ tableHTML: res?.data?.sizeGuid?.sizedetail, imagePreview: res?.data?.sizeGuid?.sizeimg, name: res?.data?.sizeGuid?.name });
+            setState({
+                tableHTML: res?.data?.sizeGuid?.sizedetail ? res?.data?.sizeGuid?.sizedetail : sampleData,
+                imagePreview: res?.data?.sizeGuid?.sizeimg,
+                name: res?.data?.sizeGuid?.name,
+                columns: getColumnsandRows?.columns,
+                rows: getColumnsandRows?.rows,
+            });
         } catch (error) {
             console.log('error: ', error);
         }
@@ -97,6 +130,7 @@ const UpdateSizeGuide = () => {
 
     const addNewImage = async (files) => {
         // let files = e.target.files[0];
+        setState({ loading: true });
         const isImage = files.type.startsWith('image/');
         if (isImage) {
             if (files.size > 300 * 1024) {
@@ -109,12 +143,9 @@ const UpdateSizeGuide = () => {
         }
 
         const unique = await generateUniqueFilenames(files.name);
-        console.log('✌️unique --->', unique);
 
         const result = await addNewMediaFile(files, unique);
-        console.log('✌️result --->', result);
         const fileType = await getFileType(result);
-        console.log('✌️fileType --->', fileType);
         const body = {
             fileUrl: result,
             title: '',
@@ -133,7 +164,8 @@ const UpdateSizeGuide = () => {
                 fileUrl: response.data?.fileCreate?.file?.fileUrl,
             },
         };
-        console.log('✌️bodys --->', bodys);
+        setState({ loading: false });
+
         return response.data?.fileCreate?.file?.fileUrl;
     };
 
@@ -176,45 +208,46 @@ const UpdateSizeGuide = () => {
                 ${tableRows}
             </tbody>
         </table>`;
-        setState({ tableHTML: tableHTML,rows, columns  });
+        Success('Size Guide submitted!');
+
+        setState({ tableHTML: tableHTML, rows, columns });
     };
-
-    const SubmittedForm = Yup.object()
-        .shape({
-            name: Yup.string().required('Please fill the Name'),
-            image: Yup.string().required('Image is required'),
-            // Custom test at the object level using `.test()` outside of individual fields
-        })
-        .test('rows-columns-validation', 'At least one row is required if columns are added, and all cells must be filled.', function (values) {
-            const { columns, rows } = this.options.context;
-
-            if (columns.length > 0 && rows.length === 0) {
-                return this.createError({ path: 'size', message: 'At least one row is required if columns are added.' });
-            }
-
-            const hasEmptyCells = rows.some((row) => columns.some((col) => !row[col] || row[col].trim() === ''));
-
-            if (hasEmptyCells) {
-                return this.createError({ path: 'size', message: 'All row cells must be filled.' });
-            }
-
-            return true;
-        });
 
     const handleSubmit = async () => {
         try {
-            const values = {
-                name: state.name,
-                image: state.imagePreview,
-            };
+            if (!state.name || state.name.trim() === '') {
+                Failure('Name is required');
+                return;
+            }
+            const isImageUploaded = !!state.imagePreview;
+            const hasColumns = state.columns.length > 0;
+            const hasRows = state.rows.length > 0;
+            if (!isImageUploaded && !hasColumns) {
+                Failure('Add either image or size Table');
+                return;
+            }
 
-            await SubmittedForm.validate(values, {
-                abortEarly: false,
-                context: {
-                    columns: state.columns,
-                    rows: state.rows,
-                },
-            });
+            if (!isImageUploaded) {
+                if (hasColumns && !hasRows) {
+                    Failure('At least one row is required if columns are added.');
+                    return;
+                }
+
+                const hasEmptyCells = state.rows.some((row) => state.columns.some((col) => !row[col] || row[col].trim() === ''));
+
+                if (hasEmptyCells) {
+                    Failure('All row cells must be filled.');
+                    return;
+                }
+            }
+
+            // await SubmittedForm.validate(values, {
+            //     abortEarly: false,
+            //     context: {
+            //         columns: state.columns,
+            //         rows: state.rows,
+            //     },
+            // });
 
             const body: any = {};
             if (state.imgFile) {
@@ -225,12 +258,16 @@ const UpdateSizeGuide = () => {
             }
             if (state.tableHTML) {
                 body.sizedetail = state.tableHTML;
+            }else{
+                body.sizedetail = "";
+
             }
+
             const inputs = {
                 id,
                 input: {
-                    sizeimg: body.sizeimg,
-                    sizedetail: body.sizedetail,
+                    sizeimg: body.sizeimg ? body.sizeimg : '',
+                    sizedetail:  body.sizedetail,
                     name: state.name,
                 },
             };
@@ -253,8 +290,11 @@ const UpdateSizeGuide = () => {
             console.log('✌️error --->', err);
         }
     };
+    console.log('✌️state.tableHTML --->', state.tableHTML);
 
-    return (
+    return loading ? (
+        <CommonLoader />
+    ) : (
         <>
             <div className="panel mb-5 flex items-center justify-between gap-5">
                 <h5 className="text-lg font-semibold dark:text-white-light">Update Size Guide</h5>
@@ -293,9 +333,9 @@ const UpdateSizeGuide = () => {
                             <button onClick={() => document.getElementById('image-upload').click()} className="rounded bg-blue-600 px-4 py-2 text-white">
                                 Replace Image
                             </button>
-                            {/* <button onClick={removeImage} className="rounded bg-red-500 px-4 py-2 text-white">
+                            <button onClick={removeImage} className="rounded bg-red-500 px-4 py-2 text-white">
                                 Remove
-                            </button> */}
+                            </button>
                         </div>
                         <input id="image-upload" type="file" accept="image/*" className="hidden" onChange={uploadFiles} />
                     </div>
@@ -304,9 +344,16 @@ const UpdateSizeGuide = () => {
             {state.errors?.image && <div className="mt-1 text-danger">{state.errors?.image}</div>}
 
             <div>
-                <label htmlFor="name" className="block text-lg font-medium text-gray-700">
-                    Size Chart
-                </label>
+                <div className="flex justify-between">
+                    <label htmlFor="name" className="block text-lg font-medium text-gray-700">
+                        Size Chart
+                    </label>
+                    {state.tableHTML &&
+                    <button onClick={() => setState({ tableHTML: '', columns: [], rows: [] })} className="rounded bg-red-500 px-4 py-2 text-white">
+                        Remove
+                    </button>
+                    }
+                </div>
 
                 <DynamicSizeTable tableData={tableData} htmlTableString={state.tableHTML} />
                 {state.errors?.size && <div className="mt-1 text-danger">{state.errors?.size}</div>}
@@ -316,7 +363,7 @@ const UpdateSizeGuide = () => {
                     Cancel
                 </button>
                 <button type="button" className="btn btn-primary  w-full md:mb-0 md:w-auto" onClick={() => handleSubmit()}>
-                    {updateLoading ? <IconLoader /> : 'Submit'}
+                    {state.loading || updateLoading || addNewImageLoading ? <IconLoader /> : 'Submit'}
                 </button>
             </div>
         </>

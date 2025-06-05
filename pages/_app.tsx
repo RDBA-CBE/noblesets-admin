@@ -15,6 +15,9 @@ import 'react-perfect-scrollbar/dist/css/styles.css';
 import '../styles/tailwind.css';
 import { NextPage } from 'next';
 import { ApolloClient, ApolloLink, ApolloProvider, InMemoryCache, createHttpLink } from '@apollo/client';
+import { onError } from '@apollo/client/link/error';
+import { useRouter } from 'next/router'; // Add this
+import { useMemo } from 'react';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
     getLayout?: (page: ReactElement) => ReactNode;
@@ -25,31 +28,51 @@ type AppPropsWithLayout = AppProps & {
 };
 
 const App = ({ Component, pageProps }: AppPropsWithLayout) => {
-    const httpLink = createHttpLink({
-        uri: 'https://file.prade.in/graphql/',
-    });
+    const router = useRouter(); // Get Next.js router
 
-    const authLink = new ApolloLink((operation, forward) => {
-        const token = localStorage.getItem('adminToken');
-
-        operation.setContext({
-            headers: {
-                Authorization: token ? `JWT ${token}` : '',
-                'Content-Type': 'application/json',
-            },
+    const client = useMemo(() => {
+        const httpLink = createHttpLink({
+            uri: 'https://file.prade.in/graphql/',
         });
-        // console.log('operation headers: ', operation.getContext().headers);
 
-        return forward(operation);
-    });
-    const client = new ApolloClient({
-        link: authLink.concat(httpLink),
-        cache: new InMemoryCache(),
-    });
+        const authLink = new ApolloLink((operation, forward) => {
+            const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
+
+            operation.setContext({
+                headers: {
+                    Authorization: token ? `JWT ${token}` : '',
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            return forward(operation);
+        });
+
+        const errorLink = onError(({ graphQLErrors, networkError }) => {
+            if (graphQLErrors) {
+                for (let err of graphQLErrors) {
+                    if (
+                        err.message === 'Invalid token. User does not exist or is inactive.'
+                    ) {
+                        localStorage.removeItem('adminToken'); // optional
+                        router.push('/login'); // Redirect to login
+                    }
+                }
+            }
+
+            if (networkError) {
+                console.error(`[Network error]: ${networkError}`);
+            }
+        });
+
+        return new ApolloClient({
+            link: ApolloLink.from([errorLink, authLink, httpLink]),
+            cache: new InMemoryCache(),
+        });
+    }, [router]);
 
     const getLayout = Component.getLayout ?? ((page) => <DefaultLayout>{page}</DefaultLayout>);
 
-    
     return (
         <ApolloProvider client={client}>
             <Provider store={store}>
@@ -67,4 +90,5 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
         </ApolloProvider>
     );
 };
+
 export default appWithI18Next(App, ni18nConfig);

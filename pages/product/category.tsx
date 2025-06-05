@@ -300,11 +300,7 @@ const Category = () => {
                                     render: (row) => <img src={row?.image ? row?.image : '/assets/images/placeholder.png'} alt="Product" className="h-10 w-10 object-cover ltr:mr-2 rtl:ml-2" />,
                                 },
                                 { accessor: 'name', sortable: true },
-                                {
-                                    accessor: 'textdescription',
-                                    sortable: true,
-                                    title: 'Description',
-                                },
+                                
                                 {
                                     accessor: 'parent',
                                     sortable: true,
@@ -319,6 +315,16 @@ const Category = () => {
                                     sortable: true,
 
                                     render: (row: any) => <button onClick={() => router.push(`/?category=${row.id}`)}>{row.product}</button>,
+                                },
+                                {
+                                    accessor: 'textdescription',
+                                    // sortable: true,
+                                    title: 'Description',
+                                    render: (row) => (
+                                        <Tippy content={row?.textdescription} placement="top" className="rounded-lg bg-black p-1 text-sm text-white">
+                                            <div>{row?.textdescription?.length > 20 ? `${row.textdescription.slice(0, 20)}...` : row?.textdescription}</div>
+                                        </Tippy>
+                                    ),
                                 },
 
                                 {

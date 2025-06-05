@@ -194,7 +194,7 @@ const EditCategory = () => {
                 input: {
                     name: name,
                     description: Description,
-                    backgroundImageUrl: previewUrl ? encodeUrlPathOnly(previewUrl) : '',
+                    backgroundImageUrl: previewUrl ? encodeUrlPathOnly(previewUrl) : null,
                     menuOrder: menuOrder,
                 },
                 id: catId,

@@ -522,8 +522,14 @@ export const UPDATE_CATEGORY_NEW = gql`
                 description
                 slug
                 __typename
+                menuOrder
             }
             __typename
+            errors {
+                code
+                field
+                message
+            }
         }
     }
 `;

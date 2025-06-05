@@ -143,11 +143,11 @@ const Payments = () => {
                 <div className="mb-5 flex-col gap-5 md:flex md:flex-row md:items-center ">
                     <h5 className="text-lg font-semibold dark:text-white-light">Payments List</h5>
 
-                    <div className="mt-5 md:mt-0 md:flex  md:ltr:ml-auto md:rtl:mr-auto">
+                    {/* <div className="mt-5 md:mt-0 md:flex  md:ltr:ml-auto md:rtl:mr-auto">
                         <button type="button" className="btn btn-primary  w-full md:mb-0 md:w-auto" onClick={() => CreateFinish()}>
                             + Create
                         </button>
-                    </div>
+                    </div> */}
                 </div>
                 {dataLoading ? (
                     <CommonLoader />

@@ -33,8 +33,6 @@ const Product_export = () => {
         variables: { channel: 'india-channel' },
     });
 
-
-
     const fetchCategories = async (variables) => {
         return await categoryRefetch(variables);
     };
@@ -85,7 +83,6 @@ const Product_export = () => {
             let hasNextPage = true;
             let after = null;
             let allData = [];
-            let attributeColumns = new Set(); // Set to track unique attribute names across all products
 
             while (hasNextPage) {
                 let cat = [];
@@ -117,19 +114,34 @@ const Product_export = () => {
                             ID: product?.productId,
                             SKU: data?.sku,
                             Name: product?.name,
-                            "Tax Class": product?.taxClass?.name,
+                            'Tax Class': product?.taxClass?.name,
                             'In Stock': data?.stocks?.length > 0 ? (data?.stocks[0]?.quantity > 0 ? 'Yes' : 'No') : 'No',
                             Stock: data?.stocks?.length > 0 ? data?.stocks[0]?.quantity : 0,
                             Price: data?.pricing?.price?.gross?.amount,
-                            Category: product?.category?.map((cat) => {
-                                return cat.parent ? `${cat?.name}(${cat?.parent?.name})` : cat?.name;
-                              })?.join(', '),
+                            Category: product?.category
+                                ?.map((cat) => {
+                                    return cat.parent ? `${cat?.name}(${cat?.parent?.name})` : cat?.name;
+                                })
+                                ?.join(', '),
                             Tags: ArrayToString(product?.tags),
                             Images: ArrayToImg(product?.media),
                             Upsells: ArrayToString(product?.getUpsells),
                             'Cross Sells': ArrayToString(product?.getCrosssells),
                             Position: product?.orderNo,
                             Published: IsPublished(product?.channelListings),
+                            brand: JSON.stringify({
+                                name: product?.brand?.name || '',
+                                slug: product?.brand?.slug || '',
+                            }),
+                            sizeGuide: JSON.stringify({
+                                name: product?.sizeGuide?.name || '',
+                                slug: product?.sizeGuide?.slug || '',
+                                sizeimg: product?.sizeGuide?.sizeimg || '',
+                                sizedetail: product?.sizeGuide?.sizedetail || '',
+                            }),
+                            priceBreakup: JSON.stringify({
+                                breakupDetails: product?.priceBreakup?.breakupDetails || '',
+                            }),
                         };
 
                         const metadata = product?.metadata || [];
@@ -138,17 +150,23 @@ const Product_export = () => {
                         res['Short Description'] = shortDescription;
                         res['Description'] = description;
 
+                        // 🟢 Format attributes into JSON
                         const attributes = product?.attributes || [];
+                        const formattedAttributes = [];
+
                         attributes.forEach((attr) => {
                             const attributeName = attr?.attribute?.name;
-                            const attributeValues = attr?.values?.map((val) => val?.name).join(', ') || '';
+                            const attributeValues = attr?.values?.map((val) => val?.name) || [];
 
                             if (attributeName) {
-                                attributeColumns?.add(attributeName);
-
-                                res[attributeName] = attributeValues;
+                                formattedAttributes.push({
+                                    name: attributeName,
+                                    values: attributeValues,
+                                });
                             }
                         });
+
+                        res['Attributes'] = JSON.stringify(formattedAttributes); // Save as JSON string
 
                         return res;
                     }),
@@ -160,17 +178,8 @@ const Product_export = () => {
 
             setState({ loading: false });
 
-            const attributeColumnArray: any = Array.from(attributeColumns);
-
             if (allData?.length > 0) {
-                const excelData = allData?.map((item) => {
-                    attributeColumnArray?.forEach((attr) => {
-                        if (!(attr in item)) {
-                            item[attr] = ''; 
-                        }
-                    });
-                    return item;
-                });
+                const excelData = allData;
 
                 downloadExcel(excelData, 'Export Products', [
                     'ID',
@@ -189,7 +198,11 @@ const Product_export = () => {
                     'Short Description',
                     'Description',
                     'Published',
-                    ...attributeColumnArray, // Include dynamic attribute columns
+                    'brand',
+                    'sizeGuide',
+                    'priceBreakup',
+                    'Attributes',
+
                 ]);
             } else {
                 Failure('No Data Found');
@@ -215,14 +228,14 @@ const Product_export = () => {
                             </label>
                         </div>
                         <div className="mb-5 w-[30%]">
-                        <CategorySelect
-                            queryFunc={fetchCategories} // Pass the function to fetch categories
-                            placeholder="Select Category"
-                            // title="Categories"
-                            selectedCategory={state.category}
-                            onCategoryChange={(data: any) => setState({ category: data })}
-                            isMulti={false}
-                        />
+                            <CategorySelect
+                                queryFunc={fetchCategories} // Pass the function to fetch categories
+                                placeholder="Select Category"
+                                // title="Categories"
+                                selectedCategory={state.category}
+                                onCategoryChange={(data: any) => setState({ category: data })}
+                                isMulti={false}
+                            />
                             {/* <select className="form-select flex-1" value={state.category} onChange={(e) => setState({ category: e.target.value })}>
                                 <option value="">Select a Categories </option>
                                 {parentList?.categories?.edges?.map((item: any) => {

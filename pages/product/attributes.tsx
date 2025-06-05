@@ -245,15 +245,18 @@ const Category = () => {
         try {
             if (attributeName == '') {
                 setAttributeNameError('Attribute Name is required');
-            } else if (slug == '') {
-                setSlugError('Slug is required');
-            } else {
+            } 
+            // else if (slug == '') {
+            //     setSlugError('Slug is required');
+            // } 
+            
+            else {
                 const body = {
                     filterableInDashboard: true,
                     filterableInStorefront: true,
                     inputType: 'MULTISELECT',
                     name: attributeName,
-                    slug: ConvertToSlug(slug),
+                    slug: ConvertToSlug(attributeName),
                     storefrontSearchPosition: 1,
                     type: 'PRODUCT_TYPE',
                     valueRequired: false,
@@ -386,10 +389,10 @@ const Category = () => {
                     <div className=" p-5 ">
                         <input type="text" value={attributeName} onChange={(e) => setAttributeName(e.target.value)} placeholder="Enter Attribute Name" name="name" className="form-input" required />
                         {attributeNameError && <p className="error-message mt-1 text-red-500">{attributeNameError}</p>}
-                        <div className="mt-5">
+                        {/* <div className="mt-5">
                             <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="Enter Slug" name="name" className="form-input" required />
                             {slugError && <p className="error-message mt-1 text-red-500">{slugError}</p>}
-                        </div>
+                        </div> */}
                         <div className="flex items-center justify-end gap-5 pt-5">
                             <button
                                 type="button"

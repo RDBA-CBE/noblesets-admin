@@ -133,15 +133,19 @@ export default function createAttribute() {
     const updateAttribute = async () => {
         if (state.attributeName == '') {
             setState({ nameError: 'Attribute name is required' });
-        } else if (state.slug == '') {
-            setState({ slugError: 'Slug is required' });
-        } else {
+        }
+        
+        // else if (state.slug == '') {
+        //     setState({ slugError: 'Slug is required' });
+        // } 
+        
+        else {
             const res = await updateAttributes({
                 variables: {
                     id: id,
                     input: {
                         name: state.attributeName,
-                        slug: ConvertToSlug(state.slug),
+                        slug: ConvertToSlug(state.attributeName),
                         visibleInStorefront: state.visibleInStorefront,
 
                         // unit: null,
@@ -154,6 +158,7 @@ export default function createAttribute() {
                 Success('Attribute updated successfully');
                 getDetails();
                 setState({ nameError: '', slugError: '' });
+                router.push("/product/attributes")
             }
         }
     };
@@ -180,7 +185,7 @@ export default function createAttribute() {
                 />
                 {state?.nameError && <p className="mt-[4px] text-[14px] text-red-600">{state?.nameError}</p>}
 
-                <div className="mt-5">
+                {/* <div className="mt-5">
                     <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                         Slug
                     </label>
@@ -194,7 +199,7 @@ export default function createAttribute() {
                         required
                     />
                     {state?.slugError && <p className="mt-[4px] text-[14px] text-red-600">{state?.slugError}</p>}
-                </div>
+                </div> */}
             </div>
             <div className=" w-full flex-wrap  items-center">
                 <div className="panel ">

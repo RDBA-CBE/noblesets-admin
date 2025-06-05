@@ -170,8 +170,8 @@ const ShippingProvider = () => {
                 timer: 3000,
             });
             toast.fire({
-                icon: modalTitle ? 'success' : 'info',
-                title: modalTitle ? 'Data updated successfully' : 'New data added successfully',
+                icon: modalTitle ? 'success' : 'success',
+                title: modalTitle ? 'Shipping Provider updated successfully' : 'New Shipping Provider added successfully',
                 padding: '10px 20px',
             });
 

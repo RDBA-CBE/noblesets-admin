@@ -51,7 +51,7 @@ const ProductImport = () => {
             let config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: SERVER_URL + 'import_data1/',
+                url: SERVER_URL + '/import-product/',
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: 'JWT ' + token,

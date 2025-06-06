@@ -36,6 +36,9 @@ import {
     ORDER_GRAND_REFUND_ORDER,
     CREATE_MANUAL_ORDER_REFUND,
     ORDER_DETAILS_GRAND_REFUND,
+    DELETE_INVOICE,
+    DELETE_INVOICE_REQUEST,
+    NEW_INVOICE_REQUEST,
 } from '@/query/product';
 import { Loader } from '@mantine/core';
 import moment from 'moment';
@@ -142,6 +145,10 @@ const Editorder = () => {
     const [draftOrderCancel] = useMutation(DRAFT_ORDER_CANCEL);
     const [createInvoice] = useMutation(CREATE_INVOICE);
     const [updatesInvoice] = useMutation(UPDATE_INVOICE);
+    const [deleteInvoice, { loading: deleteLoading }] = useMutation(DELETE_INVOICE);
+    const [deleteReqInvoice, { loading: deleteReqLoading }] = useMutation(DELETE_INVOICE_REQUEST);
+    const [newInvoiceReq, { loading: newInvoiceReqLoading }] = useMutation(NEW_INVOICE_REQUEST);
+
     const [updateInvoicePdf] = useMutation(UPDATE_INVOICE_PDF);
     const [unfillmentOrder] = useMutation(UNFULFILLMENT_ORDER);
     const [createPayslip] = useMutation(CREATE_PAYSLIP);
@@ -1017,33 +1024,42 @@ const Editorder = () => {
     const updateInvoice = async (country?: any) => {
         try {
             setUpdateInvoideLoading(true);
-            const res = await updatesInvoice({
+            const deleteReq = await deleteReqInvoice({
                 variables: {
-                    invoiceid: orderData?.invoices[0]?.id,
-                    input: {
-                        number: 'PR2425' + invoiceNumber,
-                        createdAt: invoiceDate,
-                    },
+                    id: orderData?.invoices[0]?.id,
                 },
             });
 
-            if (res.data?.invoiceUpdate?.errors?.length > 0) {
-                setOpenInvoice(false);
-                setUpdateInvoideLoading(false);
-                getOrderDetails();
-                Failure('Invoice not updated');
+            if (deleteReq?.data?.invoiceRequestDelete?.errors?.length > 0) {
+                Failure(deleteReq?.data?.invoiceRequestDelete?.errors?.[0]?.message);
             } else {
-                const res = await updateInvoicePdf({
+                const deleteInvoices = await deleteInvoice({
                     variables: {
-                        invoiceId: orderData?.invoices[0]?.id,
+                        id: orderData?.invoices[0]?.id,
                     },
                 });
-                setUpdateInvoideLoading(false);
+                if (deleteInvoices?.data?.invoiceDelete?.errors?.length > 0) {
+                    Failure(deleteInvoices?.data?.invoiceDelete?.errors?.[0]?.message);
+                } else {
+                    const newInvoiceReqRes = await newInvoiceReq({
+                        variables: {
+                            // id: orderData?.invoices[0]?.id,
+                            createdAt: invoiceDate,
+                            orderId: id,
+                            number: 'PR2425' + invoiceNumber,
+                        },
+                    });
+                    if (newInvoiceReqRes?.data?.invoiceRequest?.errors?.length > 0) {
+                        Failure(newInvoiceReqRes?.data?.invoiceRequest?.errors?.[0]?.message);
+                    } else {
+                        setUpdateInvoideLoading(false);
 
-                setOpenInvoice(false);
-                getOrderDetails();
+                        setOpenInvoice(false);
+                        getOrderDetails();
 
-                Success('Invoice Updated Successfully');
+                        Success('Invoice Updated Successfully');
+                    }
+                }
             }
         } catch (error) {
             setUpdateInvoideLoading(false);
@@ -1416,7 +1432,7 @@ const Editorder = () => {
         }
     };
     const showRefundBtn = (data) => {
-console.log('✌️data --->', data);
+        console.log('✌️data --->', data);
         let without_shipping_amount = Number(data?.total?.gross?.amount) - (Number(data?.shippingPrice?.gross?.amount) + Number(data?.codAmount) + Number(data?.giftWrapAmount));
         let totalRefunded = data?.totalRefunded?.amount;
         let show = false;
@@ -1426,10 +1442,10 @@ console.log('✌️data --->', data);
         } else if (data?.paymentMethod == null) {
             show = false;
         } else {
-        if (totalRefunded < without_shipping_amount && (data?.paymentStatus == 'FULLY_CHARGED' || data?.paymentStatus == 'PARTIALLY_REFUNDED' || data.isPaid)) {
-            show = true;
+            if (totalRefunded < without_shipping_amount && (data?.paymentStatus == 'FULLY_CHARGED' || data?.paymentStatus == 'PARTIALLY_REFUNDED' || data.isPaid)) {
+                show = true;
+            }
         }
-    }
         setShowRefundBtn(show);
     };
 

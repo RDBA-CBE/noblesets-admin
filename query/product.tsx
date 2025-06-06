@@ -2690,6 +2690,70 @@ export const UPDATE_INVOICE = gql`
     }
 `;
 
+export const DELETE_INVOICE = gql`
+    mutation MyMutation($id: ID!) {
+        invoiceDelete(id: $id) {
+            invoice {
+                id
+                number
+                url
+                updatedAt
+                status
+            }
+            errors {
+                code
+                field
+                message
+            }
+        }
+    }
+`;
+
+export const DELETE_INVOICE_REQUEST = gql`
+    mutation MyMutation($id: ID!) {
+        invoiceRequestDelete(id: $id) {
+            invoice {
+                createdAt
+                id
+                number
+                status
+                updatedAt
+                url
+                message
+                __typename
+            }
+            __typename
+            errors {
+                code
+                field
+                message
+            }
+        }
+    }
+`;
+
+export const NEW_INVOICE_REQUEST = gql`
+    mutation MyMutation($number: String!, $orderId: ID!, $createdAt: DateTime!) {
+        invoiceRequest(number: $number, orderId: $orderId, createdAt: $createdAt) {
+            invoice {
+                createdAt
+                externalUrl
+                id
+                message
+                number
+                status
+                updatedAt
+                url
+            }
+            errors {
+                message
+                field
+                code
+            }
+        }
+    }
+`;
+
 export const UPDATE_PAYSLIP = gql`
     mutation OrderUpdateMetadata($id: ID!, $input: [MetadataInput!]!, $keysToDelete: [String!]!) {
         updateMetadata(id: $id, input: $input) {

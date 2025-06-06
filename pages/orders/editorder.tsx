@@ -33,6 +33,9 @@ import {
     UNFULFILLMENT_ORDER,
     REFUND_DATA,
     ORDER_FULLFILMENT_REFUND,
+    DELETE_INVOICE,
+    DELETE_INVOICE_REQUEST,
+    NEW_INVOICE_REQUEST,
 } from '@/query/product';
 import { Loader } from '@mantine/core';
 import moment from 'moment';
@@ -150,6 +153,9 @@ const Editorder = () => {
     const [sendPayslip] = useMutation(SEND_PAYLSIP);
     const [sendGiftCart] = useMutation(SEND_GIFT_CART);
     const [orderFullfilmentRefund, { loading: refundLoading }] = useMutation(ORDER_FULLFILMENT_REFUND);
+    const [deleteInvoice, { loading: deleteLoading }] = useMutation(DELETE_INVOICE);
+    const [deleteReqInvoice, { loading: deleteReqLoading }] = useMutation(DELETE_INVOICE_REQUEST);
+    const [newInvoiceReq, { loading: newInvoiceReqLoading }] = useMutation(NEW_INVOICE_REQUEST);
 
     // updateFullfillStatus
 
@@ -993,36 +999,83 @@ const Editorder = () => {
         }
     };
 
+    // const updateInvoice = async (country?: any) => {
+    //     try {
+    //         setUpdateInvoideLoading(true);
+    //         const res = await updatesInvoice({
+    //             variables: {
+    //                 invoiceid: orderData?.invoices[0]?.id,
+    //                 input: {
+    //                     number: 'PR2425' + invoiceNumber,
+    //                     createdAt: invoiceDate,
+    //                 },
+    //             },
+    //         });
+
+    //         if (res.data?.invoiceUpdate?.errors?.length > 0) {
+    //             setOpenInvoice(false);
+    //             setUpdateInvoideLoading(false);
+    //             getOrderDetails();
+    //             Failure('Invoice not updated');
+    //         } else {
+    //             const res = await updateInvoicePdf({
+    //                 variables: {
+    //                     invoiceId: orderData?.invoices[0]?.id,
+    //                 },
+    //             });
+    //             setUpdateInvoideLoading(false);
+
+    //             setOpenInvoice(false);
+    //             getOrderDetails();
+
+    //             Success('Invoice Updated Successfully');
+    //         }
+    //     } catch (error) {
+    //         setUpdateInvoideLoading(false);
+
+    //         console.log('error: ', error);
+    //     }
+    // };
+
     const updateInvoice = async (country?: any) => {
         try {
             setUpdateInvoideLoading(true);
-            const res = await updatesInvoice({
+            const deleteReq = await deleteReqInvoice({
                 variables: {
-                    invoiceid: orderData?.invoices[0]?.id,
-                    input: {
-                        number: 'PR2425' + invoiceNumber,
-                        createdAt: invoiceDate,
-                    },
+                    id: orderData?.invoices[0]?.id,
                 },
             });
 
-            if (res.data?.invoiceUpdate?.errors?.length > 0) {
-                setOpenInvoice(false);
-                setUpdateInvoideLoading(false);
-                getOrderDetails();
-                Failure('Invoice not updated');
+            if (deleteReq?.data?.invoiceRequestDelete?.errors?.length > 0) {
+                Failure(deleteReq?.data?.invoiceRequestDelete?.errors?.[0]?.message);
             } else {
-                const res = await updateInvoicePdf({
+                const deleteInvoices = await deleteInvoice({
                     variables: {
-                        invoiceId: orderData?.invoices[0]?.id,
+                        id: orderData?.invoices[0]?.id,
                     },
                 });
-                setUpdateInvoideLoading(false);
+                if (deleteInvoices?.data?.invoiceDelete?.errors?.length > 0) {
+                    Failure(deleteInvoices?.data?.invoiceDelete?.errors?.[0]?.message);
+                } else {
+                    const newInvoiceReqRes = await newInvoiceReq({
+                        variables: {
+                            // id: orderData?.invoices[0]?.id,
+                            createdAt: invoiceDate,
+                            orderId: id,
+                            number: 'PR2425' + invoiceNumber,
+                        },
+                    });
+                    if (newInvoiceReqRes?.data?.invoiceRequest?.errors?.length > 0) {
+                        Failure(newInvoiceReqRes?.data?.invoiceRequest?.errors?.[0]?.message);
+                    } else {
+                        setUpdateInvoideLoading(false);
 
-                setOpenInvoice(false);
-                getOrderDetails();
+                        setOpenInvoice(false);
+                        getOrderDetails();
 
-                Success('Invoice Updated Successfully');
+                        Success('Invoice Updated Successfully');
+                    }
+                }
             }
         } catch (error) {
             setUpdateInvoideLoading(false);
@@ -1262,7 +1315,6 @@ const Editorder = () => {
         let totalRefunded = data?.totalRefunded?.amount;
         let show = false;
         if (data?.paymentMethod?.name == 'Cash On Delivery') {
-
             show = false;
         } else if (data?.paymentMethod == null) {
             show = false;

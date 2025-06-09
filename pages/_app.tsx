@@ -32,7 +32,7 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
 
     const client = useMemo(() => {
         const httpLink = createHttpLink({
-            uri: 'https://file.prade.in/graphql/',
+            uri: 'https://noble.irepute.in/graphql/',
         });
 
         const authLink = new ApolloLink((operation, forward) => {

@@ -43,6 +43,7 @@ const Pincode = () => {
     const [modal1, setModal1] = useState(false);
     const [modalTitle, setModalTitle] = useState(null);
     const [modalContant, setModalContant] = useState<any>(null);
+    console.log('✌️modalContant --->', modalContant);
     const [totalCount, setTotalCount] = useState(0);
 
     const {
@@ -185,22 +186,64 @@ const Pincode = () => {
     };
     const SubmittedForm = Yup.object().shape({
         name: Yup.string().required('Name is required'),
-      
+
         pincode: Yup.string()
-          .required('Pincode is required')
-          .matches(
-            /^(\d{1,10})(,\d{1,10})*$/,
-            'Only comma-separated numbers are allowed, each up to 10 digits (e.g., 641701,621704)'
-          ),
-      });
+            .required('Pincode is required')
+            .matches(/^(\d{1,10})(,\d{1,10})*$/, 'Only comma-separated numbers are allowed, each up to 10 digits (e.g., 641701,621704)'),
+    });
+
+    const SubmittedForm1 = Yup.object().shape({
+        name: Yup.string().required('Name is required'),
+
+        pincode: Yup.array()
+            .transform((value, originalValue) => {
+                // Convert comma-separated string to array if needed
+                if (typeof originalValue === 'string') {
+                    return originalValue
+                        .split(',')
+                        .map((item) => item.trim())
+                        .filter((item) => item.length > 0); // remove empty entries
+                }
+
+                // For array input, trim and filter
+                if (Array.isArray(originalValue)) {
+                    return originalValue.map((item) => (typeof item === 'string' ? item.trim() : item)).filter((item) => typeof item === 'string' && item.length > 0);
+                }
+
+                return value;
+            })
+            .of(
+                Yup.string()
+                    .matches(/^\d{1,10}$/, 'Each pincode must be a number with up to 10 digits')
+                    .required('Pincode cannot be empty')
+            )
+            .min(1, 'At least one valid pincode is required')
+            .required('Pincode is required'),
+    });
 
     // form submit
     const onSubmit = async (record: any, { resetForm }: any) => {
+        let pincode = null;
+        if (modalTitle) {
+            if (Array.isArray(record?.pincode)) {
+                const pincodes = record?.pincode?.map((item) => (typeof item === 'string' ? item.trim() : item)).filter((item) => item && /^\d{1,10}$/.test(item)); // optional: keep only valid ones
+                pincode = pincodes;
+            } else {
+                const cleaned = record?.pincode
+                    .split(',') // Split by comma
+                    .map((item) => item.trim()) // Trim spaces
+                    .filter((item) => item.length > 0);
+                pincode = cleaned;
+            }
+        } else {
+            pincode = record?.pincode?.split(',');
+        }
+
         try {
             const variables = {
                 input: {
                     name: record.name,
-                    codes: Array.isArray(record?.pincode) ? record?.pincode : record?.pincode?.split(','),
+                    codes: pincode,
                 },
             };
 
@@ -233,6 +276,7 @@ const Pincode = () => {
 
     // category table edit
     const EditCategory = (record: any) => {
+        console.log('✌️record --->', record);
         setModal1(true);
         setModalTitle(record);
         setModalContant(record);
@@ -417,7 +461,7 @@ const Pincode = () => {
                                     <div className="mb-5 p-5">
                                         <Formik
                                             initialValues={modalContant === null ? { name: '', pincode: '' } : { name: modalContant?.name, pincode: modalContant?.code }}
-                                            validationSchema={SubmittedForm}
+                                            validationSchema={modalContant === null ? SubmittedForm : SubmittedForm1}
                                             onSubmit={(values, { resetForm }) => {
                                                 onSubmit(values, { resetForm }); // Call the onSubmit function with form values and resetForm method
                                             }}

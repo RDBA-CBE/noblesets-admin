@@ -1132,10 +1132,16 @@ const Editorder = () => {
                     id: orderData?.invoices[0]?.id,
                 },
             });
+            if (res?.data?.invoiceSendNotification?.errors?.length > 0) {
+                Failure(res?.data?.invoiceSendNotification?.errors[0]?.message);
+                setInvoiceSendLoading(false);
+            } else {
+                console.log('✌️res --->', res);
 
-            setInvoiceSendLoading(false);
+                setInvoiceSendLoading(false);
 
-            Success('Invoice sent Successfully');
+                Success('Invoice sent Successfully');
+            }
         } catch (error) {
             setInvoiceSendLoading(false);
 

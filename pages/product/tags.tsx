@@ -100,6 +100,8 @@ const Tags = () => {
         },
     });
 
+    const { refetch: searchRefetch } = useQuery(PRODUCT_LIST_TAGS);
+
     const [fetchNextPage] = useLazyQuery(PRODUCT_LIST_TAGS, {
         onCompleted: (data) => {
             commonPagination(data);
@@ -113,6 +115,7 @@ const Tags = () => {
     });
 
     const commonPagination = (data) => {
+        console.log('✌️data --->', data);
         const customers = data.tags.edges;
         const pageInfo = data.tags?.pageInfo;
 
@@ -160,7 +163,7 @@ const Tags = () => {
                 after: null,
                 search: '',
             });
-            console.log('data: ', data);
+            setTotalCount(data?.tags?.totalCount);
             commonPagination(data);
         } catch (error) {
             console.log('error: ', error);
@@ -174,14 +177,14 @@ const Tags = () => {
             refresh();
         } else {
             console.log('else: ');
-            const res = await categoryListRefetch({
-                variables: {
-                    channel: 'india-channel',
-                    search: e,
-                    last: PAGE_SIZE,
-                    before: startCursor,
-                },
+            const res = await searchRefetch({
+                channel: 'india-channel',
+                search: e,
+                first: PAGE_SIZE,
+                // before: startCursor,
             });
+            setTotalCount(res?.data?.tags?.totalCount);
+
             commonPagination(res?.data);
         }
     };
@@ -268,9 +271,9 @@ const Tags = () => {
                 }
                 selectedRecords?.map(async (item: any) => {
                     await bulkDelete({ variables: { id: item.id } });
+                    await refresh();
                 });
                 Swal.fire('Deleted!', 'Your files have been deleted.', 'success');
-                refresh();
                 setSelectedRecords([]);
             },
             () => {
@@ -298,93 +301,93 @@ const Tags = () => {
             {/* {getLoading ? (
                 <CommonLoader />
             ) : ( */}
-                <div className="panel mt-6">
-                    <div className="mb-5 flex flex-col gap-5 md:flex-row md:items-center">
-                        <h5 className="text-lg font-semibold dark:text-white-light">Tags ({totalCount})</h5>
+            <div className="panel mt-6">
+                <div className="mb-5 flex flex-col gap-5 md:flex-row md:items-center">
+                    <h5 className="text-lg font-semibold dark:text-white-light">Tags ({totalCount})</h5>
 
-                        <div className="flex ltr:ml-auto rtl:mr-auto">
-                            <input type="text" className="form-input mr-2 w-auto" placeholder="Search..." value={search} onChange={(e) => handleSearchChange(e.target.value)} />
-                            <div className="dropdown  mr-2 ">
-                                <Dropdown
-                                    placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                    btnClassName="btn btn-outline-primary dropdown-toggle"
-                                    button={
-                                        <>
-                                            Bulk Actions
-                                            <span>
-                                                <IconCaretDown className="inline-block ltr:ml-1 rtl:mr-1" />
-                                            </span>
-                                        </>
-                                    }
-                                >
-                                    <ul className="!min-w-[170px]">
-                                        <li>
-                                            <button type="button" onClick={() => BulkDeleteCategory()}>
-                                                Delete
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </Dropdown>
-                            </div>
-                            <button type="button" className="btn btn-primary" onClick={() => CreateTags()}>
-                                + Create
-                            </button>
+                    <div className="flex ltr:ml-auto rtl:mr-auto">
+                        <input type="text" className="form-input mr-2 w-auto" placeholder="Search..." value={search} onChange={(e) => handleSearchChange(e.target.value)} />
+                        <div className="dropdown  mr-2 ">
+                            <Dropdown
+                                placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
+                                btnClassName="btn btn-outline-primary dropdown-toggle"
+                                button={
+                                    <>
+                                        Bulk Actions
+                                        <span>
+                                            <IconCaretDown className="inline-block ltr:ml-1 rtl:mr-1" />
+                                        </span>
+                                    </>
+                                }
+                            >
+                                <ul className="!min-w-[170px]">
+                                    <li>
+                                        <button type="button" onClick={() => BulkDeleteCategory()}>
+                                            Delete
+                                        </button>
+                                    </li>
+                                </ul>
+                            </Dropdown>
                         </div>
-                    </div>
-                    {getLoading ? (
-                        <CommonLoader />
-                    ) : (
-                        <div className="datatables">
-                            <DataTable
-                                className="table-hover whitespace-nowrap"
-                                records={recordsData}
-                                columns={[
-                                    { accessor: 'name', sortable: true },
-                                    {
-                                        accessor: 'actions',
-                                        title: 'Actions',
-                                        render: (row: any) => (
-                                            <>
-                                                <Tippy content="Edit">
-                                                    <button type="button" onClick={() => EditCategory(row)}>
-                                                        <IconPencil className="ltr:mr-2 rtl:ml-2" />
-                                                    </button>
-                                                </Tippy>
-                                                <Tippy content="Delete">
-                                                    <button type="button" onClick={() => DeleteCategory(row)}>
-                                                        <IconTrashLines />
-                                                    </button>
-                                                </Tippy>
-                                            </>
-                                        ),
-                                    },
-                                ]}
-                                highlightOnHover
-                                totalRecords={recordsData?.length}
-                                recordsPerPage={PAGE_SIZE}
-                                minHeight={200}
-                                page={null}
-                                onPageChange={(p) => {}}
-                                withBorder={true}
-                                sortStatus={sortStatus}
-                                onSortStatusChange={setSortStatus}
-                                selectedRecords={selectedRecords}
-                                onSelectedRecordsChange={(val) => {
-                                    setSelectedRecords(val);
-                                }}
-                            />
-                        </div>
-                    )}
-
-                    <div className="mt-5 flex justify-end gap-3">
-                        <button disabled={!hasPreviousPage} onClick={handlePreviousPage} className={`btn ${!hasPreviousPage ? 'btn-disabled' : 'btn-primary'}`}>
-                            <IconArrowBackward />
-                        </button>
-                        <button disabled={!hasNextPage} onClick={handleNextPage} className={`btn ${!hasNextPage ? 'btn-disabled' : 'btn-primary'}`}>
-                            <IconArrowForward />
+                        <button type="button" className="btn btn-primary" onClick={() => CreateTags()}>
+                            + Create
                         </button>
                     </div>
                 </div>
+                {getLoading ? (
+                    <CommonLoader />
+                ) : (
+                    <div className="datatables">
+                        <DataTable
+                            className="table-hover whitespace-nowrap"
+                            records={recordsData}
+                            columns={[
+                                { accessor: 'name' },
+                                {
+                                    accessor: 'actions',
+                                    title: 'Actions',
+                                    render: (row: any) => (
+                                        <>
+                                            <Tippy content="Edit">
+                                                <button type="button" onClick={() => EditCategory(row)}>
+                                                    <IconPencil className="ltr:mr-2 rtl:ml-2" />
+                                                </button>
+                                            </Tippy>
+                                            <Tippy content="Delete">
+                                                <button type="button" onClick={() => DeleteCategory(row)}>
+                                                    <IconTrashLines />
+                                                </button>
+                                            </Tippy>
+                                        </>
+                                    ),
+                                },
+                            ]}
+                            highlightOnHover
+                            totalRecords={recordsData?.length}
+                            recordsPerPage={PAGE_SIZE}
+                            minHeight={200}
+                            page={null}
+                            onPageChange={(p) => {}}
+                            withBorder={true}
+                            sortStatus={sortStatus}
+                            onSortStatusChange={setSortStatus}
+                            selectedRecords={selectedRecords}
+                            onSelectedRecordsChange={(val) => {
+                                setSelectedRecords(val);
+                            }}
+                        />
+                    </div>
+                )}
+
+                <div className="mt-5 flex justify-end gap-3">
+                    <button disabled={!hasPreviousPage} onClick={handlePreviousPage} className={`btn ${!hasPreviousPage ? 'btn-disabled' : 'btn-primary'}`}>
+                        <IconArrowBackward />
+                    </button>
+                    <button disabled={!hasNextPage} onClick={handleNextPage} className={`btn ${!hasNextPage ? 'btn-disabled' : 'btn-primary'}`}>
+                        <IconArrowForward />
+                    </button>
+                </div>
+            </div>
             {/* )} */}
 
             {/* CREATE AND EDIT Tags FORM */}

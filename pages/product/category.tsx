@@ -68,22 +68,19 @@ const Category = () => {
         },
     });
 
-
-    const {
-       
-    } = useQuery(CATEGORY_LIST, {
+    const {} = useQuery(CATEGORY_LIST, {
         variables: {
             channel: 'india-channel',
             first: PAGE_SIZE,
             after: null,
-            search:  '',
+            search: '',
         },
         onCompleted: (data) => {
             setTotalCount(data?.categories?.totalCount);
         },
     });
 
-    const { data, refetch: refetch } = useQuery(CATEGORY_LIST);
+    const { data, refetch: searchRefetch } = useQuery(CATEGORY_LIST);
 
     const [fetchNextPage] = useLazyQuery(CATEGORY_LIST, {
         onCompleted: (data) => {
@@ -165,14 +162,14 @@ const Category = () => {
             refresh();
         } else {
             console.log('else: ');
-            const res = await categoryListRefetch({
-                variables: {
-                    channel: 'india-channel',
-                    search: e,
-                    last: PAGE_SIZE,
-                    before: startCursor,
-                },
+            const res = await searchRefetch({
+                channel: 'india-channel',
+                search: e,
+                first: PAGE_SIZE,
+                // before: startCursor,
             });
+            setTotalCount(res?.data?.categories?.totalCount);
+
             commonPagination(res?.data);
         }
     };
@@ -217,8 +214,7 @@ const Category = () => {
                 }
                 selectedRecords?.map(async (item: any) => {
                     await bulkDelete({ variables: { id: item.id } });
-                await refresh()
-
+                    await refresh();
                 });
                 // const updatedRecordsData = recordsData.filter((record) => !selectedRecords.includes(record));
                 // setRecordsData(updatedRecordsData);
@@ -242,7 +238,7 @@ const Category = () => {
                 // setCategoryList(updatedRecordsData);
                 // getCategoryList()
                 setSelectedRecords([]);
-                await refresh()
+                await refresh();
                 // setCategoryList(finishList)
                 // await categoryListRefetch();
 
@@ -300,29 +296,26 @@ const Category = () => {
                                 // { accessor: 'id',  },
                                 {
                                     accessor: 'image',
-                                    
+
                                     render: (row) => <img src={row?.image ? row?.image : '/assets/images/placeholder.png'} alt="Product" className="h-10 w-10 object-cover ltr:mr-2 rtl:ml-2" />,
                                 },
-                                { accessor: 'name',  },
-                                
+                                { accessor: 'name' },
+
                                 {
                                     accessor: 'parent',
-                                    
                                 },
                                 {
                                     accessor: 'menuOrder',
-                                    
                                 },
 
                                 {
                                     accessor: 'product',
-                                    
 
                                     render: (row: any) => <button onClick={() => router.push(`/?category=${row.id}`)}>{row.product}</button>,
                                 },
                                 {
                                     accessor: 'textdescription',
-                                    // 
+                                    //
                                     title: 'Description',
                                     render: (row) => (
                                         <Tippy content={row?.textdescription} placement="top" className="rounded-lg bg-black p-1 text-sm text-white">

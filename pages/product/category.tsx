@@ -145,7 +145,7 @@ const Category = () => {
     // Statement Earrings necklaces
     const refresh = async () => {
         try {
-            const { data } = await refetch({
+            const { data } = await categoryListRefetch({
                 channel: 'india-channel',
                 first: PAGE_SIZE,
                 after: null,
@@ -217,12 +217,13 @@ const Category = () => {
                 }
                 selectedRecords?.map(async (item: any) => {
                     await bulkDelete({ variables: { id: item.id } });
-                });
-                const updatedRecordsData = recordsData.filter((record) => !selectedRecords.includes(record));
-                setRecordsData(updatedRecordsData);
-                // setCategoryList(updatedRecordsData);
-                setSelectedRecords([]);
                 await refresh()
+
+                });
+                // const updatedRecordsData = recordsData.filter((record) => !selectedRecords.includes(record));
+                // setRecordsData(updatedRecordsData);
+                // // setCategoryList(updatedRecordsData);
+                setSelectedRecords([]);
 
                 Swal.fire('Deleted!', 'Your files have been deleted.', 'success');
             },
@@ -236,8 +237,8 @@ const Category = () => {
         showDeleteAlert(
             async () => {
                 const { data } = await deleteCategory({ variables: { id: record.id } });
-                const updatedRecordsData = recordsData.filter((dataRecord: any) => dataRecord.id !== record.id);
-                setRecordsData(updatedRecordsData);
+                // const updatedRecordsData = recordsData.filter((dataRecord: any) => dataRecord.id !== record.id);
+                // setRecordsData(updatedRecordsData);
                 // setCategoryList(updatedRecordsData);
                 // getCategoryList()
                 setSelectedRecords([]);

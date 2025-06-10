@@ -51,7 +51,7 @@ const ProductImport = () => {
             let config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: SERVER_URL + '/import-product/',
+                url: SERVER_URL + 'import-product/',
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: 'JWT ' + token,
@@ -63,7 +63,7 @@ const ProductImport = () => {
             if (response.data.errors && response.data.errors.length > 0) {
                 setState({ errors: response.data.errors });
             } else {
-                Success('File uploaded successfully');
+                Success(response.data?.message);
                 setState({ errors: [], file: null, updateProducts: false });
                 fileInputRef.current.value = ''; // Clear the file input
             }
@@ -164,7 +164,7 @@ const ProductImport = () => {
                     <h4 className="text-lg font-semibold">Upload Errors :</h4>
                     <ul className="list-inside list-disc">
                         {state.errors.map((error, index) => (
-                            <li key={index}>{error}</li>
+                            <li key={index}>{error?.message}</li>
                         ))}
                     </ul>
                 </div>

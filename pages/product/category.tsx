@@ -151,6 +151,7 @@ const Category = () => {
                 after: null,
                 search: '',
             });
+            setTotalCount(data?.categories?.totalCount);
             commonPagination(data);
         } catch (error) {
             console.log('error: ', error);
@@ -221,6 +222,7 @@ const Category = () => {
                 setRecordsData(updatedRecordsData);
                 // setCategoryList(updatedRecordsData);
                 setSelectedRecords([]);
+                await refresh()
 
                 Swal.fire('Deleted!', 'Your files have been deleted.', 'success');
             },
@@ -239,6 +241,7 @@ const Category = () => {
                 // setCategoryList(updatedRecordsData);
                 // getCategoryList()
                 setSelectedRecords([]);
+                await refresh()
                 // setCategoryList(finishList)
                 // await categoryListRefetch();
 
@@ -293,32 +296,32 @@ const Category = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                // { accessor: 'id', sortable: true },
+                                // { accessor: 'id',  },
                                 {
                                     accessor: 'image',
-                                    sortable: true,
+                                    
                                     render: (row) => <img src={row?.image ? row?.image : '/assets/images/placeholder.png'} alt="Product" className="h-10 w-10 object-cover ltr:mr-2 rtl:ml-2" />,
                                 },
-                                { accessor: 'name', sortable: true },
+                                { accessor: 'name',  },
                                 
                                 {
                                     accessor: 'parent',
-                                    sortable: true,
+                                    
                                 },
                                 {
                                     accessor: 'menuOrder',
-                                    sortable: true,
+                                    
                                 },
 
                                 {
                                     accessor: 'product',
-                                    sortable: true,
+                                    
 
                                     render: (row: any) => <button onClick={() => router.push(`/?category=${row.id}`)}>{row.product}</button>,
                                 },
                                 {
                                     accessor: 'textdescription',
-                                    // sortable: true,
+                                    // 
                                     title: 'Description',
                                     render: (row) => (
                                         <Tippy content={row?.textdescription} placement="top" className="rounded-lg bg-black p-1 text-sm text-white">

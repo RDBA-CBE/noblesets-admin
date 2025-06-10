@@ -291,7 +291,7 @@ const CreateDiscount = () => {
                                     className="form-input"
                                     required
                                     min={state.startDate}
-                                    max={new Date(new Date(state.startDate).setFullYear(new Date(state.startDate).getFullYear() + 1)).toISOString().slice(0, 16)}
+                                    // max={new Date(new Date(state.startDate).setFullYear(new Date(state.startDate).getFullYear() + 1)).toISOString().slice(0, 16)}
                                 />
                             </>
                         )}

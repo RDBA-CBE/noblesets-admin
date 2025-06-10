@@ -503,7 +503,7 @@ const EditCoupon = () => {
                                     className="form-input"
                                     required
                                     min={state.startDate}
-                                    max={new Date(new Date(state.startDate).setFullYear(new Date(state.startDate).getFullYear() + 1)).toISOString().slice(0, 16)}
+                                    // max={new Date(new Date(state.startDate).setFullYear(new Date(state.startDate).getFullYear() + 1)).toISOString().slice(0, 16)}
                                 />
                                 {state.errors?.endDateError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.endDateError}</p>}
                             </>

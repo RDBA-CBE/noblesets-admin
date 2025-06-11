@@ -109,7 +109,7 @@ const Pincode = () => {
                 image: item.node?.baseProduct?.thumbnail?.url,
                 created_at: moment(item.node?.createdAt).format('DD-MM-YYYY'),
                 message: item.node?.customizationDetails ? JSON.parse(item.node?.customizationDetails).message : '',
-                email: item.node?.customer?.email,
+                email: item.node?.customer?.email || item.node?.email,
             };
         });
         setRecordsData(newData);

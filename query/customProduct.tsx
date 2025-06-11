@@ -34,6 +34,7 @@ export const REPORT_LIST = gql`
                     customer {
                         firstName
                         lastName
+                        email
                     }
                     customizationDetails
                     phone

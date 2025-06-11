@@ -472,7 +472,7 @@ const Brands = () => {
                                         </div>
                                     ),
                                 },
-                                { accessor: 'name', sortable: true },
+                                { accessor: 'name',  },
                                 {
                                     accessor: 'actions',
                                     title: 'Actions',
@@ -581,7 +581,7 @@ const Brands = () => {
                                                     <div className="w-1/2 text-center">
                                                         <h3 className="mb-2 text-xl font-semibold">Upload Image</h3>
                                                         <p className="mb-2 text-sm">or</p>
-                                                        <input type="file" accept="image/*" className="mb-2 ml-32" onChange={uploadFiles} />
+                                                        <input type="file" accept="image/*" className="mb-2" onChange={uploadFiles} />
                                                         <p className="mb-2 text-sm">Maximum upload file size: 30 MB.</p>
                                                     </div>
                                                 </div>

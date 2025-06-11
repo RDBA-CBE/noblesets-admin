@@ -103,7 +103,7 @@ const AbandonedCarts = () => {
                             columns={[
                                 {
                                     accessor: 'name',
-                                    sortable: true,
+                                    
 
                                     render: (row) => (
                                         <div className="cursor-pointer text-info underline" onClick={() => window.open(`/customer/edit?id=${row.customerId}`,"_blank")}>
@@ -111,10 +111,10 @@ const AbandonedCarts = () => {
                                         </div>
                                     ),
                                 },
-                                { accessor: 'email', sortable: true },
+                                { accessor: 'email',  },
                                 {
                                     accessor: 'product',
-                                    sortable: true,
+                                    
                                     render: (row) => (
                                         <button className="flex text-info underline" onClick={() => window.open(`${FRONTEND_URL}/product-details/${row.slug}`, '_blank')}>
                                             {row.product}
@@ -122,8 +122,8 @@ const AbandonedCarts = () => {
                                     ),
                                 },
 
-                                { accessor: 'note', sortable: true },
-                                { accessor: 'date', sortable: true },
+                                { accessor: 'note',  },
+                                { accessor: 'date',  },
                             ]}
                             highlightOnHover
                             totalRecords={recordsData.length}
@@ -131,7 +131,7 @@ const AbandonedCarts = () => {
                             page={null} // Add this line to set the current page
                             onPageChange={(p) => {}} // Dummy handler for onPageChange
                             sortStatus={{
-                                columnAccessor: 'name',
+                                columnAccessor: 'names',
                                 direction: 'asc',
                             }}
                             onSortStatusChange={() => {}}

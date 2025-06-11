@@ -170,13 +170,13 @@ const Coupon = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                { accessor: 'name', sortable: true },
-                                { accessor: 'startDate', sortable: true },
-                                { accessor: 'endDate', sortable: true },
-                                { accessor: 'Used/Limit', sortable: true },
+                                { accessor: 'name',  },
+                                { accessor: 'startDate',  },
+                                { accessor: 'endDate',  },
+                                { accessor: 'Used/Limit',  },
                                 {
                                     accessor: 'autoApply',
-                                    sortable: true,
+                                    
 
                                     render: (row: any) => (
                                         <>
@@ -216,7 +216,7 @@ const Coupon = () => {
                             page={null}
                             onPageChange={(p) => {}}
                             sortStatus={{
-                                columnAccessor: 'name',
+                                columnAccessor: 'names',
                                 direction: 'asc',
                             }}
                             onSortStatusChange={() => {}}

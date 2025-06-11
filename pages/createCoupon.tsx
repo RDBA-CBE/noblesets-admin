@@ -335,7 +335,7 @@ const CreateCoupon = () => {
                             columns={[
                                 {
                                     accessor: 'code',
-                                    sortable: true,
+                                    
                                     render: (row, index) => {
                                         return (
                                             <>
@@ -346,7 +346,7 @@ const CreateCoupon = () => {
                                 },
                                 {
                                     accessor: 'status',
-                                    sortable: true,
+                                    
                                     render: (row, index) => {
                                         return (
                                             <>

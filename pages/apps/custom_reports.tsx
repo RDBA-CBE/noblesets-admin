@@ -109,6 +109,7 @@ const Pincode = () => {
                 image: item.node?.baseProduct?.thumbnail?.url,
                 created_at: moment(item.node?.createdAt).format('DD-MM-YYYY'),
                 message: item.node?.customizationDetails ? JSON.parse(item.node?.customizationDetails).message : '',
+                email: item.node?.customer?.email,
             };
         });
         setRecordsData(newData);
@@ -331,6 +332,8 @@ const Pincode = () => {
                                 },
                                 { accessor: 'baseProduct' },
                                 { accessor: 'name' },
+                                { accessor: 'email' },
+
                                 {
                                     accessor: 'message',
 

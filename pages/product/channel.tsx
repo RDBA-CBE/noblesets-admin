@@ -293,9 +293,9 @@ const Channel = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                { accessor: 'name', sortable: true },
-                                { accessor: 'slug', sortable: true },
-                                { accessor: 'id', sortable: true },
+                                { accessor: 'name',  },
+                                { accessor: 'slug',  },
+                                { accessor: 'id',  },
                                 {
                                     // Custom column for actions
                                     accessor: 'actions', // You can use any accessor name you want

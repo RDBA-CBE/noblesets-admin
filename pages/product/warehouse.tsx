@@ -337,8 +337,8 @@ const Warehouse = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                { accessor: 'name', sortable: true },
-                                { accessor: 'id', sortable: true },
+                                { accessor: 'name',  },
+                                { accessor: 'id',  },
 
                                 {
                                     accessor: 'actions',

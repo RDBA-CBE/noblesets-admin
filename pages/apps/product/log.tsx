@@ -131,8 +131,8 @@ const Log = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                { accessor: 'date', sortable: true },
-                                { accessor: 'log', sortable: true },
+                                { accessor: 'date',  },
+                                { accessor: 'log',  },
                             ]}
                             highlightOnHover
                             totalRecords={recordsData.length}
@@ -140,7 +140,7 @@ const Log = () => {
                             page={null}
                             onPageChange={() => {}}
                             sortStatus={{
-                                columnAccessor: 'name',
+                                columnAccessor: 'names',
                                 direction: 'asc',
                             }}
                             onSortStatusChange={() => {}}

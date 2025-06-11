@@ -162,12 +162,12 @@ const Shipping = () => {
                         className="table-hover whitespace-nowrap"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', sortable: true, title: 'ID' },
-                            { accessor: 'zonename', sortable: true, title: 'Zone Name' },
-                            { accessor: 'regions', sortable: true, title: 'Region(s)' },
-                            { accessor: 'shippingmethod', sortable: true, title: 'Shipping Method(s)' },
-                            { accessor: 'taxstatus', sortable: true, title: 'Tax Status' },
-                            { accessor: 'cost', sortable: true, title: 'Cost' },
+                            { accessor: 'id',  title: 'ID' },
+                            { accessor: 'zonename',  title: 'Zone Name' },
+                            { accessor: 'regions',  title: 'Region(s)' },
+                            { accessor: 'shippingmethod',  title: 'Shipping Method(s)' },
+                            { accessor: 'taxstatus',  title: 'Tax Status' },
+                            { accessor: 'cost',  title: 'Cost' },
                             {
                                 // Custom column for actions
                                 accessor: 'actions', // You can use any accessor name you want

@@ -331,15 +331,15 @@ const CustomerList = () => {
                             columns={[
                                 {
                                     accessor: 'name',
-                                    sortable: true,
+                                    
                                 },
 
-                                { accessor: 'email', sortable: true },
-                                { accessor: 'dateJoined', sortable: true, title: 'Registered Date' },
+                                { accessor: 'email',  },
+                                { accessor: 'dateJoined',  title: 'Registered Date' },
 
                                 {
                                     accessor: 'orderCount',
-                                    sortable: true,
+                                    
                                     render: (row) => (
                                         <>
                                             <button className=" underline" onClick={() => router.push(`/orders/orders/?customer=${row.email}`)}>
@@ -373,7 +373,7 @@ const CustomerList = () => {
                             page={null} // Add this line to set the current page
                             onPageChange={(p) => {}} // Dummy handler for onPageChange
                             sortStatus={{
-                                columnAccessor: 'name',
+                                columnAccessor: 'nameaf',
                                 direction: 'asc',
                             }}
                             onSortStatusChange={() => {}}

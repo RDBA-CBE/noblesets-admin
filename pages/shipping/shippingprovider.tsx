@@ -291,9 +291,9 @@ const ShippingProvider = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                // { accessor: 'id', sortable: true },
-                                // { accessor: 'image', sortable: true, render: (row) => <img src={row.image} alt="Product" className="h-10 w-10 object-cover ltr:mr-2 rtl:ml-2" /> },
-                                { accessor: 'name', sortable: true },
+                                // { accessor: 'id',  },
+                                // { accessor: 'image',  render: (row) => <img src={row.image} alt="Product" className="h-10 w-10 object-cover ltr:mr-2 rtl:ml-2" /> },
+                                { accessor: 'name',  },
 
                                 {
                                     // Custom column for actions

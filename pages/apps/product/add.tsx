@@ -1651,6 +1651,8 @@ const ProductAdd = () => {
                             </label>
 
                             <DynamicSizeTable tableData={tableData} htmlTableString={tableHtml} />
+                            {priceBreakUpError && <p className="error-message mt-1 text-red-500 ">{priceBreakUpError}</p>}
+
                         </div>
 
                         <div className="panel mb-5 ">

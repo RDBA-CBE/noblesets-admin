@@ -251,7 +251,7 @@ const SizeGuide = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                { accessor: 'name', sortable: true },
+                                { accessor: 'name',  },
                                 {
                                     accessor: 'actions',
                                     title: 'Actions',

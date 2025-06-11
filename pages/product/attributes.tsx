@@ -326,7 +326,7 @@ const Category = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                { accessor: 'name', sortable: true },
+                                { accessor: 'name',  },
 
                                 {
                                     // Custom column for actions

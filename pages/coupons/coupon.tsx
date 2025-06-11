@@ -304,15 +304,15 @@ const ProductList = () => {
                         className="table-hover whitespace-nowrap"
                         records={recordsData}
                         columns={[
-                            // { accessor: 'id', sortable: true },
-                            { accessor: 'image', sortable: true, render: (row) => <img src={row.image} alt="Product" className="h-10 w-10 object-cover ltr:mr-2 rtl:ml-2" /> },
-                            { accessor: 'name', sortable: true },
-                            // { accessor: 'sku', sortable: true },
-                            // { accessor: 'stock', sortable: true },
-                            { accessor: 'price', sortable: true },
-                            // { accessor: 'categories', sortable: true },
-                            // { accessor: 'tags', sortable: true },
-                            { accessor: 'date', sortable: true },
+                            // { accessor: 'id',  },
+                            { accessor: 'image',  render: (row) => <img src={row.image} alt="Product" className="h-10 w-10 object-cover ltr:mr-2 rtl:ml-2" /> },
+                            { accessor: 'name',  },
+                            // { accessor: 'sku',  },
+                            // { accessor: 'stock',  },
+                            { accessor: 'price',  },
+                            // { accessor: 'categories',  },
+                            // { accessor: 'tags',  },
+                            { accessor: 'date',  },
                             {
                                 // Custom column for actions
                                 accessor: 'actions', // You can use any accessor name you want

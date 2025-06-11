@@ -507,7 +507,7 @@ const AbandonedCarts = () => {
                             columns={[
                                 {
                                     accessor: 'order',
-                                    sortable: true,
+                                    
                                     render: (row) => (
                                         <>
                                             <div className="">{row.order}</div>
@@ -519,11 +519,11 @@ const AbandonedCarts = () => {
                                         </>
                                     ),
                                 },
-                                { accessor: 'invoice', sortable: true, title: 'Invoice Number' },
-                                { accessor: 'date', sortable: true },
+                                { accessor: 'invoice',  title: 'Invoice Number' },
+                                { accessor: 'date',  },
                                 {
                                     accessor: 'status',
-                                    sortable: true,
+                                    
                                     title: 'Order status',
                                     render: (row) => (
                                         <div
@@ -545,7 +545,7 @@ const AbandonedCarts = () => {
                                 },
                                 {
                                     accessor: 'paymentStatus',
-                                    sortable: true,
+                                    
                                     title: 'Payment status',
                                     render: (row) => (
                                         <div
@@ -569,7 +569,7 @@ const AbandonedCarts = () => {
                                 },
                                 {
                                     accessor: 'shipmentTracking',
-                                    sortable: true,
+                                    
                                     title: 'Shipment Tracking',
                                     render: (item) => {
                                         return item?.courierPartner && item?.fulfillments?.length > 0 ? (
@@ -582,7 +582,7 @@ const AbandonedCarts = () => {
                                         );
                                     },
                                 },
-                                { accessor: 'total', sortable: true },
+                                { accessor: 'total',  },
                                 {
                                     accessor: 'actions',
                                     title: 'Actions',
@@ -639,7 +639,7 @@ const AbandonedCarts = () => {
                             page={null}
                             onPageChange={(p) => {}} // Dummy handler for onPageChange
                             sortStatus={{
-                                columnAccessor: 'name',
+                                columnAccessor: 'names',
                                 direction: 'asc',
                             }}
                             onSortStatusChange={() => {}}

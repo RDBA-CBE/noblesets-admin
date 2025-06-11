@@ -83,7 +83,7 @@ import BrandSelect from '@/components/Layouts/BrandSelect';
 import { BRAND_LIST } from '@/query/brand';
 import { SIZEGUIDE_LIST } from '@/query/sizeGuide';
 import DynamicSizeTable from '@/components/Layouts/DynamicTable';
-import { UPDATE_PRICE_BREAKUP } from '@/query/priceBreakUp';
+import { CREATE_PRICE_BREAKUP, UPDATE_PRICE_BREAKUP } from '@/query/priceBreakUp';
 
 const ProductEdit = (props: any) => {
     const router = useRouter();
@@ -239,6 +239,8 @@ const ProductEdit = (props: any) => {
     const [removeImage] = useMutation(REMOVE_IMAGE);
     const [updateProduct, { loading: updateProductLoad }] = useMutation(UPDATE_PRODUCT);
     const [deleteVarient, { loading: deleteVariantLoad }] = useMutation(DELETE_VARIENT);
+    const [priceBreakupCreate] = useMutation(CREATE_PRICE_BREAKUP);
+
     const longPressTimeout = useRef(null);
 
     const [columns, setColumns] = useState([]);
@@ -267,6 +269,7 @@ const ProductEdit = (props: any) => {
     const [productPreview, setPreviewData] = useState(null);
     const [previewSelectedImg, setPreviewSelectedImg] = useState(null);
     const [tableHtml, setTableHtml] = useState(null);
+console.log('✌️tableHtml --->', tableHtml);
 
     const [imageUrl, setImageUrl] = useState([]);
 
@@ -442,8 +445,43 @@ const ProductEdit = (props: any) => {
                         setPriceBreackupId(data?.priceBreakup?.id);
                         setTableHtml(data?.priceBreakup?.breakupDetails);
 
-
                         const getData = getRowsAndColumnss(data?.priceBreakup?.breakupDetails);
+                        console.log('✌️getData --->', getData);
+                        if (getData?.columns?.length > 0) {
+                            setColumns(getData?.columns);
+                        }
+                        if (getData?.rows?.length > 0) {
+                            SetRows(getData?.rows);
+                        }
+                    } else {
+                        const sampleData = `
+        <table>
+      <thead>
+        <tr>
+          <th>Metal Cost</th>
+          <th>Making Charge</th>
+          <th>Stone Value</th>
+          <th>Gross Value</th>
+          <th>GST(3%)</th>
+          <th>Final Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td>
+          <td></td>
+           <td></td>
+          <td></td> 
+          <td></td>
+          <td></td>
+        </tr>
+        
+      </tbody>
+    </table>`;
+                        setPriceBreackupId(null);
+                        setTableHtml(sampleData);
+
+                        const getData = getRowsAndColumnss(sampleData);
                         console.log('✌️getData --->', getData);
                         if (getData?.columns?.length > 0) {
                             setColumns(getData?.columns);
@@ -1008,7 +1046,11 @@ const ProductEdit = (props: any) => {
                 setUpdateLoading(false);
                 Failure(data?.productChannelListingUpdate?.errors[0]?.message);
             } else {
-                updatePriceBreakup();
+                if (priceBreackupId) {
+                    updatePriceBreakup();
+                } else {
+                    createPriceBreakup();
+                }
                 variantListUpdate();
                 const updatedImg = images?.map((item: any) => item.id);
                 if (deletedImages?.length > 0) {
@@ -1028,6 +1070,19 @@ const ProductEdit = (props: any) => {
         } catch (error) {
             setUpdateLoading(false);
 
+            console.log('error: ', error);
+        }
+    };
+
+    const createPriceBreakup = async () => {
+        try {
+            const { data } = await priceBreakupCreate({
+                variables: {
+                    product: id,
+                    breakupDetails: tableHtml,
+                },
+            });
+        } catch (error) {
             console.log('error: ', error);
         }
     };
@@ -1093,7 +1148,7 @@ const ProductEdit = (props: any) => {
                             errorPolicy: 'REJECT_FAILED_ROWS',
                         },
                     });
-    
+
                     // if (data?.productVariantBulkUpdate?.errors?.length > 0) {
                     // variants?.map(async (variant: any) => {
                     //     const { data } = await updateSingleVariant({
@@ -2376,7 +2431,6 @@ const ProductEdit = (props: any) => {
                                     placeholder="Select brands"
                                 />
                                 {/* <Select isMulti value={selectedCat} onChange={(e) => setselectedCat(e)} options={parentLists} placeholder="Select categories..." className="form-select" /> */}
-
                             </div>
                             {/* <p className="mt-5 cursor-pointer text-primary underline" onClick={() => setIsOpenBrand(true)}>
                                 Add a new brand

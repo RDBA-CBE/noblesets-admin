@@ -708,7 +708,7 @@ const Index = () => {
             if (row.variants.length > 0) {
                 const variantArr = row.variants?.map((item: any, index: any) => ({
                     attributes: [],
-                    // sku: `${item.sku}-1`,
+                    sku: `${item.sku}-1`,
                     name: item.name,
                     trackInventory: item.trackInventory,
                     channelListings: [

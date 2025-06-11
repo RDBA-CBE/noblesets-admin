@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 
 export default function DynamicSizeTable(props) {
     const { htmlTableString, tableData } = props;
-    console.log('✌️htmlTableString --->', htmlTableString);
     const [columns, setColumns] = useState([]);
     const [rows, setRows] = useState([]);
     const [tableInitialized, setTableInitialized] = useState(false);

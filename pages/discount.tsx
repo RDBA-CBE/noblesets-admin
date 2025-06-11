@@ -177,9 +177,9 @@ const Discount = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                { accessor: 'name', sortable: true },
-                                { accessor: 'startDate', sortable: true },
-                                { accessor: 'endDate', sortable: true },
+                                { accessor: 'name',  },
+                                { accessor: 'startDate',  },
+                                { accessor: 'endDate',  },
 
                                 {
                                     accessor: 'actions',
@@ -210,7 +210,7 @@ const Discount = () => {
                             page={null}
                             onPageChange={(p) => {}}
                             sortStatus={{
-                                columnAccessor: 'name',
+                                columnAccessor: 'names',
                                 direction: 'asc',
                             }}
                             onSortStatusChange={() => {}}

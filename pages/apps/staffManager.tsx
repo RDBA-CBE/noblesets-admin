@@ -430,7 +430,7 @@ const staffManager = () => {
                             page={null} // Add this line to set the current page
                             onPageChange={(p) => {}} // Dummy handler for onPageChange
                             sortStatus={{
-                                columnAccessor: 'name',
+                                columnAccessor: 'names',
                                 direction: 'asc',
                             }}
                             onSortStatusChange={() => {}}

@@ -384,8 +384,8 @@ const Pincode = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                { accessor: 'name', sortable: true },
-                                { accessor: 'code', sortable: true, render: (row: any) => <div>{row?.code?.join(', ')}</div> },
+                                { accessor: 'name',  },
+                                { accessor: 'code',  render: (row: any) => <div>{row?.code?.join(', ')}</div> },
 
                                 {
                                     accessor: 'actions',

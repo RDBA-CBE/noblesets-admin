@@ -157,10 +157,10 @@ const Payments = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                { accessor: 'name', sortable: true },
+                                { accessor: 'name',  },
                                 {
                                     accessor: 'status',
-                                    sortable: true,
+                                    
                                     render: (row: any) => (
                                         <div className="disabled: flex">
                                         {/* <div>{row?.status?"Enabled":"Disabled"}</div> */}
@@ -179,7 +179,7 @@ const Payments = () => {
                                     ),
                                 },
 
-                                { accessor: 'description', sortable: true },
+                                { accessor: 'description',  },
 
                                 {
                                     accessor: 'actions',

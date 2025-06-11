@@ -89,15 +89,15 @@ const LastUpdates = () => {
                         columns={[
                             {
                                 accessor: 'product Name',
-                                sortable: true,
+                                
                                 render: (row) => (
                                     <div className="cursor-pointer" onClick={() => router.push(`/apps/product/edit?id=${row.id}`)}>
                                         {row['product Name']}
                                     </div>
                                 ),
                             },
-                            { accessor: 'date', sortable: true },
-                            { accessor: 'Quantity', sortable: true },
+                            { accessor: 'date',  },
+                            { accessor: 'Quantity',  },
                         ]}
                         highlightOnHover
                         totalRecords={lowStockData.length}

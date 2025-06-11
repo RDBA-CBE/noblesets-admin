@@ -173,7 +173,7 @@ const LowStock = () => {
                         columns={[
                             {
                                 accessor: 'name',
-                                sortable: true,
+                                
                                 title: 'Product Name',
                                 render: (row) => (
                                     <div className="cursor-pointer" onClick={() => window.open(`/apps/product/edit?id=${row.id}`, '_blank')}>

@@ -174,8 +174,8 @@ const Coupon = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                { accessor: 'name', sortable: true },
-                                { accessor: 'price', sortable: true },
+                                { accessor: 'name',  },
+                                { accessor: 'price',  },
 
 
                                 {
@@ -209,7 +209,7 @@ const Coupon = () => {
                             page={null}
                             onPageChange={(p) => {}}
                             sortStatus={{
-                                columnAccessor: 'name',
+                                columnAccessor: 'names',
                                 direction: 'asc',
                             }}
                             onSortStatusChange={() => {}}

@@ -251,7 +251,7 @@ const AbandonedCarts = () => {
                                 {
                                     accessor: 'ID',
                                     title: 'ID',
-                                    sortable: true,
+                                    
                                     width: 300,
                                     render: (row) => (
                                         <div
@@ -267,9 +267,9 @@ const AbandonedCarts = () => {
                                         </div>
                                     ),
                                 },
-                                { accessor: 'firstRunTime', sortable: true },
-                                { accessor: 'secondRunTime', sortable: true },
-                                { accessor: 'thirdRunTime', sortable: true },
+                                { accessor: 'firstRunTime',  },
+                                { accessor: 'secondRunTime',  },
+                                { accessor: 'thirdRunTime',  },
                                 {
                                     accessor: 'actions',
                                     title: 'Actions',
@@ -301,7 +301,7 @@ const AbandonedCarts = () => {
                             page={null} // Add this line to set the current page
                             onPageChange={(p) => {}} // Dummy handler for onPageChange
                             sortStatus={{
-                                columnAccessor: 'name',
+                                columnAccessor: 'names',
                                 direction: 'asc',
                             }}
                             onSortStatusChange={() => {}}

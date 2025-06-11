@@ -590,7 +590,7 @@ const EditCoupon = () => {
                             columns={[
                                 {
                                     accessor: 'code',
-                                    sortable: true,
+                                    
                                     render: (row, index) => {
                                         return (
                                             <>
@@ -601,7 +601,7 @@ const EditCoupon = () => {
                                 },
                                 {
                                     accessor: 'status',
-                                    sortable: true,
+                                    
                                     render: (row, index) => {
                                         return (
                                             <>
@@ -662,7 +662,7 @@ const EditCoupon = () => {
                         columns={[
                             {
                                 accessor: 'code',
-                                sortable: true,
+                                
                                 render: (row, index) => {
                                     return (
                                         <>

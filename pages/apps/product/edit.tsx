@@ -946,8 +946,9 @@ console.log('✌️tableHtml --->', tableHtml);
 
                                 order_no: menuOrder,
                                 attributes: att,
-                                brand: selectedBrand?.value,
-                                size_guide: selectedSizeGuide?.value,
+                                brand: selectedBrand?.value?selectedBrand?.value:null,
+
+                                size_guide: selectedSizeGuide?.value?selectedSizeGuide?.value:null,
                                 taxClass: TAX_CLASS,
                             },
                             firstValues: 10,
@@ -999,8 +1000,9 @@ console.log('✌️tableHtml --->', tableHtml);
                                 crosssells,
                                 slug: slug ? ConvertToSlug(slug) : '',
                                 order_no: menuOrder,
-                                brand: selectedBrand?.value,
-                                size_guide: selectedSizeGuide?.value,
+                                brand: selectedBrand?.value?selectedBrand?.value:null,
+                                size_guide: selectedSizeGuide?.value?selectedSizeGuide?.value:null,
+
                                 taxClass: TAX_CLASS,
                             },
                             firstValues: 10,

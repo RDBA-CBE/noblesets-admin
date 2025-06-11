@@ -1376,12 +1376,10 @@ const Index = () => {
                         columns={[
                             {
                                 accessor: 'image',
-                                sortable: true,
                                 render: (row) => <img src={row?.image ? row?.image : '/assets/images/placeholder.png'} alt="Product" className="h-10 w-10 object-cover ltr:mr-2 rtl:ml-2" />,
                             },
                             {
                                 accessor: 'name',
-                                sortable: true,
                                 render: (row, index) => (
                                     <>
                                         <div className="">{row.name}</div>
@@ -1403,16 +1401,15 @@ const Index = () => {
                                     </>
                                 ),
                             },
-                            { accessor: 'orderNumber', sortable: true },
+                            { accessor: 'orderNumber' },
 
-                            { accessor: 'sku', sortable: true, title: 'SKU' },
+                            { accessor: 'sku', title: 'SKU' },
 
-                            { accessor: 'stock', sortable: false },
-                            { accessor: 'status', sortable: true },
-                            { accessor: 'price', sortable: true },
+                            { accessor: 'stock' },
+                            { accessor: 'status'},
+                            { accessor: 'price' },
                             {
                                 accessor: 'categories',
-                                sortable: true,
 
                                 render: (row) => <div style={{ whiteSpace: 'normal', wordWrap: 'break-word', overflow: 'hidden', width: '200px' }}>{row.categories}</div>,
                             },
@@ -1424,7 +1421,6 @@ const Index = () => {
                             // },
                             {
                                 accessor: 'date',
-                                sortable: true,
                                 width: 160,
                                 render: (row) => <div style={{ whiteSpace: 'normal', wordWrap: 'break-word', overflow: 'hidden', width: '160px' }}>{row.date}</div>,
                             },

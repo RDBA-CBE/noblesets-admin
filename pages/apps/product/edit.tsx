@@ -1086,19 +1086,28 @@ const ProductEdit = (props: any) => {
                 bulkVariantCreate(NewAddedVariant);
             } else {
                 if (updateArr?.length > 0) {
-                    variants?.map(async (variant: any) => {
-                        const { data } = await updateSingleVariant({
-                            variables: {
-                                variantId: variant?.id,
-
-                                // variantId: variant?.id, // Replace with actual variant global ID
-                                channelId: CHANNEL_USD, // Replace with actual channel global ID
-                                price: Number(variant?.regularPrice),
-                                costPrice: Number(variant?.regularPrice),
-                            },
-                        });
-                        console.log('✌️data --->', data);
+                    const { data } = await updateVariant({
+                        variables: {
+                            product: id,
+                            input: updateArr,
+                            errorPolicy: 'REJECT_FAILED_ROWS',
+                        },
                     });
+    
+                    // if (data?.productVariantBulkUpdate?.errors?.length > 0) {
+                    // variants?.map(async (variant: any) => {
+                    //     const { data } = await updateSingleVariant({
+                    //         variables: {
+                    //             variantId: variant?.id,
+                    //             // sku: variant?.sku,
+
+                    //             channelId: CHANNEL_USD,
+                    //             price: Number(variant?.regularPrice),
+                    //             costPrice: Number(variant?.regularPrice),
+                    //         },
+                    //     });
+                    //     console.log('✌️data --->', data);
+                    // });
 
                     if (data?.productVariantBulkUpdate?.errors?.length > 0) {
                         setUpdateLoading(false);

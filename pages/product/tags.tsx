@@ -25,7 +25,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { CATEGORY_LIST, CREATE_CATEGORY, DELETE_CATEGORY, PRODUCT_LIST, UPDATE_CATEGORY, PRODUCT_LIST_TAGS, CREATE_TAG, UPDATE_TAG, DELETE_TAG } from '@/query/product';
 import ReactQuill from 'react-quill';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
-import { Success } from '@/utils/functions';
+import { Failure, Success } from '@/utils/functions';
 import IconLoader from '@/components/Icon/IconLoader';
 import { useRouter } from 'next/router';
 import IconArrowBackward from '@/components/Icon/IconArrowBackward';
@@ -203,10 +203,26 @@ const Tags = () => {
             };
 
             const { data } = await (modalTitle ? updateTag({ variables: { ...variables, id: modalContant.id } }) : addTag({ variables }));
-            Success('Tag created successfully');
-            refresh();
-            setModal1(false);
-            resetForm();
+
+            if (modalTitle) {
+                if (data?.tagUpdate?.errors?.length > 0) {
+                    Failure(data?.tagUpdate?.errors[0]?.message);
+                } else {
+                    Success('Tag updated successfully');
+                    refresh();
+                    setModal1(false);
+                    resetForm();
+                }
+            } else {
+                if (data?.tagCreate?.errors?.length > 0) {
+                    Failure(data?.tagCreate?.errors[0]?.message);
+                } else {
+                    Success('Tag created successfully');
+                    refresh();
+                    setModal1(false);
+                    resetForm();
+                }
+            }
         } catch (error) {
             console.log('error: ', error);
         }

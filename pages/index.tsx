@@ -594,31 +594,6 @@ const Index = () => {
                 tagId = row?.tags?.map((item: any) => item.id);
             }
 
-            let finish = [];
-            if (row?.productFinish?.length > 0) {
-                finish = row?.productFinish?.map((item: any) => item.id);
-            }
-
-            let design = [];
-            if (row?.prouctDesign?.length > 0) {
-                design = row?.prouctDesign?.map((item: any) => item.id);
-            }
-
-            let style = [];
-            if (row?.productstyle?.length > 0) {
-                style = row?.productstyle?.map((item: any) => item.id);
-            }
-
-            let stone = [];
-            if (row?.productStoneType?.length > 0) {
-                stone = row?.productStoneType?.map((item: any) => item.id);
-            }
-
-            let size = [];
-            if (row?.productSize?.length > 0) {
-                size = row?.productSize?.map((item: any) => item.id);
-            }
-
             let upsells = [];
             if (row?.getUpsells?.length > 0) {
                 upsells = row?.getUpsells?.map((item: any) => item?.productId);
@@ -666,19 +641,13 @@ const Index = () => {
                             description: row.seoDescription,
                             title: row.seoTitle,
                         },
-                        slug: row.slug + '-1',
+                        // slug: row.slug + '-1',
                         order_no: row.orderNo,
                         brand,
                         size_guide,
                         taxClass: TAX_CLASS,
 
-                        // brand: selectedBrand?.value,
-                        // size_guide: selectedSizeGuide?.value,
-                        // prouctDesign: design,
-                        // productstyle: style,
-                        // productFinish: finish,
-                        // productStoneType: stone,
-                        // productSize: size,
+                      
                     },
                 },
             });

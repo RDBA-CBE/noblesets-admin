@@ -565,6 +565,14 @@ export const CREATE_TAG = gql`
                 id
                 name
                 slug
+                __typename
+            }
+            __typename
+            errors {
+                message
+                values
+                code
+                field
             }
         }
     }
@@ -577,6 +585,12 @@ export const UPDATE_TAG = gql`
                 id
                 name
                 slug
+            }
+            errors {
+                message
+                values
+                code
+                field
             }
         }
     }

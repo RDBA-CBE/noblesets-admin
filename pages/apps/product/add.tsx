@@ -226,7 +226,7 @@ const ProductAdd = () => {
     const [addCategory] = useMutation(CREATE_CATEGORY);
     const [addBrand] = useMutation(CREATE_BRAND);
 
-    const [addTag] = useMutation(CREATE_TAG);
+    const [addTag, { loading: tagLoading }] = useMutation(CREATE_TAG);
 
     const {
         data: parentList,
@@ -1220,12 +1220,16 @@ const ProductAdd = () => {
             };
 
             const { data } = await addTag({ variables });
-            setIsOpenTag(false);
-            resetForm();
-            tagListRefetch();
-            setTagLoader(false);
-            Success('Tag created successfully');
-            setSelectedTag([{ value: data?.tagCreate?.tag?.id, label: data?.tagCreate?.tag?.name }]);
+            if (data?.tagCreate?.errors?.length > 0) {
+                Failure(data?.tagCreate?.errors[0]?.message);
+            } else {
+                setIsOpenTag(false);
+                resetForm();
+                tagListRefetch();
+                setTagLoader(false);
+                Success('Tag created successfully');
+                setSelectedTag([{ value: data?.tagCreate?.tag?.id, label: data?.tagCreate?.tag?.name }]);
+            }
         } catch (error) {
             setTagLoader(false);
 
@@ -1630,8 +1634,6 @@ const ProductAdd = () => {
                             {shortDesErrMsg && <p className="error-message mt-1 text-red-500 ">{shortDesErrMsg}</p>}
                         </div>
 
-                      
-
                         <div className="panel mb-5">
                             <label htmlFor="editor" className="block text-sm font-medium text-gray-700">
                                 Product Description
@@ -1647,8 +1649,8 @@ const ProductAdd = () => {
                             <label htmlFor="editor" className="block text-sm font-medium text-gray-700">
                                 Price Breakup
                             </label>
+
                             <DynamicSizeTable tableData={tableData} htmlTableString={tableHtml} />
-                            {priceBreakUpError && <p className="error-message mt-1 text-red-500 ">{priceBreakUpError}</p>}
                         </div>
 
                         <div className="panel mb-5 ">
@@ -2813,7 +2815,7 @@ const ProductAdd = () => {
                                                     </div> */}
 
                                                     <button type="submit" className="btn btn-primary !mt-6">
-                                                        {'Submit'}
+                                                        {tagLoading ? <IconLoader /> : 'Submit'}
                                                     </button>
                                                 </Form>
                                             )}

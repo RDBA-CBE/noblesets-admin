@@ -269,12 +269,12 @@ const Sidebar = () => {
                                                     </li>
                                                 )}
                                                 <li>
-                                                    <Link href="/apps/pincode" target="_blank">
+                                                    <Link href="/apps/pincode" >
                                                         {t('Pincode')}
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link href="/apps/custom_reports" target="_blank">
+                                                    <Link href="/apps/custom_reports" >
                                                         {t('Custom Products')}
                                                     </Link>
                                                 </li>

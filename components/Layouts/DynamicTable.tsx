@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react';
 
 export default function DynamicSizeTable(props) {
     const { htmlTableString, tableData } = props;
-console.log('✌️htmlTableString --->', htmlTableString);
+    console.log('✌️htmlTableString --->', htmlTableString);
     const [columns, setColumns] = useState([]);
     const [rows, setRows] = useState([]);
     const [tableInitialized, setTableInitialized] = useState(false);
+  
 
     useEffect(() => {
         if (htmlTableString) {
@@ -31,7 +32,7 @@ console.log('✌️htmlTableString --->', htmlTableString);
                 setRows(parsedRows);
                 setTableInitialized(true);
             }
-        }else {
+        } else {
             // Optionally reset the state if htmlTableString is null or empty
             setColumns([]);
             setRows([]);
@@ -185,16 +186,19 @@ console.log('✌️htmlTableString --->', htmlTableString);
                             </tbody>
                         </table>
                     </div>
-                    <div className="mb-4 mt-4 flex justify-end space-x-2">
-                        <button onClick={addColumn} className="rounded bg-blue-500 px-3 py-1 text-white">
-                            Add Column
-                        </button>
-                        <button onClick={addRow} className="rounded bg-green-500 px-3 py-1 text-white">
-                            Add Rows
-                        </button>
-                        <button onClick={() => handleSubmit()} className="rounded bg-[#c2882b]  px-3 py-1 text-white">
-                            Submit
-                        </button>
+                    <div className="mb-4 mt-4 flex justify-between space-x-2">
+                        <div>{<p className="error-message mt-1 text-blue-500 ">Fill the column values and then click the submit button to update the data</p>}</div>
+                        <div className="flex justify-end space-x-2">
+                            <button onClick={addColumn} className="rounded bg-blue-500 px-3 py-1 text-white">
+                                Add Column
+                            </button>
+                            <button onClick={addRow} className="rounded bg-green-500 px-3 py-1 text-white">
+                                Add Rows
+                            </button>
+                            <button onClick={() => handleSubmit()} className="rounded bg-[#c2882b]  px-3 py-1 text-white">
+                                Submit
+                            </button>
+                        </div>
                     </div>
                 </>
             )}

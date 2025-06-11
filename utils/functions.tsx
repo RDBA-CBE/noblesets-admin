@@ -1577,3 +1577,9 @@ export const encodeUrlPathOnly = (url) => {
     const cleanedPath = urlObj.pathname.replace(/ /g, '%20');
     return `${urlObj.origin}${cleanedPath}`;
   };
+
+
+
+  export const generate4DigitRandomNumber=()=> {
+    return Math.floor(1000 + Math.random() * 9000);
+  }

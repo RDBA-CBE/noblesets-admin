@@ -59,6 +59,7 @@ import {
     channels,
     formatCurrency,
     freeShipping,
+    generate4DigitRandomNumber,
     getCurrentDateTime,
     isEmptyObject,
     mintDateTime,
@@ -1002,24 +1003,39 @@ const Editorder = () => {
         }
     };
 
-    const generateInvoice = async (country?: any) => {
-        try {
-            setInvoiceLoading(true);
-            const res = await createInvoice({
-                variables: {
-                    orderId: id,
-                },
-            });
-            getOrderDetails();
-            setInvoiceLoading(false);
-
-            Success('Invoice generated Successfully');
-        } catch (error) {
-            setInvoiceLoading(false);
-
-            console.log('error: ', error);
-        }
-    };
+     const generateInvoice = async (country?: any) => {
+           try {
+               setInvoiceLoading(true);
+               // const res = await createInvoice({
+               //     variables: {
+               //         orderId: id,
+               //     },
+               // });
+   
+               const newInvoiceReqRes = await newInvoiceReq({
+                   variables: {
+                       // id: orderData?.invoices[0]?.id,
+                       createdAt: moment(new Date()).format('YYYY-MM-DDTHH:mm'),
+                       orderId: id,
+                       number: 'NS2425' + generate4DigitRandomNumber(),
+                   },
+               });
+               if (newInvoiceReqRes?.data?.invoiceRequest?.errors?.length > 0) {
+                   Failure(newInvoiceReqRes?.data?.invoiceRequest?.errors?.[0]?.message);
+               } else {
+                   getOrderDetails();
+                   setInvoiceLoading(false);
+   
+                   Success('Invoice generated Successfully');
+               }
+   
+               setInvoiceLoading(false);
+           } catch (error) {
+               setInvoiceLoading(false);
+   
+               console.log('error: ', error);
+           }
+       };
 
     const updateInvoice = async (country?: any) => {
         try {
@@ -1046,7 +1062,7 @@ const Editorder = () => {
                             // id: orderData?.invoices[0]?.id,
                             createdAt: invoiceDate,
                             orderId: id,
-                            number: 'PR2425' + invoiceNumber,
+                            number: 'NS2425' + invoiceNumber,
                         },
                     });
                     if (newInvoiceReqRes?.data?.invoiceRequest?.errors?.length > 0) {
@@ -2756,7 +2772,7 @@ const Editorder = () => {
                             <div className="w-full flex-col ">
                                 <div className="flex gap-3">
                                     <div className="w-[30%]">
-                                        <input type="text" disabled className="form-input" placeholder="Reference" value={'PR2425'} />
+                                        <input type="text" disabled className="form-input" placeholder="Reference" value={'NS2425'} />
                                     </div>
                                     <div className="w-[70%]">
                                         <input

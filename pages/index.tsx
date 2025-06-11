@@ -41,7 +41,7 @@ import IconX from '@/components/Icon/IconX';
 import ErrorMessage from '@/components/Layouts/ErrorMessage';
 import CategorySelect from '@/components/CategorySelect';
 import TagSelect from '@/components/TagSelect';
-import { UPDATE_PRICE_BREAKUP } from '@/query/priceBreakUp';
+import { CREATE_PRICE_BREAKUP, UPDATE_PRICE_BREAKUP } from '@/query/priceBreakUp';
 
 const Index = () => {
     const PAGE_SIZE = 20;
@@ -130,6 +130,7 @@ const Index = () => {
     const [updateProduct] = useMutation(UPDATE_PRODUCT);
     const [updateVariant] = useMutation(UPDATE_VARIANT);
     const [priceBreakupUpdate] = useMutation(UPDATE_PRICE_BREAKUP);
+    const [priceBreakupCreate] = useMutation(CREATE_PRICE_BREAKUP);
 
     const { data: productCat, refetch: categorySearchRefetch } = useQuery(NEW_PARENT_CATEGORY_LIST);
 
@@ -646,8 +647,6 @@ const Index = () => {
                         brand,
                         size_guide,
                         taxClass: TAX_CLASS,
-
-                      
                     },
                 },
             });
@@ -709,7 +708,7 @@ const Index = () => {
             if (row.variants.length > 0) {
                 const variantArr = row.variants?.map((item: any, index: any) => ({
                     attributes: [],
-                    sku: `${item.sku}-1`,
+                    // sku: `${item.sku}-1`,
                     name: item.name,
                     trackInventory: item.trackInventory,
                     channelListings: [
@@ -819,7 +818,12 @@ const Index = () => {
                 deleteDuplicateProduct(productId, row);
                 setLoadingRows((prev) => ({ ...prev, [row.id]: false }));
             } else {
-                updatePriceBreakup(productId, row);
+                if (row?.priceBreakup) {
+                    updatePriceBreakup(productId, row);
+                } else {
+                    createPriceBreakup(productId);
+                }
+
                 // if (selectedTag?.length > 0) {
                 //     assignsTagToProduct(productId);
                 //     console.log('success: ', data);
@@ -829,6 +833,43 @@ const Index = () => {
                 // window.open(`/apps/product/edit?id=${productId}`, '_blank');
                 duplicate_refresh(row);
             }
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    };
+
+    const createPriceBreakup = async (productId: any) => {
+        try {
+            const sampleData = `
+        <table>
+      <thead>
+        <tr>
+          <th>Metal Cost</th>
+          <th>Making Charge</th>
+          <th>Stone Value</th>
+          <th>Gross Value</th>
+          <th>GST(3%)</th>
+          <th>Final Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td>
+          <td></td>
+           <td></td>
+          <td></td> 
+          <td></td>
+          <td></td>
+        </tr>
+        
+      </tbody>
+    </table>`;
+            const { data } = await priceBreakupCreate({
+                variables: {
+                    product: productId,
+                    breakupDetails: sampleData,
+                },
+            });
         } catch (error) {
             console.log('error: ', error);
         }

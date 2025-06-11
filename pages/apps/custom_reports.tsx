@@ -110,6 +110,7 @@ const Pincode = () => {
                 created_at: moment(item.node?.createdAt).format('DD-MM-YYYY'),
                 message: item.node?.customizationDetails ? JSON.parse(item.node?.customizationDetails).message : '',
                 email: item.node?.customer?.email || item.node?.email,
+                role: item.node?.customer?.email ? 'Customer' : 'Guest',
             };
         });
         setRecordsData(newData);
@@ -330,8 +331,9 @@ const Pincode = () => {
                                     accessor: 'image',
                                     render: (row) => <img src={row?.image ? row?.image : '/assets/images/placeholder.png'} alt="Product" className="h-10 w-10 object-cover ltr:mr-2 rtl:ml-2" />,
                                 },
-                                { accessor: 'baseProduct' },
+                                { accessor: 'baseProduct', title: 'Product Name' },
                                 { accessor: 'name' },
+                                {accessor: 'role', title: 'User Type' },
                                 { accessor: 'email' },
 
                                 {

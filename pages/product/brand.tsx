@@ -501,10 +501,7 @@ const Brands = () => {
                             withBorder={true}
                             sortStatus={sortStatus}
                             onSortStatusChange={setSortStatus}
-                            selectedRecords={selectedRecords}
-                            onSelectedRecordsChange={(val) => {
-                                setSelectedRecords(val);
-                            }}
+                           
                         />
                     </div>
                 )}

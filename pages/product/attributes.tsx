@@ -57,7 +57,7 @@ const Category = () => {
     const [totalCount, setTotalCount] = useState(0);
 
     useEffect(() => {
-        dispatch(setPageTitle('Category'));
+        dispatch(setPageTitle('Attributes'));
     });
 
     const {

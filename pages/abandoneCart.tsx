@@ -159,7 +159,7 @@ const tableFormat = (products) => {
         name: `${product?.node?.customer?.firstName} ${product?.node?.customer?.firstName}`,
         email: product?.node?.customer?.email,
         note: product?.node?.logNote,
-        date: moment(product.node?.time).format('YYYY/MM/DD [at] h:mm a'),
+        date: moment(product.node?.time).format('DD/MM/YYYY [at] h:mm a'),
         customerId: product?.node?.customer?.id,
         product: product?.node?.productName,
         productId: product?.node?.productId,

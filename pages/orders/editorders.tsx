@@ -130,6 +130,7 @@ const Editorder = () => {
 
     const [formData, setFormData] = useState(initialValues);
     const [errors, setErrors] = useState<any>({});
+    const [invoiceNameError, setInvoiceNameError] = useState('');
 
     const [addNotes] = useMutation(CREATE_NOTES);
     const [deleteNotes] = useMutation(DELETE_NOTES);
@@ -1003,77 +1004,80 @@ const Editorder = () => {
         }
     };
 
-     const generateInvoice = async (country?: any) => {
-           try {
-               setInvoiceLoading(true);
-               // const res = await createInvoice({
-               //     variables: {
-               //         orderId: id,
-               //     },
-               // });
-   
-               const newInvoiceReqRes = await newInvoiceReq({
-                   variables: {
-                       // id: orderData?.invoices[0]?.id,
-                       createdAt: moment(new Date()).format('YYYY-MM-DDTHH:mm'),
-                       orderId: id,
-                       number: 'NS2425' + generate4DigitRandomNumber(),
-                   },
-               });
-               if (newInvoiceReqRes?.data?.invoiceRequest?.errors?.length > 0) {
-                   Failure(newInvoiceReqRes?.data?.invoiceRequest?.errors?.[0]?.message);
-               } else {
-                   getOrderDetails();
-                   setInvoiceLoading(false);
-   
-                   Success('Invoice generated Successfully');
-               }
-   
-               setInvoiceLoading(false);
-           } catch (error) {
-               setInvoiceLoading(false);
-   
-               console.log('error: ', error);
-           }
-       };
+    const generateInvoice = async (country?: any) => {
+        try {
+            setInvoiceLoading(true);
+            // const res = await createInvoice({
+            //     variables: {
+            //         orderId: id,
+            //     },
+            // });
+
+            const newInvoiceReqRes = await newInvoiceReq({
+                variables: {
+                    // id: orderData?.invoices[0]?.id,
+                    createdAt: moment(new Date()).format('YYYY-MM-DDTHH:mm'),
+                    orderId: id,
+                    number: 'NS2425' + generate4DigitRandomNumber(),
+                },
+            });
+            if (newInvoiceReqRes?.data?.invoiceRequest?.errors?.length > 0) {
+                Failure(newInvoiceReqRes?.data?.invoiceRequest?.errors?.[0]?.message);
+            } else {
+                getOrderDetails();
+                setInvoiceLoading(false);
+
+                Success('Invoice generated Successfully');
+            }
+
+            setInvoiceLoading(false);
+        } catch (error) {
+            setInvoiceLoading(false);
+
+            console.log('error: ', error);
+        }
+    };
 
     const updateInvoice = async (country?: any) => {
         try {
-            setUpdateInvoideLoading(true);
-            const deleteReq = await deleteReqInvoice({
-                variables: {
-                    id: orderData?.invoices[0]?.id,
-                },
-            });
-
-            if (deleteReq?.data?.invoiceRequestDelete?.errors?.length > 0) {
-                Failure(deleteReq?.data?.invoiceRequestDelete?.errors?.[0]?.message);
+            if (invoiceNumber == '') {
+                setInvoiceNameError('Please enter invoice number');
             } else {
-                const deleteInvoices = await deleteInvoice({
+                setUpdateInvoideLoading(true);
+                const deleteReq = await deleteReqInvoice({
                     variables: {
                         id: orderData?.invoices[0]?.id,
                     },
                 });
-                if (deleteInvoices?.data?.invoiceDelete?.errors?.length > 0) {
-                    Failure(deleteInvoices?.data?.invoiceDelete?.errors?.[0]?.message);
+
+                if (deleteReq?.data?.invoiceRequestDelete?.errors?.length > 0) {
+                    Failure(deleteReq?.data?.invoiceRequestDelete?.errors?.[0]?.message);
                 } else {
-                    const newInvoiceReqRes = await newInvoiceReq({
+                    const deleteInvoices = await deleteInvoice({
                         variables: {
-                            // id: orderData?.invoices[0]?.id,
-                            createdAt: invoiceDate,
-                            orderId: id,
-                            number: 'NS2425' + invoiceNumber,
+                            id: orderData?.invoices[0]?.id,
                         },
                     });
-                    if (newInvoiceReqRes?.data?.invoiceRequest?.errors?.length > 0) {
-                        Failure(newInvoiceReqRes?.data?.invoiceRequest?.errors?.[0]?.message);
+                    if (deleteInvoices?.data?.invoiceDelete?.errors?.length > 0) {
+                        Failure(deleteInvoices?.data?.invoiceDelete?.errors?.[0]?.message);
                     } else {
-                        setUpdateInvoideLoading(false);
-
-                        setOpenInvoice(false);
-                        getOrderDetails();
-
-                        Success('Invoice Updated Successfully');
+                        const newInvoiceReqRes = await newInvoiceReq({
+                            variables: {
+                                // id: orderData?.invoices[0]?.id,
+                                createdAt: invoiceDate,
+                                orderId: id,
+                                number: 'NS2425' + invoiceNumber,
+                            },
+                        });
+                        if (newInvoiceReqRes?.data?.invoiceRequest?.errors?.length > 0) {
+                            Failure(newInvoiceReqRes?.data?.invoiceRequest?.errors?.[0]?.message);
+                        } else {
+                            setUpdateInvoideLoading(false);
+                            setInvoiceNameError("")
+                            setOpenInvoice(false);
+                            getOrderDetails();
+                            Success('Invoice Updated Successfully');
+                        }
                     }
                 }
             }
@@ -1135,7 +1139,6 @@ const Editorder = () => {
             if (res?.data?.invoiceSendNotification?.errors?.length > 0) {
                 Failure(res?.data?.invoiceSendNotification?.errors[0]?.message);
                 setInvoiceSendLoading(false);
-
             } else {
                 console.log('✌️res --->', res);
 
@@ -2548,7 +2551,7 @@ const Editorder = () => {
                                     </div>
                                     <div className="flex justify-between">
                                         <p>Date</p>
-                                        <p>{moment(orderData?.metadata[0]?.value).format('YYYY/MM/DD')}</p>
+                                        <p>{moment(orderData?.metadata[0]?.value).format('DD/MM/YYYY')}</p>
                                     </div>
                                     <div className="flex justify-between pt-3">
                                         <button type="submit" className="btn btn-primary" onClick={() => payslipSend()}>
@@ -2590,7 +2593,7 @@ const Editorder = () => {
                                     </div>
                                     <div className="flex justify-between">
                                         <p>Date</p>
-                                        <p>{moment(orderData?.invoices[0]?.createdAt).format('YYYY/MM/DD')}</p>
+                                        <p>{moment(orderData?.invoices[0]?.createdAt).format('DD/MM/YYYY')}</p>
                                     </div>
                                     <div className="flex justify-between pt-3">
                                         <button type="submit" className="btn btn-primary" onClick={() => invoiceSend()}>
@@ -2788,16 +2791,17 @@ const Editorder = () => {
                                         />
                                     </div>
                                 </div>
+                                <ErrorMessage message={invoiceNameError} />
                                 <div className="pt-5">
                                     <input
                                         type="datetime-local"
-                                        min={mintDateTime(slipDate) || getCurrentDateTime()}
-                                        max={getCurrentDateTime()}
+                                        // min={mintDateTime(slipDate) || getCurrentDateTime()}
+                                        // max={getCurrentDateTime()}
                                         value={moment(invoiceDate).format('YYYY-MM-DDTHH:mm')}
                                         onChange={(e) => setInvoiceDate(e.target.value)}
                                         id="dateTimeCreated"
                                         name="dateTimeCreated"
-                                        className="form-input"
+                                        className="form-input cursor-not-allowed bg-white text-black opacity-100 "
                                     />
                                 </div>
                             </div>

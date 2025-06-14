@@ -174,7 +174,7 @@ const Log = () => {
 const tableFormat = (products) => {
     return products.map((product) => ({
         log: product?.node?.log,
-        date: product.node?.date ? moment(product.node?.date).format('YYYY/MM/DD [at] h:mm a') : '-',
+        date: product.node?.date ? moment(product.node?.date).format('DD/MM/YYYY [at] h:mm a') : '-',
     }));
 };
 

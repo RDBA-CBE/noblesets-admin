@@ -31,6 +31,9 @@ import {
     SEND_GIFT_CART,
     DRAFT_ORDER_CANCEL,
     UNFULFILLMENT_ORDER,
+    NEW_INVOICE_REQUEST,
+    DELETE_INVOICE,
+    DELETE_INVOICE_REQUEST,
 } from '@/query/product';
 import { Loader } from '@mantine/core';
 import moment from 'moment';
@@ -47,6 +50,7 @@ import {
     channels,
     formatCurrency,
     freeShipping,
+    generate4DigitRandomNumber,
     getCurrentDateTime,
     mintDateTime,
     objIsEmpty,
@@ -97,6 +101,9 @@ const OrderQuickEdit = (props: any) => {
     const [updatePayslip] = useMutation(UPDATE_PAYSLIP);
     const [sendInvoice] = useMutation(SEND_INVOICE);
     const [sendPayslip] = useMutation(SEND_PAYLSIP);
+    const [newInvoiceReq, { loading: newInvoiceReqLoading }] = useMutation(NEW_INVOICE_REQUEST);
+    const [deleteInvoice, { loading: deleteLoading }] = useMutation(DELETE_INVOICE);
+    const [deleteReqInvoice, { loading: deleteReqLoading }] = useMutation(DELETE_INVOICE_REQUEST);
 
     // updateFullfillStatus
 
@@ -493,15 +500,25 @@ const OrderQuickEdit = (props: any) => {
     const generateInvoice = async (country?: any) => {
         try {
             setInvoiceLoading(true);
-            const res = await createInvoice({
+
+            const newInvoiceReqRes = await newInvoiceReq({
                 variables: {
+                    // id: orderData?.invoices[0]?.id,
+                    createdAt: moment(new Date()).format('YYYY-MM-DDTHH:mm'),
                     orderId: id,
+                    number: 'NS2425' + generate4DigitRandomNumber(),
                 },
             });
-            getOrderData();
+            if (newInvoiceReqRes?.data?.invoiceRequest?.errors?.length > 0) {
+                Failure(newInvoiceReqRes?.data?.invoiceRequest?.errors?.[0]?.message);
+            } else {
+                getOrderData();
+                setInvoiceLoading(false);
+                updateList();
+                Success('Invoice generated Successfully');
+            }
+
             setInvoiceLoading(false);
-            updateList();
-            Success('Invoice generated Successfully');
         } catch (error) {
             setInvoiceLoading(false);
 
@@ -509,39 +526,90 @@ const OrderQuickEdit = (props: any) => {
         }
     };
 
+    // const updateInvoice = async (country?: any) => {
+    //     try {
+    //         if (invoiceNumber == '') {
+    //             setInvoiceNameError('Please enter invoice number');
+    //         } else if (!validateDateTime(invoiceDate)) {
+    //             setInvoiceDateError('Please enter invoice date');
+    //         } else {
+    //             setUpdateInvoideLoading(true);
+    //             const res = await updatesInvoice({
+    //                 variables: {
+    //                     invoiceid: orderData?.invoices[0]?.id,
+    //                     input: {
+    //                         number: 'PR2425' + invoiceNumber,
+    //                         createdAt: invoiceDate,
+    //                     },
+    //                 },
+    //             });
+
+    //             if (res.data?.invoiceUpdate?.errors?.length > 0) {
+    //                 setOpenInvoice(false);
+    //                 setUpdateInvoideLoading(false);
+    //                 Failure('Invoice not updated');
+    //             } else {
+    //                 const res = await updateInvoicePdf({
+    //                     variables: {
+    //                         invoiceId: orderData?.invoices[0]?.id,
+    //                     },
+    //                 });
+    //                 setUpdateInvoideLoading(false);
+    //                 setOpenInvoice(false);
+    //                 getOrderData();
+    //                 updateList();
+    //                 Success('Invoice Updated Successfully');
+    //             }
+    //         }
+    //     } catch (error) {
+    //         setUpdateInvoideLoading(false);
+
+    //         console.log('error: ', error);
+    //     }
+    // };
+
     const updateInvoice = async (country?: any) => {
         try {
             if (invoiceNumber == '') {
                 setInvoiceNameError('Please enter invoice number');
-            } else if (!validateDateTime(invoiceDate)) {
-                setInvoiceDateError('Please enter invoice date');
             } else {
                 setUpdateInvoideLoading(true);
-                const res = await updatesInvoice({
+                const deleteReq = await deleteReqInvoice({
                     variables: {
-                        invoiceid: orderData?.invoices[0]?.id,
-                        input: {
-                            number: 'PR2425' + invoiceNumber,
-                            createdAt: invoiceDate,
-                        },
+                        id: orderData?.invoices[0]?.id,
                     },
                 });
 
-                if (res.data?.invoiceUpdate?.errors?.length > 0) {
-                    setOpenInvoice(false);
-                    setUpdateInvoideLoading(false);
-                    Failure('Invoice not updated');
+                if (deleteReq?.data?.invoiceRequestDelete?.errors?.length > 0) {
+                    Failure(deleteReq?.data?.invoiceRequestDelete?.errors?.[0]?.message);
                 } else {
-                    const res = await updateInvoicePdf({
+                    const deleteInvoices = await deleteInvoice({
                         variables: {
-                            invoiceId: orderData?.invoices[0]?.id,
+                            id: orderData?.invoices[0]?.id,
                         },
                     });
-                    setUpdateInvoideLoading(false);
-                    setOpenInvoice(false);
-                    getOrderData();
-                    updateList();
-                    Success('Invoice Updated Successfully');
+                    if (deleteInvoices?.data?.invoiceDelete?.errors?.length > 0) {
+                        Failure(deleteInvoices?.data?.invoiceDelete?.errors?.[0]?.message);
+                    } else {
+                        const newInvoiceReqRes = await newInvoiceReq({
+                            variables: {
+                                // id: orderData?.invoices[0]?.id,
+                                createdAt: invoiceDate,
+                                orderId: id,
+                                number: 'NS2425' + invoiceNumber,
+                            },
+                        });
+                        if (newInvoiceReqRes?.data?.invoiceRequest?.errors?.length > 0) {
+                            Failure(newInvoiceReqRes?.data?.invoiceRequest?.errors?.[0]?.message);
+                        } else {
+                            setUpdateInvoideLoading(false);
+                            setOpenInvoice(false);
+                            getOrderData();
+                            updateList();
+                            setInvoiceNameError("")
+                            Success('Invoice Updated Successfully');
+                        }
+                    }
                 }
             }
         } catch (error) {
@@ -792,18 +860,14 @@ const OrderQuickEdit = (props: any) => {
                                                 {orderData?.metadata[0]?.value && (
                                                     <div className="flex justify-between">
                                                         <p>Date</p>
-                                                        <p>{moment(orderData?.metadata[0]?.value).format('YYYY/MM/DD')}</p>
+                                                        <p>{moment(orderData?.metadata[0]?.value).format('DD/MM/YYYY')}</p>
                                                     </div>
                                                 )}
                                                 <div className="flex justify-between pt-3">
                                                     <button type="submit" className="btn btn-primary" onClick={() => payslipSend()}>
                                                         {sendPayslipLoading ? <IconLoader /> : 'Send'}
                                                     </button>
-                                                    <button
-                                                        type="submit"
-                                                        className="btn btn-outline-primary"
-                                                        onClick={() => window.open(SERVER_URL + orderData?.metadata[2]?.value, '_blank')}
-                                                    >
+                                                    <button type="submit" className="btn btn-outline-primary" onClick={() => window.open(SERVER_URL + orderData?.metadata[2]?.value, '_blank')}>
                                                         <IconDownload />
                                                     </button>
                                                 </div>
@@ -835,7 +899,7 @@ const OrderQuickEdit = (props: any) => {
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <p>Date</p>
-                                                    <p>{moment(orderData?.invoices[0]?.createdAt).format('YYYY/MM/DD')}</p>
+                                                    <p>{moment(orderData?.invoices[0]?.createdAt).format('DD/MM/YYYY')}</p>
                                                 </div>
                                                 <div className="flex justify-between pt-3">
                                                     <button type="submit" className="btn btn-primary" onClick={() => invoiceSend()}>
@@ -971,7 +1035,7 @@ const OrderQuickEdit = (props: any) => {
                             <div className="w-full flex-col ">
                                 <div className="flex gap-3">
                                     <div className="w-[30%]">
-                                        <input type="text" disabled className="form-input" placeholder="Reference" value={'PR2425'} />
+                                        <input type="text" disabled className="form-input" placeholder="Reference" value={'NS2425'} />
                                     </div>
                                     <div className="w-[70%]">
                                         <input
@@ -991,15 +1055,15 @@ const OrderQuickEdit = (props: any) => {
                                 <div className="pt-5">
                                     <input
                                         type="datetime-local"
-                                        min={mintDateTime(slipDate) || getCurrentDateTime()}
-                                        max={getCurrentDateTime()}
+                                        // min={mintDateTime(slipDate) || getCurrentDateTime()}
+                                        // max={getCurrentDateTime()}
                                         value={moment(invoiceDate).format('YYYY-MM-DDTHH:mm')}
                                         onChange={(e) => setInvoiceDate(e.target.value)}
                                         id="dateTimeCreated"
                                         name="dateTimeCreated"
-                                        className="form-input"
+                                        className="form-input cursor-not-allowed bg-white text-black opacity-100"
                                     />
-                                    <ErrorMessage message={invoiceDateError} />
+                                    {/* <ErrorMessage message={invoiceDateError} /> */}
                                 </div>
                             </div>
 

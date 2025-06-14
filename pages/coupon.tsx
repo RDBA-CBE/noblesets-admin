@@ -242,8 +242,8 @@ const Coupon = () => {
 const tableFormat = (products) => {
     return products.map((product) => ({
         name: product?.node?.name,
-        startDate: product.node?.startDate ? moment(product.node?.startDate).format('YYYY/MM/DD [at] h:mm a') : '-',
-        endDate: product.node?.endDate ? moment(product.node?.endDate).format('YYYY/MM/DD [at] h:mm a') : '-',
+        startDate: product.node?.startDate ? moment(product.node?.startDate).format('DD/MM/YYYY [at] h:mm a') : '-',
+        endDate: product.node?.endDate ? moment(product.node?.endDate).format('DD/MM/YYYY [at] h:mm a') : '-',
         id: product.node?.id,
         autoApply: product.node?.autoApply,
         'Used/Limit': `${product?.node?.used} / ${product?.node?.singleUse ? '1' : product?.node?.usageLimit == null ? '∞' : product?.node?.usageLimit}`,

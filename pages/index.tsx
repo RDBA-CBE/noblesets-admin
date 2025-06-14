@@ -368,8 +368,8 @@ const Index = () => {
             categories: item.node.category?.length > 0 ? item.node?.category?.map((cats) => cats?.name).join(',') : '-',
             // categories: item.node.category?.name ? item.node.category.name : '-',
             date: item.node.updatedAt
-                ? `Last Modified ${moment(item.node.updatedAt).format('YYYY/MM/DD [at] h:mm a')}`
-                : `Published ${moment(item.node.channelListings[0]?.publishedAt).format('YYYY/MM/DD [at] h:mm a')}`,
+                ? `Last Modified ${moment(item.node.updatedAt).format('DD/MM/YYYY [at] h:mm a')}`
+                : `Published ${moment(item.node.channelListings[0]?.publishedAt).format('DD/MM/YYYY [at] h:mm a')}`,
             price: `₹${roundOff(item.node.pricing?.priceRange ? item.node.pricing?.priceRange?.start?.gross?.amount : 0)}`,
             status: item.node.channelListings[0]?.isPublished ? 'Published' : 'Draft',
             sku: item.node.defaultVariant ? item.node.defaultVariant.sku : '-',

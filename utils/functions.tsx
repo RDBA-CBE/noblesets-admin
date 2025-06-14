@@ -506,20 +506,43 @@ export const mintDateTime = (date: any) => {
     let minutes = now.getMinutes().toString().padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
-export const roundOff = (price: any) => {
-    let roundedPrice = '';
-    if (price) {
-        const roundedValue = Math.ceil(price);
-        roundedPrice = roundedValue.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        });
-    } else {
-        roundedPrice = price;
-    }
-    return roundedPrice;
-};
+// export const roundOff = (price: any) => {
+//     let roundedPrice = '';
+//     if (price) {
+//         const roundedValue = Math.ceil(price);
+//         roundedPrice = roundedValue.toLocaleString(undefined, {
+//             minimumFractionDigits: 2,
+//             maximumFractionDigits: 2,
+//         });
+//     } else {
+//         roundedPrice = price;
+//     }
+//     return roundedPrice;
+// };
 
+export const roundOff = (value: any) => {
+    if (value === null || value === undefined) return '';
+  
+    // Remove commas and convert to number
+    const num = Number(value.toString().replace(/,/g, ''));
+    if (isNaN(num)) return String(value);
+  
+    // Custom rounding logic
+    const integerPart = Math.floor(num);
+    const decimalPart = num - integerPart;
+    const rounded = decimalPart > 0.5 ? Math.ceil(num) : Math.floor(num);
+  
+    // Format with Indian number system
+    const roundedStr = rounded.toString();
+    const lastThree = roundedStr.slice(-3);
+    const otherDigits = roundedStr.slice(0, -3);
+    const formatted =
+      otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ',') +
+      (otherDigits ? ',' : '') +
+      lastThree;
+  
+    return formatted;
+  };
 export const formatCurrency = (currency: any) => {
     if (currency === 'INR') {
         return '₹';
@@ -528,16 +551,40 @@ export const formatCurrency = (currency: any) => {
     }
 };
 
+// export const addCommasToNumber = (value: any) => {
+//     if (typeof value === 'number') {
+//         return value.toLocaleString(undefined, {
+//             minimumFractionDigits: 2,
+//             maximumFractionDigits: 2,
+//         });
+//     } else {
+//         return value;
+//     }
+// };
+
 export const addCommasToNumber = (value: any) => {
-    if (typeof value === 'number') {
-        return value.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        });
-    } else {
-        return value;
-    }
-};
+    if (value === null || value === undefined) return '';
+  
+    // Remove commas and convert to number
+    const num = Number(value.toString().replace(/,/g, ''));
+    if (isNaN(num)) return String(value);
+  
+    // Custom rounding logic
+    const integerPart = Math.floor(num);
+    const decimalPart = num - integerPart;
+    const rounded = decimalPart > 0.5 ? Math.ceil(num) : Math.floor(num);
+  
+    // Format with Indian number system
+    const roundedStr = rounded.toString();
+    const lastThree = roundedStr.slice(-3);
+    const otherDigits = roundedStr.slice(0, -3);
+    const formatted =
+      otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ',') +
+      (otherDigits ? ',' : '') +
+      lastThree;
+  
+    return formatted;
+  };
 
 export const OrderStatus = (status: any) => {
     if (status === 'FULFILLED') {

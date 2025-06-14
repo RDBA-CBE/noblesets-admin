@@ -1,9 +1,8 @@
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import Rating from 'react-rating-stars-component';
 // import ProfileImage from "@assets/img/actors/actors-image";
 import ReactReadMoreReadLess from 'react-read-more-read-less';
-
-
 
 const ReviewSection = (props) => {
     const { reviewList } = props;
@@ -25,7 +24,7 @@ const ReviewSection = (props) => {
                                         <img src={review.user?.avatar ? review.user?.avatar : '/assets/images/user.png'} alt="avatar" className="rounded-circle me-2" width={50} />
                                         <div>
                                             <strong>{`${review.user?.firstName} ${review.user?.lastName}`}</strong>
-                                            <p className="text-muted small m-0">{review.created_at}</p>
+                                            {review.created_at && <p className="text-muted small m-0">{moment(review.created_at)?.format('DD-MM-YYYY')}</p>}
                                         </div>
                                     </div>
                                     <ReactReadMoreReadLess

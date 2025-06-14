@@ -1826,6 +1826,23 @@ console.log('✌️tableHtml --->', tableHtml);
                             </label>
                             <ReactQuill id="editor" theme="snow" value={value} onChange={setValue} />
                         </div> */}
+                       
+
+                        <div className="panel mb-5">
+                            <label htmlFor="editor" className="block text-sm font-medium text-gray-700">
+                                Product Short description
+                            </label>
+                            <textarea
+                                id="ctnTextarea"
+                                value={shortDescription}
+                                onChange={(e) => setShortDescription(e.target.value)}
+                                rows={3}
+                                className="form-textarea"
+                                placeholder="Enter Short Description"
+                                required
+                            ></textarea>
+                            {shortDesErrMsg && <p className="error-message mt-1 text-red-500 ">{shortDesErrMsg}</p>}
+                        </div>
                         <div className="panel mb-5">
                             <label htmlFor="editor" className="block text-sm font-medium text-gray-700">
                                 Product description
@@ -1844,22 +1861,6 @@ console.log('✌️tableHtml --->', tableHtml);
                                 <div ref={editorRef} className="border border-r-8 border-gray-200"></div>
                             </div>
                             {descriptionErrMsg && <p className="error-message mt-1 text-red-500 ">{descriptionErrMsg}</p>}
-                        </div>
-
-                        <div className="panel mb-5">
-                            <label htmlFor="editor" className="block text-sm font-medium text-gray-700">
-                                Product Short description
-                            </label>
-                            <textarea
-                                id="ctnTextarea"
-                                value={shortDescription}
-                                onChange={(e) => setShortDescription(e.target.value)}
-                                rows={3}
-                                className="form-textarea"
-                                placeholder="Enter Short Description"
-                                required
-                            ></textarea>
-                            {shortDesErrMsg && <p className="error-message mt-1 text-red-500 ">{shortDesErrMsg}</p>}
                         </div>
                         <div className="panel mb-5 mt-5">
                             <label htmlFor="editor" className="block text-sm font-medium text-gray-700">

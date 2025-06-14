@@ -71,6 +71,7 @@ export default function CategorySelect({
                     isSearchable={true}
                     isMulti={isMulti}
                     isLoading={false}
+                    hideSelectedOptions={false}
                     onInputChange={(inputValue, { action }) => {
                         if (action === 'input-change') {
                             getProductSearch(inputValue);
@@ -81,9 +82,32 @@ export default function CategorySelect({
                     closeMenuOnSelect={!isMulti} 
                     blurInputOnSelect={false}
                     styles={{
-                        menuPortal: (base) => ({ ...base, zIndex: 9999 }), 
-                        menu: (base) => ({ ...base, zIndex: 9999 }), 
-                    }}
+                        // 🔹 Option styling
+                        option: (base, state) => ({
+                          ...base,
+                          color: state.isSelected ? '#999' : '#000',
+                          backgroundColor: state.isDisabled
+                            ? '#f0f0f0'
+                            : state.isSelected
+                            ? '#fff'
+                            : state.isFocused
+                            ? '#eee'
+                            : '#fff',
+                          cursor : 'pointer',
+                        }),
+                
+                        // 🔹 Menu z-index
+                        menu: (base) => ({
+                          ...base,
+                          zIndex: 9999,
+                        }),
+                
+                        // 🔹 Portal z-index (if used)
+                        menuPortal: (base) => ({
+                          ...base,
+                          zIndex: 9999,
+                        }),
+                      }}
                 />
         </div>
     );

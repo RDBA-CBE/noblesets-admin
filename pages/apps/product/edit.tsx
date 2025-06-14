@@ -2695,7 +2695,7 @@ console.log('✌️tableHtml --->', tableHtml);
                                                 <div className="active  pt-5">
                                                     <div className="flex h-[500px] items-center justify-center">
                                                         <div className="w-1/2 text-center">
-                                                            <h3 className="mb-2 text-xl font-semibold">Drag and drop files to upload</h3>
+                                                            <h3 className="mb-2 text-xl font-semibold">Upload File</h3>
                                                             <p className="mb-2 text-sm ">or</p>
                                                             {/* <input type="file" className="mb-2 ml-32" /> */}
                                                             <input type="file" className="mb-2 ml-32" onChange={handleFileChange} />

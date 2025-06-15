@@ -423,6 +423,18 @@ export const NotesMsg = [
     { type: 'ORDER_MARKED_AS_PAID', message: 'Order Payment status changed from Pending to Completed.' },
     { type: 'PAYMENT_REFUNDED', message: 'Order Refund updated.' },
     { type: 'FULFILLMENT_REFUNDED', message: 'Order Refund updated.' },
+
+
+    { type: 'ORDER_FULLY_PAID', message: 'Order Refund updated.' },
+    { type: 'TRANSACTION_EVENT', message: 'Order Refunded updated.' },
+    { type: 'TRACKING_UPDATED', message: 'Order Tracking updated.' },
+    // { type: 'INVOICE_SENT', message: 'Order Packing slip generated.' },
+    { type: 'INVOICE_GENERATED', message: 'Order Invoice generated.' },
+    { type: 'PLACED', message: 'Order placed' },
+    { type: 'CANCELED', message: 'Order Cancelled' },
+
+
+   
 ];
 
 export const objIsEmpty = (obj: object) => {

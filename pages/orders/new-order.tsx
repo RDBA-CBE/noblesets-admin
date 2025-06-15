@@ -162,7 +162,7 @@ const NewOrder = () => {
 
     const { data: customerAddress, refetch: addressRefetch } = useQuery(CUSTOMER_ADDRESS);
 
-    const { data: searchProduct, refetch: searchProductRefetch } = useQuery(PRODUCT_SEARCH);
+    const { data: searchProduct, refetch: searchProductRefetch,loading:searchLoading } = useQuery(PRODUCT_SEARCH);
 
     const { data: stateData, refetch: stateRefetch } = useQuery(STATES_LIST, {
         variables: { code: state.billingAddress.country },
@@ -300,7 +300,6 @@ const NewOrder = () => {
     }, [productDetails]);
 
     const getOrderDetails = () => {
-console.log('✌️getOrderDetails --->', );
         setState({ loading: true });
         if (productDetails) {
             if (productDetails && productDetails?.order && productDetails?.order?.lines?.length > 0) {
@@ -491,7 +490,7 @@ console.log('✌️getOrderDetails --->', );
                 },
             });
 
-           await updateDraftOrder({
+            await updateDraftOrder({
                 variables: {
                     id: orderId,
                     input: {
@@ -515,50 +514,49 @@ console.log('✌️getOrderDetails --->', );
             // if (res?.data?.orderUpdateShipping
             //     ?.errors?.length > 0) {
             // } else {
-                 await getOrderDatas()
+            await getOrderDatas();
             //    await  updateAddress()
 
-                 
-                // const res = await getOrderData({
-                //     variables: {
-                //         id: orderId,
-                //         isStaffUser: true,
-                //     },
-                // });
-                // console.log('getOrderData --->', res);
-                // let productDetails = res?.data;
+            // const res = await getOrderData({
+            //     variables: {
+            //         id: orderId,
+            //         isStaffUser: true,
+            //     },
+            // });
+            // console.log('getOrderData --->', res);
+            // let productDetails = res?.data;
 
-                // if (productDetails) {
-                //     if (productDetails && productDetails?.order && productDetails?.order?.lines?.length > 0) {
-                //         const list = productDetails?.order?.lines;
-                //         setState({ lineList: list, loading: false });
-                //     } else {
-                //         setState({ loading: false, lineList: [] });
-                //     }
+            // if (productDetails) {
+            //     if (productDetails && productDetails?.order && productDetails?.order?.lines?.length > 0) {
+            //         const list = productDetails?.order?.lines;
+            //         setState({ lineList: list, loading: false });
+            //     } else {
+            //         setState({ loading: false, lineList: [] });
+            //     }
 
-                //     if (productDetails && productDetails?.order && productDetails?.order?.events?.length > 0) {
-                //         const list = productDetails?.order?.events;
-                //         const filteredArray = list.filter(
-                //             (item: any) => item.type === 'CONFIRMED' || item.type === 'FULFILLMENT_FULFILLED_ITEMS' || item.type === 'NOTE_ADDED' || item.type === 'ORDER_MARKED_AS_PAID'
-                //         );
+            //     if (productDetails && productDetails?.order && productDetails?.order?.events?.length > 0) {
+            //         const list = productDetails?.order?.events;
+            //         const filteredArray = list.filter(
+            //             (item: any) => item.type === 'CONFIRMED' || item.type === 'FULFILLMENT_FULFILLED_ITEMS' || item.type === 'NOTE_ADDED' || item.type === 'ORDER_MARKED_AS_PAID'
+            //         );
 
-                //         const result = filteredArray?.map((item: any) => {
-                //             const secondItem: any = NotesMsg.find((i) => i.type === item.type);
-                //             return {
-                //                 type: item.type,
-                //                 message: item.type === 'NOTE_ADDED' ? item.message : secondItem.message,
-                //                 id: item.id,
-                //                 date: item.date,
-                //             };
-                //         });
+            //         const result = filteredArray?.map((item: any) => {
+            //             const secondItem: any = NotesMsg.find((i) => i.type === item.type);
+            //             return {
+            //                 type: item.type,
+            //                 message: item.type === 'NOTE_ADDED' ? item.message : secondItem.message,
+            //                 id: item.id,
+            //                 date: item.date,
+            //             };
+            //         });
 
-                //         setState({ notesList: result, loading: false });
-                //     } else {
-                //         setState({ loading: false });
-                //     }
-                // } else {
-                //     setState({ loading: false });
-                // }
+            //         setState({ notesList: result, loading: false });
+            //     } else {
+            //         setState({ loading: false });
+            //     }
+            // } else {
+            //     setState({ loading: false });
+            // }
             // }
         } catch (error) {
             console.error(error);
@@ -566,59 +564,68 @@ console.log('✌️getOrderDetails --->', );
     };
 
     //Add new Product to this order
-    const handleHeadingSelect = (heading: any) => {
-        const isHeadingChecked = state.selectedItems[heading] && Object.values(state.selectedItems[heading]).every((value) => value);
+    const handleHeadingSelect = (productId: string) => {
+        const isHeadingChecked = state.selectedItems[productId] && Object.values(state.selectedItems[productId]).every((value) => value);
+
+        const product = state.productList.find((p) => p.id === productId);
+
         const newSelectedItems = {
             ...state.selectedItems,
-            [heading]: Object.fromEntries(state.productList?.find((item: any) => item?.name === heading)?.variants?.map(({ name }: any) => [name, !isHeadingChecked])),
+            [productId]: Object.fromEntries(product?.variants?.map((variant) => [variant.id, !isHeadingChecked]) ?? []),
         };
+
         setState({ selectedItems: newSelectedItems });
     };
 
-    const handleSelect = (heading: any, subHeading: any) => {
+    const handleSelect = (productId: string, variantId?: string) => {
         const newSelectedItems = { ...state.selectedItems };
 
-        if (subHeading) {
-            newSelectedItems[heading] = {
-                ...state.selectedItems[heading],
-                [subHeading]: !state.selectedItems[heading]?.[subHeading],
+        if (variantId) {
+            newSelectedItems[productId] = {
+                ...state.selectedItems[productId],
+                [variantId]: !state.selectedItems[productId]?.[variantId],
             };
 
-            // Check if all children are selected or not
-            const allSelected = Object.values(newSelectedItems[heading]).every((value) => value);
-            const anySelected = Object.values(newSelectedItems[heading]).some((value) => value);
+            const allSelected = Object.values(newSelectedItems[productId]).every((val) => val);
+            const anySelected = Object.values(newSelectedItems[productId]).some((val) => val);
 
             if (allSelected) {
-                newSelectedItems[heading] = Object.fromEntries(Object.entries(newSelectedItems[heading]).map(([name]) => [name, true]));
+                newSelectedItems[productId] = Object.fromEntries(Object.entries(newSelectedItems[productId]).map(([id]) => [id, true]));
             }
 
             if (!anySelected) {
-                delete newSelectedItems[heading];
+                delete newSelectedItems[productId];
             }
         } else {
-            const isHeadingChecked = state.selectedItems[heading] && Object.values(state.selectedItems[heading]).every((value) => value);
-            newSelectedItems[heading] = Object.fromEntries(state.productList.find((item: any) => item.name === heading).variants.map(({ name }: any) => [name, !isHeadingChecked]));
+            const product = state.productList.find((p) => p.id === productId);
+            const isHeadingChecked = state.selectedItems[productId] && Object.values(state.selectedItems[productId]).every((val) => val);
+
+            newSelectedItems[productId] = Object.fromEntries(product?.variants.map((variant) => [variant.id, !isHeadingChecked]) ?? []);
         }
+
         setState({ selectedItems: newSelectedItems });
     };
 
-    const handleSubHeadingSelect = (heading: any, subHeading: any) => {
-        handleSelect(heading, subHeading);
+    const handleSubHeadingSelect = (productId: string, variantId: string) => {
+        handleSelect(productId, variantId);
     };
 
     const addProducts = async () => {
         try {
             setState({ productLoading: true });
             const selectedSubheadingIds: any = [];
-            state.productList.forEach(({ name, variants }: any) => {
-                if (state.selectedItems[name]) {
-                    variants.forEach(({ name: variantName, id }: any) => {
-                        if (state.selectedItems[name][variantName]) {
-                            selectedSubheadingIds.push(id);
+            state.productList.forEach(({ id: productId, variants }: any) => {
+                if (state.selectedItems[productId]) {
+                    variants.forEach(({ id: variantId }: any) => {
+                        if (state.selectedItems[productId][variantId]) {
+                            selectedSubheadingIds.push(variantId);
                         }
                     });
                 }
             });
+
+            console.log('selectedSubheadingIds: ', selectedSubheadingIds);
+
             if (selectedSubheadingIds?.length > 0) {
                 const input = selectedSubheadingIds.map((item: any) => ({
                     quantity: 1,
@@ -1963,50 +1970,53 @@ console.log('✌️getOrderDetails --->', );
                                     <input type="text" className="form-input w-full p-3" placeholder="Search..." value={state.search} onChange={(e) => setState({ search: e.target.value })} />
                                 </div>
 
-                                {productLoadMoreLoading ? (
+                                {productLoadMoreLoading || searchLoading? (
                                     <CommonLoader />
                                 ) : (
                                     <div className="h-[550px] overflow-auto">
                                         {/* Product list */}
-                                        {state.productList?.map(({ name, variants, thumbnail }: any) => (
-                                            <div key={name}>
-                                                <div className="flex gap-3">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="form-checkbox"
-                                                        checked={state.selectedItems[name] && Object.values(state.selectedItems[name])?.every((value) => value)}
-                                                        onChange={() => handleHeadingSelect(name)}
-                                                    />
-                                                    <img src={profilePic(thumbnail?.url)} height={30} width={30} alt={name} />
-                                                    <div>{name}</div>
+                                        {state.productList?.map(({ id: productId, name, variants, thumbnail }) => {
+                                            return (
+                                                <div key={productId}>
+                                                    <div className="flex gap-3">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="form-checkbox"
+                                                            checked={state.selectedItems[productId] && Object.values(state.selectedItems[productId])?.every((value) => value)}
+                                                            onChange={() => handleHeadingSelect(productId)}
+                                                        />
+                                                        <img src={profilePic(thumbnail?.url)} height={30} width={30} alt={name} />
+                                                        <div>{name}</div>
+                                                    </div>
+                                                    <ul>
+                                                        {variants?.map(({ id: variantId, name: variantName, sku, pricing }) => (
+                                                            <li key={variantId} className="py-5 pl-4">
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="flex">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            className="form-checkbox"
+                                                                            checked={state.selectedItems[productId]?.[variantId]}
+                                                                            onChange={() => handleSubHeadingSelect(productId, variantId)}
+                                                                        />
+                                                                        <div>
+                                                                            <div>{variantName}</div>
+                                                                            <div>{sku}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="flex">
+                                                                        <div>
+                                                                            <div>{`${formatCurrency(pricing?.price?.gross?.currency)}${addCommasToNumber(pricing?.price?.gross?.amount)}`}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
                                                 </div>
-                                                <ul>
-                                                    {variants?.map(({ name: variantName, sku, costPrice, pricing }: any) => (
-                                                        <li key={variantName} className="py-5 pl-4">
-                                                            <div className="flex items-center justify-between">
-                                                                <div className="flex">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        className="form-checkbox"
-                                                                        checked={state.selectedItems[name]?.[variantName]}
-                                                                        onChange={() => handleSubHeadingSelect(name, variantName)}
-                                                                    />
-                                                                    <div>
-                                                                        <div>{variantName}</div>
-                                                                        <div>{sku}</div>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="flex">
-                                                                    <div>
-                                                                        <div>{`${formatCurrency(pricing?.price?.gross?.currency)}${addCommasToNumber(pricing?.price?.gross?.amount)}`}</div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
+
                                         {state.hasNextPage && (
                                             <div className="flex w-full justify-center">
                                                 <button

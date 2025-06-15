@@ -259,7 +259,6 @@ const Editorder = () => {
     const [loading, setLoading] = useState(false);
     const [refundData, setRefundData] = useState(null);
     const [refundProduct, setRefundProduct] = useState(null);
-    console.log('refundProduct: ', refundProduct);
     const [disableLines, setDisableLines] = useState(false);
     const [initialQuantity, setInitialQuantity] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
@@ -344,27 +343,59 @@ const Editorder = () => {
                 //     orderDetails?.order?.metadata?.length > 0 && setSlipDate(mintDateTime(orderDetails?.order?.metadata[0]?.value));
                 //     setSlipNumber(orderDetails?.order?.metadata[1]?.value);
                 // }
+                console.log('orderDetails: ', orderDetails);
 
                 //Status
-                const filteredArray = orderDetails?.order?.events?.filter(
-                    (item: any) =>
-                        item.type === 'CONFIRMED' ||
-                        item.type === 'FULFILLMENT_FULFILLED_ITEMS' ||
-                        item.type === 'NOTE_ADDED' ||
-                        item.type === 'ORDER_MARKED_AS_PAID' ||
-                        item.type === 'PAYMENT_REFUNDED' ||
-                        item.type === 'FULFILLMENT_REFUNDED'
-                );
+                const shownOnceTypes = ['TRACKING_UPDATED', 'INVOICE_GENERATED','CONFIRMED'];
+
+                // const confirmedEvents = orderDetails?.order?.events?.filter((item: any) => item.type === 'CONFIRMED') || [];
+                // const confirmedCount = confirmedEvents.length;
+
+                const alreadyAdded = new Set();
+
+                const filteredArray = orderDetails?.order?.events?.filter((item: any) => {
+                    const validTypes = [
+                        'PLACED',
+                        'CONFIRMED',
+                        'FULFILLMENT_FULFILLED_ITEMS',
+                        'NOTE_ADDED',
+                        'ORDER_MARKED_AS_PAID',
+                        'PAYMENT_REFUNDED',
+                        'FULFILLMENT_REFUNDED',
+                        'ORDER_FULLY_PAID',
+                        'TRACKING_UPDATED',
+                        // 'INVOICE_SENT',
+                        'INVOICE_GENERATED',
+                        'CANCELED',
+                        'TRANSACTION_EVENT',
+                    ];
+
+                    // Only allow first occurrence of types that should be shown once
+                    if (shownOnceTypes.includes(item.type)) {
+                        if (alreadyAdded.has(item.type)) {
+                            return false; // skip duplicates
+                        } else {
+                            alreadyAdded.add(item.type);
+                            return true;
+                        }
+                    }
+                    // if (item.type === 'CONFIRMED') {
+                    //     return confirmedCount === 2;
+                    // }
+                    // Other types, just check inclusion
+                    return validTypes.includes(item.type);
+                });
 
                 const result = filteredArray?.map((item: any) => {
-                    const secondItem: any = NotesMsg.find((i) => i.type === item.type);
+                    const matched = NotesMsg.find((msg) => msg.type === item.type);
                     return {
                         type: item.type,
-                        message: item.type === 'NOTE_ADDED' ? item.message : secondItem?.message,
+                        message: item.type === 'NOTE_ADDED' ? item.message : matched?.message,
                         id: item.id,
                         date: item.date,
                     };
                 });
+
                 if (orderDetails?.order?.courierPartner) {
                     setShippingPatner(orderDetails?.order?.courierPartner?.id);
                 }
@@ -473,7 +504,6 @@ const Editorder = () => {
                 PERMISSION_MANAGE_TRANSLATIONS: true,
                 PERMISSION_MANAGE_USERS: true,
             });
-            console.log('res?.data?.order: ', res?.data?.order);
 
             setRefundData(res?.data?.order);
 
@@ -485,7 +515,6 @@ const Editorder = () => {
                 //checkout no fillfilment order
 
                 let lines = res?.data?.order?.lines;
-                console.log('lines: ', lines);
                 filterByRefundData = {
                     lines,
                 };
@@ -495,7 +524,6 @@ const Editorder = () => {
                 remainingQuantity = FullfillQuantity(filterByRefundData, res?.data?.order?.grantedRefunds);
             } else {
                 remainingQuantity = Quantity(filterByRefundData, res?.data?.order?.grantedRefunds);
-                console.log('remainingQuantity: ', remainingQuantity);
             }
 
             const updatedObj = {
@@ -509,7 +537,6 @@ const Editorder = () => {
                     };
                 }),
             };
-            console.log('updatedObj: ', updatedObj);
 
             setRefundProduct(updatedObj);
             let disableLines = false;
@@ -943,9 +970,13 @@ const Editorder = () => {
                             id,
                         },
                     });
-                    getOrderDetails();
+                    if (res?.data?.orderCancel?.errors?.length > 0) {
+                        Failure(res?.data?.orderCancel?.errors[0]?.message);
+                    } else {
+                        getOrderDetails();
 
-                    Swal.fire('Cancelled!', 'Are you sure to cancelled the order.', 'success');
+                        Swal.fire('Cancelled!', 'Are you sure to cancelled the order.', 'success');
+                    }
                 },
 
                 () => {
@@ -1073,7 +1104,7 @@ const Editorder = () => {
                             Failure(newInvoiceReqRes?.data?.invoiceRequest?.errors?.[0]?.message);
                         } else {
                             setUpdateInvoideLoading(false);
-                            setInvoiceNameError("")
+                            setInvoiceNameError('');
                             setOpenInvoice(false);
                             getOrderDetails();
                             Success('Invoice Updated Successfully');
@@ -1278,7 +1309,7 @@ const Editorder = () => {
         }
 
         let final = amt - (orderData?.shippingPrice?.gross?.amount + Number(orderData?.codAmount) + Number(orderData?.giftWrapAmount));
-        setMaxRefundAmt(final);
+        setMaxRefundAmt(Math.round(final));
         return final;
     };
 

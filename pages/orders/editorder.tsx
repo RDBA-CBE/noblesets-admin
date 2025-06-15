@@ -340,15 +340,61 @@ const Editorder = () => {
                 // }
 
                 //Status
-                const filteredArray = orderDetails?.order?.events?.filter(
-                    (item: any) =>
-                        item.type === 'CONFIRMED' ||
-                        item.type === 'FULFILLMENT_FULFILLED_ITEMS' ||
-                        item.type === 'NOTE_ADDED' ||
-                        item.type === 'ORDER_MARKED_AS_PAID' ||
-                        item.type === 'PAYMENT_REFUNDED' ||
-                        item.type === 'FULFILLMENT_REFUNDED'
-                );
+                // const filteredArray = orderDetails?.order?.events?.filter(
+                //     (item: any) =>
+                //         item.type === 'CONFIRMED' ||
+                //         item.type === 'FULFILLMENT_FULFILLED_ITEMS' ||
+                //         item.type === 'NOTE_ADDED' ||
+                //         item.type === 'ORDER_MARKED_AS_PAID' ||
+                //         item.type === 'PAYMENT_REFUNDED' ||
+                //         item.type === 'FULFILLMENT_REFUNDED'
+
+                //         PLACED - order placed
+                //         Confired - 2 times show order confirm message
+
+                // );
+
+                const shownOnceTypes = ['TRACKING_UPDATED', 'INVOICE_GENERATED', 'CONFIRMED'];
+                const validTypes = [
+                    'PLACED',
+                    'CONFIRMED',
+                    'FULFILLMENT_FULFILLED_ITEMS',
+                    'NOTE_ADDED',
+                    'ORDER_MARKED_AS_PAID',
+                    'PAYMENT_REFUNDED',
+                    'FULFILLMENT_REFUNDED',
+                    'ORDER_FULLY_PAID',
+                    'TRACKING_UPDATED',
+                    // 'INVOICE_SENT',
+                    'INVOICE_GENERATED',
+                    'CANCELED',
+                    'TRANSACTION_EVENT',
+                ];
+
+                // const confirmedEvents = orderDetails?.order?.events?.filter((item: any) => item.type === 'CONFIRMED') || [];
+                // const confirmedCount = confirmedEvents.length;
+
+                const alreadyAdded = new Set();
+
+                const filteredArray = orderDetails?.order?.events?.filter((item: any) => {
+                    // Handle shown-once types
+                    if (shownOnceTypes.includes(item.type)) {
+                        if (alreadyAdded.has(item.type)) {
+                            return false;
+                        } else {
+                            alreadyAdded.add(item.type);
+                            return true;
+                        }
+                    }
+
+                    // Special case: CONFIRMED only if exactly 2 times in total
+                    //   if (item.type === 'CONFIRMED') {
+                    //     return confirmedCount === 2;
+                    //   }
+
+                    // All other valid types
+                    return validTypes.includes(item.type);
+                });
 
                 const result = filteredArray?.map((item: any) => {
                     const secondItem: any = NotesMsg.find((i) => i.type === item.type);
@@ -921,9 +967,13 @@ const Editorder = () => {
                             id,
                         },
                     });
-                    getOrderDetails();
+                    if (res?.data?.orderCancel?.errors?.length > 0) {
+                        Failure(res?.data?.orderCancel?.errors[0]?.message);
+                    } else {
+                        getOrderDetails();
 
-                    Swal.fire('Cancelled!', 'Are you sure to cancelled the order.', 'success');
+                        Swal.fire('Cancelled!', 'Are you sure to cancelled the order.', 'success');
+                    }
                 },
 
                 () => {
@@ -1089,7 +1139,7 @@ const Editorder = () => {
                             Failure(newInvoiceReqRes?.data?.invoiceRequest?.errors?.[0]?.message);
                         } else {
                             setUpdateInvoideLoading(false);
-                            setInvoiceNameError("")
+                            setInvoiceNameError('');
                             setOpenInvoice(false);
                             getOrderDetails();
                             Success('Invoice Updated Successfully');
@@ -1228,7 +1278,7 @@ const Editorder = () => {
         }
 
         let final = amt - (orderData?.shippingPrice?.gross?.amount + Number(orderData?.codAmount) + Number(orderData?.giftWrapAmount));
-        setMaxRefundAmt(final);
+        setMaxRefundAmt(Math.round(final));
         return final;
     };
 
@@ -2726,12 +2776,11 @@ const Editorder = () => {
                                         onChange={(e) => setInvoiceDate(e.target.value)}
                                         id="dateTimeCreated"
                                         name="dateTimeCreated"
-                                        className="form-input bg-white text-black opacity-100 cursor-not-allowed "
+                                        className="form-input cursor-not-allowed bg-white text-black opacity-100 "
                                         disabled
                                     />
                                 </div>
                                 {/* <ErrorMessage message={invoiceDateError} /> */}
-
                             </div>
 
                             <div className="mt-8 flex items-center justify-end">

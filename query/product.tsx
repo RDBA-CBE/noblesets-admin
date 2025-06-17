@@ -2944,6 +2944,12 @@ export const ORDER_FULFILL_DATA = gql`
                 thumbnail {
                     url
                 }
+                productType {
+                    id
+                    kind
+                    name
+                    isDigital
+                }
             }
         }
         thumbnail(size: 64) {
@@ -9384,6 +9390,11 @@ export const GET_ORDER_DETAILS = gql`
                 __typename
                 thumbnail {
                     url
+                }
+                productType {
+                    isDigital
+                    id
+                    kind
                 }
             }
             __typename

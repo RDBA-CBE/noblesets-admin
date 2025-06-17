@@ -297,7 +297,6 @@ const ProductAdd = () => {
         },
     });
 
-    console.log('✌️customerData --->', customerData);
 
     const handleNextPage = () => {
         fetchNextPage({
@@ -327,6 +326,7 @@ const ProductAdd = () => {
     };
 
     const commonPagination = (data) => {
+console.log('✌️data --->', data);
         setImageList(data.files.edges);
         setMediaStartCussor(data.files.pageInfo.startCursor);
         setMediaEndCursor(data.files.pageInfo.endCursor);

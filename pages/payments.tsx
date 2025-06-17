@@ -259,7 +259,7 @@ const Payments = () => {
                                                 <Form className="space-y-5">
                                                     <div className={submitCount ? (errors.name ? 'has-error' : 'has-success') : ''}>
                                                         <label htmlFor="fullName">Name </label>
-                                                        <Field name="name" type="text" id="fullName" placeholder="Enter Name" className="form-input" />
+                                                        <Field name="name" type="text" id="fullName" placeholder="Enter Name" className="form-input cursor-not-allowed opacity-50"  disabled/>
 
                                                         {submitCount ? errors.name ? <div className="mt-1 text-danger">{errors.name}</div> : <div className="mt-1 text-success"></div> : ''}
                                                     </div>

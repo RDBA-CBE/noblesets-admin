@@ -2265,9 +2265,9 @@ const Editorder = () => {
                                         </div>
                                     )}
                                     <div className="mt-4 flex  justify-between">
-                                        <div>{orderData?.paymentMethod?.name == 'Cash On delivery' ? 'COD Fee:' : 'Shipping:'}</div>
+                                        <div>{orderData?.paymentMethod?.name == 'Cash On Delivery' ? 'COD Fee:' : 'Shipping:'}</div>
                                         <div>
-                                            {orderData?.paymentMethod?.name == 'Cash On delivery' ? (
+                                            {orderData?.paymentMethod?.name == 'Cash On Delivery' ? (
                                                 <div className="ml-[94px] items-end">{`${formatCurrency(orderData?.subtotal?.gross?.currency)}${orderData?.codAmount}`}</div>
                                             ) : (
                                                 <div className="ml-[94px] items-end">

@@ -29,7 +29,7 @@ import {
 } from '@/utils/functions';
 import axios from 'axios';
 import moment from 'moment';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Swal from 'sweetalert2';
 import CommonLoader from './elements/commonLoader';
 import pdf from '../public/assets/images/pdf.png';
@@ -74,12 +74,15 @@ const Media = () => {
     const PAGE_LIMIT = 10;
     const PAGE_SIZE = 24;
 
+    const [isDragging, setIsDragging] = useState(false);
+    const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+
     const [addNewImages, { loading: addNewImageLoading }] = useMutation(ADD_NEW_MEDIA_IMAGE);
     const [updateImages, { loading: mediaUpdateLoading }] = useMutation(UPDATE_MEDIA_IMAGE);
     const [deleteImages] = useMutation(DELETE_MEDIA_IMAGE);
     const { data, refetch: getListRefetch, loading: loading } = useQuery(GET_MEDIA_IMAGE);
 
-    const { refetch: mediaRefetch } = useQuery(MEDIA_PAGINATION);
+    const { refetch: mediaRefetch, loading: listLoading } = useQuery(MEDIA_PAGINATION);
 
     const {
         error,
@@ -174,11 +177,18 @@ const Media = () => {
         }
     };
 
-    const handleFileChange = async (e: any) => {
+    const handleFileChange = async (files: FileList | null) => {
+        if (!files || files.length === 0) return;
+
         try {
-            await addNewImage(e);
+            const newFiles = Array.from(files);
+            console.log('✌️newFiles --->', newFiles);
+            setUploadedFiles((prev) => [...prev, ...newFiles]);
+
+            // Upload logic (replace with your actual upload function)
+            await Promise.all(newFiles.map((file) => addNewImage(file)));
         } catch (error) {
-            console.error('Error uploading file:', error);
+            console.error('Error uploading files:', error);
         }
     };
 
@@ -210,15 +220,15 @@ const Media = () => {
         return uniqueFilename;
     };
 
-    const addNewImage = async (e) => {
-        let files = e.target.files[0];
+    const addNewImage = async (files) => {
+        // let files = e.target.files[0];
         const isImage = files.type.startsWith('image/');
         if (isImage) {
             if (files.size > 300 * 1024) {
                 files = await resizingImage(files);
                 files = await resizeImage(files, 700, 1050);
             } else {
-                files = await resizeImage(files, 700,1050);
+                files = await resizeImage(files, 700, 1050);
             }
             const { width, height } = await getImageDimensions(files);
         }
@@ -406,6 +416,58 @@ const Media = () => {
         }
     };
 
+    const handleDragEnter = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+        handleFileChange(e.dataTransfer.files);
+    };
+
+    const handleSingleClick = (item: any) => {
+        if (state.longPressTimer) {
+            clearTimeout(state.longPressTimer);
+            setState((prev) => ({ ...prev, longPressTimer: null }));
+            return;
+        }
+
+        // if (state.isMultiSelectMode) {
+        //   handleMultiSelect(item);
+        // } else {
+        // Your existing single selection logic
+        handleClickImage(item);
+        // }
+    };
+
+    // Handler for long press (enable multi-select)
+    const handleLongPressStart = (item: any) => {
+        const timer = setTimeout(() => {
+            setState((prev) => ({
+                ...prev,
+                isMultiSelectMode: true,
+                selectedImages: [item], // Start with this item selected
+                longPressTimer: null,
+            }));
+        }, 500); // 500ms delay for long press
+
+        setState((prev) => ({ ...prev, longPressTimer: timer }));
+    };
+
+    const handleLongPressEnd = () => {
+        if (state.longPressTimer) {
+            clearTimeout(state.longPressTimer);
+            setState((prev) => ({ ...prev, longPressTimer: null }));
+        }
+    };
+
     return (
         <div className=" ">
             <div className="panel mb-5 flex flex-col gap-5 md:flex-row md:items-center">
@@ -441,12 +503,18 @@ const Media = () => {
                         addNewImageLoading ? (
                             <CommonLoader />
                         ) : (
-                            <div className="active  pt-5">
+                            <div
+                                className={`active  pt-5 ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
+                                onDragEnter={handleDragEnter}
+                                onDragOver={handleDragEnter}
+                                onDragLeave={handleDragLeave}
+                                onDrop={handleDrop}
+                            >
                                 <div className="flex h-[500px] items-center justify-center">
-                                    <div className="w-1/2 text-center">
-                                        <h3 className="mb-2 text-xl font-semibold">Upload File</h3>
+                                    <div className={`w-1/2 text-center`}>
+                                        <h3 className="mb-2 text-xl font-semibold">Drag and Drop File</h3>
                                         <p className="mb-2 text-sm ">or</p>
-                                        <input type="file" className="mb-2 ml-32" onChange={handleFileChange} />
+                                        <input type="file" multiple className="mb-2 ml-32" onChange={(e) => handleFileChange(e.target.files)} />
 
                                         <p className="mb-2 text-sm">Maximum upload file size: 30 MB.</p>
                                     </div>
@@ -519,14 +587,17 @@ const Media = () => {
                                                         return (
                                                             <div
                                                                 key={item.node?.fileUrl}
-                                                                className={`flex h-[150px] w-[150px] overflow-hidden p-2 ${state.selectedImages.includes(item) ? 'border-4 border-blue-500' : ''}`}
-                                                                onMouseDown={() => handleMouseDown(item)}
-                                                                onMouseUp={handleMouseUp}
-                                                                onMouseLeave={handleMouseLeave}
-                                                                onClick={() => {
-                                                                    handleClickImage(item);
-                                                                    // deletesImg(item)
-                                                                }}
+                                                                className={`relative flex h-[150px] w-[150px] cursor-pointer overflow-hidden p-2 ${
+                                                                    state.selectedImages.some((selected) => selected.node?.fileUrl === item.node?.fileUrl)
+                                                                        ? 'border-4 border-blue-500'
+                                                                        : 'border-2 border-gray-200'
+                                                                }`}
+                                                                onClick={() => handleSingleClick(item)}
+                                                                onTouchStart={() => handleLongPressStart(item)}
+                                                                onTouchEnd={handleLongPressEnd}
+                                                                onMouseDown={() => handleLongPressStart(item)}
+                                                                onMouseUp={handleLongPressEnd}
+                                                                onMouseLeave={handleLongPressEnd}
                                                             >
                                                                 {item?.node?.fileUrl?.endsWith('.mp4') ? (
                                                                     <video controls src={item.node?.fileUrl} className="h-full w-full object-cover">

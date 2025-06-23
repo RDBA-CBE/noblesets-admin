@@ -22,9 +22,7 @@ export const PRODUCT_TYPE = 'UHJvZHVjdFR5cGU6Mw==';
 
 export const TAX_CLASS = 'VGF4Q2xhc3M6NQ==';
 
-
 export const SERVER_URL = 'https://noble.irepute.in/';
-
 
 export const FRONTEND_URL = 'https://noblesets.irepute.co.in';
 
@@ -424,7 +422,6 @@ export const NotesMsg = [
     { type: 'PAYMENT_REFUNDED', message: 'Order Refund updated.' },
     { type: 'FULFILLMENT_REFUNDED', message: 'Order Refund updated.' },
 
-
     { type: 'ORDER_FULLY_PAID', message: 'Order Refund updated.' },
     { type: 'TRANSACTION_EVENT', message: 'Order Refunded updated.' },
     { type: 'TRACKING_UPDATED', message: 'Order Tracking updated.' },
@@ -432,9 +429,6 @@ export const NotesMsg = [
     { type: 'INVOICE_GENERATED', message: 'Order Invoice generated.' },
     { type: 'PLACED', message: 'Order placed' },
     { type: 'CANCELED', message: 'Order Cancelled' },
-
-
-   
 ];
 
 export const objIsEmpty = (obj: object) => {
@@ -534,27 +528,24 @@ export const mintDateTime = (date: any) => {
 
 export const roundOff = (value: any) => {
     if (value === null || value === undefined) return '';
-  
+
     // Remove commas and convert to number
     const num = Number(value.toString().replace(/,/g, ''));
     if (isNaN(num)) return String(value);
-  
+
     // Custom rounding logic
     const integerPart = Math.floor(num);
     const decimalPart = num - integerPart;
     const rounded = decimalPart > 0.5 ? Math.ceil(num) : Math.floor(num);
-  
+
     // Format with Indian number system
     const roundedStr = rounded.toString();
     const lastThree = roundedStr.slice(-3);
     const otherDigits = roundedStr.slice(0, -3);
-    const formatted =
-      otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ',') +
-      (otherDigits ? ',' : '') +
-      lastThree;
-  
+    const formatted = otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ',') + (otherDigits ? ',' : '') + lastThree;
+
     return formatted;
-  };
+};
 export const formatCurrency = (currency: any) => {
     if (currency === 'INR') {
         return '₹';
@@ -576,27 +567,24 @@ export const formatCurrency = (currency: any) => {
 
 export const addCommasToNumber = (value: any) => {
     if (value === null || value === undefined) return '';
-  
+
     // Remove commas and convert to number
     const num = Number(value.toString().replace(/,/g, ''));
     if (isNaN(num)) return String(value);
-  
+
     // Custom rounding logic
     const integerPart = Math.floor(num);
     const decimalPart = num - integerPart;
     const rounded = decimalPart > 0.5 ? Math.ceil(num) : Math.floor(num);
-  
+
     // Format with Indian number system
     const roundedStr = rounded.toString();
     const lastThree = roundedStr.slice(-3);
     const otherDigits = roundedStr.slice(0, -3);
-    const formatted =
-      otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ',') +
-      (otherDigits ? ',' : '') +
-      lastThree;
-  
+    const formatted = otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ',') + (otherDigits ? ',' : '') + lastThree;
+
     return formatted;
-  };
+};
 
 export const OrderStatus = (status: any) => {
     if (status === 'FULFILLED') {
@@ -1032,16 +1020,24 @@ export const addNewFile = async (e: any) => {
     }
 };
 
-export const addNewMediaFile = async (file: any, uniqueFilename: any) => {
+export const addNewMediaFile = async (file: any, uniqueFilename: any, size: any) => {
     try {
         // let uniqueFilename = await generateUniqueFilename(file.name);
         const isImage = file.type.startsWith('image/');
         if (isImage) {
             if (file.size > 300 * 1024) {
                 file = await resizingImage(file);
-                file = await resizeImage(file, 700, 1050);
+                if (size) {
+                    file = await resizeImage(file, size?.height, size?.width);
+                } else {
+                    file = await resizeImage(file, 700, 1050);
+                }
             } else {
-                file = await resizeImage(file, 700, 1050);
+                if (size) {
+                    file = await resizeImage(file, size?.height, size?.width);
+                } else {
+                    file = await resizeImage(file, 700, 1050);
+                }
             }
             const { width, height } = await getImageDimensions(file);
             console.log('Image width, height: ', width, height);
@@ -1630,15 +1626,12 @@ export const getRowsAndColumnss = (htmlTableString: any) => {
     return { columns, rows };
 };
 
-
 export const encodeUrlPathOnly = (url) => {
     const urlObj = new URL(url);
     const cleanedPath = urlObj.pathname.replace(/ /g, '%20');
     return `${urlObj.origin}${cleanedPath}`;
-  };
+};
 
-
-
-  export const generate4DigitRandomNumber=()=> {
+export const generate4DigitRandomNumber = () => {
     return Math.floor(1000 + Math.random() * 9000);
-  }
+};

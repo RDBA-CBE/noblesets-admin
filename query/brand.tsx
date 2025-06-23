@@ -8,6 +8,7 @@ export const CREATE_BRAND = gql`
                 name
                 slug
                 logo
+                description
             }
             errors {
                 field
@@ -26,6 +27,7 @@ export const BRAND_LIST = gql`
                     name
                     slug
                     logo
+                    description
                 }
             }
             totalCount
@@ -47,6 +49,7 @@ export const UPDATE_BRAND = gql`
                 name
                 slug
                 logo
+                description
             }
             errors {
                 field

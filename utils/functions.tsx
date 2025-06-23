@@ -1020,7 +1020,7 @@ export const addNewFile = async (e: any) => {
     }
 };
 
-export const addNewMediaFile = async (file: any, uniqueFilename: any, size: any) => {
+export const addNewMediaFile = async (file: any, uniqueFilename: any, size = { height: 700, width: 1050 }) => {
     try {
         // let uniqueFilename = await generateUniqueFilename(file.name);
         const isImage = file.type.startsWith('image/');

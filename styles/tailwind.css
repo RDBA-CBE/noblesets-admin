@@ -91,7 +91,7 @@
     }
     .sidebar .nav-item > button.active,
     .sidebar .nav-item > a.active {
-        @apply bg-[#c2882b] text-white dark:bg-[#181f32] dark:text-white-dark;
+        @apply bg-[#e09a7a] text-white dark:bg-[#181f32] dark:text-white-dark;
     }
 
     .sidebar .nav-item > button.active > div > span,
@@ -104,6 +104,9 @@
         @apply flex w-full items-center px-9 py-2.5 before:h-0.5 before:w-2 before:rounded before:bg-gray-300 hover:bg-primary-light
 hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark:before:bg-gray-500 dark:hover:bg-gray-900 dark:hover:text-primary;
     }
+     .sidebar ul.sub-menu li a {
+        padding-right: 0 !important ;
+     }
     .sidebar ul.sub-menu li button.active,
     .sidebar ul.sub-menu li a.active {
         @apply text-primary before:bg-primary;
@@ -714,3 +717,4 @@ pre.hljs {
 .drag-over {
     background-color: rgba(0, 0, 0, 0.1);
 }
+

@@ -161,9 +161,9 @@ const Sidebar = () => {
                 className={`sidebar fixed bottom-0 top-0 z-50 h-full min-h-screen w-[200px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] transition-all duration-300 ${semidark ? 'text-white-dark' : ''}`}
             >
                 <div className="h-full bg-white dark:bg-black">
-                    <div className="flex items-center justify-center px-4 py-3">
+                    <div className="flex items-center justify-between px-2 py-3 mb-4">
                         <Link href="/" className="main-logo flex shrink-0 items-center">
-                            <img className="w-30 ml-[5px] flex-none" src="/assets/images/logo.png" alt="logo" />
+                            <img className="w-[100px] ml-[5px] flex-none" src="/assets/images/logo.png" alt="logo" />
                         </Link>
 
                         <button
@@ -429,12 +429,12 @@ const Sidebar = () => {
                                         <AnimateHeight duration={300} height={currentMenu === 'Stock Management' ? 'auto' : 0}>
                                             <ul className="sub-menu text-gray-500">
                                                 <li className="relative flex items-center">
-                                                    <Link href="/lowStock" className="flex items-center ">
+                                                    <Link href="/lowStock" className="flex items-center space-x-2">
                                                         <div>
                                                             <span className="flex items-center">{t('Out Of Stocks')}</span>
                                                         </div>
-                                                        <div className=" h-8 w-8 ">
-                                                            <span className="flex w-full items-center justify-center rounded-full bg-red-500 p-2 text-xs font-bold text-white">{lowStockCount}</span>
+                                                        <div className=" w-6 ">
+                                                            <span className="flex w-full items-center justify-center rounded-full bg-primary py-1 text-xs font-bold text-white">{lowStockCount}</span>
                                                         </div>
                                                     </Link>
                                                 </li>
@@ -443,8 +443,8 @@ const Sidebar = () => {
                                                         <div>
                                                             <span className="flex items-center">{t('Last updated details')}</span>
                                                         </div>
-                                                        <div className=" h-8 w-8">
-                                                            <span className="flex w-full items-center justify-center rounded-full bg-red-500 p-2 text-xs font-bold text-white">{lastUpdateCount}</span>
+                                                        <div className="w-7">
+                                                            <span className="flex w-full items-center justify-center rounded-full bg-primary py-1 text-xs font-bold text-white">{lastUpdateCount}</span>
                                                         </div>
                                                     </Link>
                                                 </li>

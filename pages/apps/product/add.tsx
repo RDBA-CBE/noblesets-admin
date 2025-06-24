@@ -2332,7 +2332,7 @@ console.log('✌️data --->', data);
                                                                 <div className="flex justify-between gap-3 pt-3">
                                                                     <div className="flex gap-3">
                                                                         {/* <select className="form-select w-40 flex-1"> */}
-                                                                        <select className="form-select w-60 flex-1" value={mediaType} onChange={(e) => filterMediaByType(e.target.value)}>
+                                                                        <select className="form-select w-40 xl:w-60 flex-1" value={mediaType} onChange={(e) => filterMediaByType(e.target.value)}>
                                                                             <option value="all">All Data</option>
                                                                             <option value="Image">Images</option>
                                                                             <option value="Video">Videos</option>
@@ -2350,7 +2350,7 @@ console.log('✌️data --->', data);
                                                                 <div className="flex justify-between gap-3 pt-3">
                                                                     <div className="flex gap-3">
                                                                         {/* <select className="form-select w-40 flex-1"> */}
-                                                                        <select className="form-select w-60 flex-1" value={mediaMonth} onChange={(e) => filterMediaByMonth(e.target.value)}>
+                                                                        <select className="form-select w-40 xl:w-60 flex-1" value={mediaMonth} onChange={(e) => filterMediaByMonth(e.target.value)}>
                                                                             <option value="all">All Data</option>
                                                                             {months.map((month, index) => (
                                                                                 <option key={month} value={`${month}/2024`}>{`${month} 2024`}</option>
@@ -2360,7 +2360,7 @@ console.log('✌️data --->', data);
                                                                     <div>
                                                                         <input
                                                                             type="text"
-                                                                            className="form-input mr-2  w-80 "
+                                                                            className="form-input mr-2  w-40 xl:w-60 "
                                                                             placeholder="Search..."
                                                                             value={mediaSearch}
                                                                             onChange={(e) => searchMediaByName(e.target.value)}
@@ -2379,7 +2379,7 @@ console.log('✌️data --->', data);
                                                                             return (
                                                                                 <div
                                                                                     key={item.node?.fileUrl}
-                                                                                    className={`col-span-4  overflow-hidden p-2 ${
+                                                                                    className={`col-span-2  overflow-hidden p-2 ${
                                                                                         selectedImages.includes(item) ? 'border-4 border-blue-500' : ''
                                                                                     }`}
                                                                                     onMouseDown={() => handleMouseDown(item)}
@@ -2420,7 +2420,7 @@ console.log('✌️data --->', data);
                                                         </div>
                                                     </div>
                                                     {selectedImg && (
-                                                        <div className="col-span-3 h-[450px] overflow-y-scroll pl-5">
+                                                        <div className="col-span-3 h-[700px] overflow-y-scroll pl-5">
                                                             {/* <div className="border-b border-gray-200 pb-5"> */}
                                                             <div className="">
                                                                 <div>
@@ -2706,7 +2706,7 @@ console.log('✌️data --->', data);
                         <div className="fixed inset-0" />
                     </Transition.Child>
                     <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
-                        <div className="flex min-h-screen items-start justify-center px-4">
+                        <div className="flex min-h-screen items-center justify-center px-4">
                             <Transition.Child
                                 as={Fragment}
                                 enter="ease-out duration-300"

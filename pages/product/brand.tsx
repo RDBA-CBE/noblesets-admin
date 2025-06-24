@@ -46,7 +46,7 @@ const Brands = () => {
     const [modalContant, setModalContant] = useState<any>(null);
     const [totalCount, setTotalCount] = useState(0);
     const [state, setState] = useSetState({
-        imagePreview:"",
+        imagePreview: '',
     });
 
     const [addNewImages, { loading: addNewImageLoading }] = useMutation(ADD_NEW_MEDIA_IMAGE);
@@ -119,6 +119,7 @@ const Brands = () => {
                 name: item.node?.name,
                 id: item.node?.id,
                 logo: item.node?.logo,
+                description: item.node?.description,
             };
         });
         setRecordsData(newData);
@@ -229,18 +230,10 @@ const Brands = () => {
 
     const addNewImage = async (files) => {
         const isImage = files.type.startsWith('image/');
-        if (isImage) {
-            if (files.size > 300 * 1024) {
-                files = await resizingImage(files);
-                files = await resizeImage(files, 700, 1050);
-            } else {
-                files = await resizeImage(files, 700, 1050);
-            }
-            const { width, height } = await getImageDimensions(files);
-        }
 
+        const size = { height:1219, width: 477  };
         const unique = await generateUniqueFilenames(files.name);
-        const result = await addNewMediaFile(files, unique);
+        const result = await addNewMediaFile(files, unique, size);
         const fileType = await getFileType(result);
         const body = {
             fileUrl: result,
@@ -268,10 +261,10 @@ const Brands = () => {
     // form submit
     const onSubmit = async () => {
         try {
-
             const values: any = {
-                name: state.name, 
+                name: state.name,
                 image: state.imagePreview,
+                description: state.description,
             };
 
             await SubmittedForm.validate(values, { abortEarly: false });
@@ -285,6 +278,8 @@ const Brands = () => {
             const variables: any = {
                 input: {
                     name: state.name,
+                    description: state.description,
+
                     // logo: body.sizeimg,
                 },
             };
@@ -303,9 +298,10 @@ const Brands = () => {
                     setModal1(false);
                     setState({
                         name: '',
-                        imagePreview: "",
+                        imagePreview: '',
                         imgFile: null,
                         errors: null,
+                        description: '',
                     });
                     // resetForm();
                 }
@@ -321,7 +317,8 @@ const Brands = () => {
                         name: '',
                         imgFile: null,
                         errors: null,
-                        imagePreview: "",
+                        imagePreview: '',
+                        description: '',
                     });
                     // resetForm();
                 }
@@ -344,7 +341,7 @@ const Brands = () => {
         setModal1(true);
         setModalTitle(record);
         setModalContant(record);
-        setState({ imagePreview: record.logo, name: record.name });
+        setState({ imagePreview: record.logo, name: record.name, description: record.description });
     };
 
     // category table create
@@ -472,7 +469,7 @@ const Brands = () => {
                                         </div>
                                     ),
                                 },
-                                { accessor: 'name',  },
+                                { accessor: 'name' },
                                 {
                                     accessor: 'actions',
                                     title: 'Actions',
@@ -501,7 +498,6 @@ const Brands = () => {
                             withBorder={true}
                             sortStatus={sortStatus}
                             onSortStatusChange={setSortStatus}
-                           
                         />
                     </div>
                 )}
@@ -526,7 +522,7 @@ const Brands = () => {
                         setModal1(false);
                         setState({
                             name: '',
-                            imagePreview: "",
+                            imagePreview: '',
                             imgFile: null,
                             errors: null,
                         });
@@ -556,9 +552,10 @@ const Brands = () => {
                                                 setModal1(false);
                                                 setState({
                                                     name: '',
-                                                    imagePreview: "",
+                                                    imagePreview: '',
                                                     imgFile: null,
                                                     errors: null,
+                                                    description: '',
                                                 });
                                             }}
                                         >
@@ -583,9 +580,9 @@ const Brands = () => {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="flex items-center gap-4">
+                                                <div className=" items-center gap-4">
                                                     <img src={state.imagePreview} alt="Uploaded" className="max-h-[400px] rounded shadow" />
-                                                    <div className="flex gap-3">
+                                                    <div className="flex gap-3 pt-4">
                                                         <button type="button" onClick={() => document.getElementById('image-upload').click()} className="rounded bg-blue-600 px-4 py-2 text-white">
                                                             Replace Image
                                                         </button>
@@ -600,6 +597,18 @@ const Brands = () => {
                                             <label htmlFor="fullName">Name</label>
                                             <input id="fullName" type="text" value={state.name} onChange={(e) => setState({ name: e.target.value })} placeholder="Enter Name" className="form-input" />
                                             {state.errors?.name && <div className="mt-1 text-danger">{state.errors?.name}</div>}
+                                        </div>
+                                        <div className="pt-3">
+                                            <label htmlFor="fullName">Description</label>
+                                            <textarea
+                                                id="ctnTextarea"
+                                                value={state.description}
+                                                onChange={(e) => setState({ description: e.target.value })}
+                                                rows={3}
+                                                className="form-textarea"
+                                                placeholder="Enter Description"
+                                                required
+                                            ></textarea>
                                         </div>
 
                                         <button type="button" className="btn btn-primary !mt-6" onClick={onSubmit}>

@@ -515,7 +515,7 @@ const EditCoupon = () => {
                     <button type="button" className="btn btn-primary  w-full md:mb-0 md:w-auto" onClick={() => updateCoupon()}>
                         {updateDisLoding || assignLoading || removeLoading || metaLoading ? <IconLoader className="mr-2 h-4 w-4 animate-spin" /> : 'Submit'}
                     </button>
-                    <button type="button" className="btn btn-danger  w-full md:mb-0 md:w-auto" onClick={() => router.push('/discount')}>
+                    <button type="button" className="btn btn-outline-primary" onClick={() => router.push('/discount')}>
                         {'Cancel'}
                     </button>
                 </div>

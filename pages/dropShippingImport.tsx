@@ -323,7 +323,7 @@ const AbandonedCarts = () => {
             <Modal
                 addHeader={editId ? 'Update Shipping Import' : 'Add Shipping Import'}
                 open={isEditOpen}
-                isFullWidth
+                // isFullWidth
                 close={() => createData(false)}
                 renderComponent={() => (
                     <div className="scroll-auto p-10 pb-7">
@@ -371,7 +371,7 @@ const AbandonedCarts = () => {
                         />
 
                         <div className="mt-8 flex items-center justify-end">
-                            <button type="button" className="btn btn-outline-danger gap-2" onClick={() => createData(false)}>
+                            <button type="button" className="btn btn-outline-primary" onClick={() => createData(false)}>
                                 Cancel
                             </button>
                             <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => (editId ? updateRow() : createShipping())}>

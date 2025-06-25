@@ -68,6 +68,7 @@ import {
     roundOff,
     sampleParams,
     showDeleteAlert,
+    roundIndianRupee,
 } from '@/utils/functions';
 import Swal from 'sweetalert2';
 import IconPencil from '@/components/Icon/IconPencil';
@@ -422,7 +423,7 @@ const Editorder = () => {
                 console.log('✌️orderDetails?.order?.status --->', orderDetails?.order?.status);
 
                 if (orderDetails?.order?.status == 'PARTIALLY_FULFILLED') {
-                    setOrderStatus('UNFULFILLED');
+                    setOrderStatus('FULFILLED');
                 } else {
                     setOrderStatus(orderDetails?.order?.status);
                 }
@@ -755,7 +756,7 @@ const Editorder = () => {
                 let lines = [];
                 const hasDigitalProduct = fullfillData?.some((item) => item.variant?.product?.productType?.isDigital === true);
                 const allDigital = fullfillData?.every((item) => item.variant?.product?.productType?.isDigital === true);
-                
+
                 if (allDigital) {
                     lines = fullfillData?.map((item: any) => {
                         return {
@@ -766,21 +767,18 @@ const Editorder = () => {
                             })),
                         };
                     });
-                }  
-                else if (hasDigitalProduct) {
-                    lines = fullfillData?.map((item: any) => {
-                        const isDigital = item.variant?.product?.productType?.isDigital;
+                } else if (hasDigitalProduct) {
+                    const exceptGiftCard = fullfillData?.filter((item) => item.variant?.product?.productType?.isDigital === false);
+                    lines = exceptGiftCard?.map((item: any) => {
+                        // const isDigital = item.variant?.product?.productType?.isDigital;
 
                         return {
                             orderLineId: item.id,
-                            ...(!isDigital
-                                ? {
-                                      stocks: item?.variant?.stocks?.map((data: any) => ({
-                                          quantity: item?.quantity,
-                                          warehouse: data?.warehouse?.id,
-                                      })),
-                                  }
-                                : { stocks: [] }),
+
+                            stocks: item?.variant?.stocks?.map((data: any) => ({
+                                quantity: item?.quantity,
+                                warehouse: data?.warehouse?.id,
+                            })),
                         };
                     });
                 } else {
@@ -808,7 +806,7 @@ const Editorder = () => {
                     Failure(res?.data?.orderFulfill?.errors[0]?.message);
                     setIsOrderOpen(false);
                 } else {
-                    getOrderDetails()
+                    getOrderDetails();
                     // setOrderStatus('FULFILLED');
                     setIsOrderOpen(false);
                     Success('Order status updated');
@@ -1439,7 +1437,7 @@ const Editorder = () => {
                 } else {
                     const response = await orderDrandRefund({
                         variables: {
-                            amount: Number(manualAmount),
+                            amount: roundIndianRupee(manualAmount),
                             reason: '',
                             lines: [],
                             grantRefundForShipping: false,
@@ -1455,7 +1453,7 @@ const Editorder = () => {
                             variables: {
                                 currency: 'INR',
                                 description: '',
-                                amount: Number(response?.data?.orderGrantRefundCreate?.order?.totalRemainingGrant?.amount),
+                                amount: roundIndianRupee(response?.data?.orderGrantRefundCreate?.order?.totalRemainingGrant?.amount),
 
                                 orderId: id,
                             },
@@ -1470,7 +1468,7 @@ const Editorder = () => {
                     }
                 }
             } else {
-                if (maxRefundAmt < totalAmount) {
+                if (roundIndianRupee(maxRefundAmt) < roundIndianRupee(totalAmount)) {
                     Failure(`Not allwed to Refund Amount.${'\n'}Max Refund Amount is ${addCommasToNumber(maxRefundAmt)}`);
                 } else {
                     const filteredData = Object.entries(quantities)
@@ -1554,7 +1552,7 @@ const Editorder = () => {
         } else if (hasDigitalProduct) {
             show = false;
         } else {
-            if (totalRefunded < without_shipping_amount && (data?.paymentStatus == 'FULLY_CHARGED' || data?.paymentStatus == 'PARTIALLY_REFUNDED' || data.isPaid)) {
+            if (roundIndianRupee(totalRefunded) < roundIndianRupee(without_shipping_amount) && (data?.paymentStatus == 'FULLY_CHARGED' || data?.paymentStatus == 'PARTIALLY_REFUNDED' || data.isPaid)) {
                 show = true;
             }
         }

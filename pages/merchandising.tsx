@@ -322,7 +322,7 @@ const Index = () => {
                                 onDragEnter={(e) => handleDragEnter(e, index)}
                                 onDrop={(e) => handleDrop(e, index)}
                             >
-                                <img src={isValidImageUrl(record?.image) ? record?.image : placeholders} alt={record?.name} className="h-48 w-full object-cover" />
+                                <img src={isValidImageUrl(record?.image) ? record?.image : placeholders} alt={record?.name} className="h-70 w-full object-cover" />
                                 <div className="mt-2 text-center">{record?.name}</div>
                             </div>
                         ))

@@ -533,7 +533,14 @@ export default function QuickEdit(props: any) {
                     <label className="block pr-5 text-lg font-medium text-gray-700">Variants</label>
                     {state?.variants?.map((item, index) => {
                         return (
-                            <div key={index} className=" border-b border-gray-200">
+                            <div key={index} className=" border-b border-gray-200 mb-5">
+                                 {index !== 0 && ( // Render remove button only for items after the first one
+                                    <div className="active mb-4 flex items-center justify-end  text-danger ">
+                                        <button className="" onClick={() => handleRemoveVariants(item, index)}>
+                                            <IconTrashLines />
+                                        </button>
+                                    </div>
+                                )}
                                 <div className="active flex items-center">
                                     <div className="mb-5 mr-4" style={{ width: '20%' }}>
                                         <label htmlFor={`name${index}`} className="block pr-5 text-sm font-medium text-gray-700">
@@ -634,13 +641,7 @@ export default function QuickEdit(props: any) {
                                         {state.variantError[index]?.regularPrice && <p className="error-message mt-1 text-red-500">{state.variantError[index].regularPrice}</p>}
                                     </div>
                                 </div>
-                                {index !== 0 && ( // Render remove button only for items after the first one
-                                    <div className="active mb-4 flex items-center  text-danger ">
-                                        <button className="" onClick={() => handleRemoveVariants(item, index)}>
-                                            <IconTrashLines />
-                                        </button>
-                                    </div>
-                                )}
+                               
                             </div>
                         );
                     })}

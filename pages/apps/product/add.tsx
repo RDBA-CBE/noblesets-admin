@@ -1579,7 +1579,7 @@ console.log('✌️data --->', data);
                 </div>
 
                 <div className="grid grid-cols-12 gap-4">
-                    <div className=" col-span-12 md:col-span-9">
+                    <div className=" col-span-12 md:col-span-8">
                         <div className="panel mb-5">
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                                 Product Name
@@ -1659,8 +1659,8 @@ console.log('✌️data --->', data);
                             <div className="flex flex-col  md:flex-row ">
                                 {isMounted && (
                                     <Tab.Group>
-                                        <div className="mx-10 mb-5 sm:mb-0 ">
-                                            <Tab.List className="mb-5 flex w-32 flex-row text-center font-semibold  md:m-auto md:mb-0 md:flex-col ">
+                                        <div className="md:me-10 mb-5 sm:mb-0 ">
+                                            <Tab.List className="mb-5 flex  w-100 md:w-32 flex-row text-center font-semibold  md:m-auto md:mb-0 md:flex-col overflow-x-scroll">
                                                 <Tab as={Fragment}>
                                                     {({ selected }) => (
                                                         <button
@@ -1709,19 +1709,19 @@ console.log('✌️data --->', data);
                                                 {variants?.map((item, index) => (
                                                     <div key={index} className="mb-5 border-b border-gray-200">
                                                         {index !== 0 && ( // Render remove button only for items after the first one
-                                                            <div className="active flex items-center justify-end text-danger">
+                                                            <div className="active flex items-center justify-end text-danger mb-4">
                                                                 <button onClick={() => handleRemoveVariants(index)}>
                                                                     <IconTrashLines />
                                                                 </button>
                                                             </div>
                                                         )}
-                                                        <div className="active flex items-center">
-                                                            <div className="mb-5 mr-4" style={{ width: '20%' }}>
+                                                        <div className="active grid grid-cols-12 items-center mb-3">
+                                                            <div className="mb-2 mr-4 col-span-12 md:col-span-3" >
                                                                 <label htmlFor={`name${index}`} className="block pr-5 text-sm font-medium text-gray-700">
                                                                     Variant:
                                                                 </label>
                                                             </div>
-                                                            <div className="mb-5" style={{ width: '80%' }}>
+                                                            <div className="mb-2 col-span-12 md:col-span-9" >
                                                                 <input
                                                                     type="text"
                                                                     id={`name${index}`}
@@ -1734,13 +1734,13 @@ console.log('✌️data --->', data);
                                                                 />
                                                             </div>
                                                         </div>
-                                                        <div className="active flex items-center">
-                                                            <div className="mb-5 mr-4" style={{ width: '20%' }}>
+                                                        <div className="active grid grid-cols-12 items-center mb-3">
+                                                            <div className="mb-2 mr-4 col-span-12 md:col-span-3" >
                                                                 <label htmlFor={`sku_${index}`} className="block pr-5 text-sm font-medium text-gray-700">
                                                                     SKU
                                                                 </label>
                                                             </div>
-                                                            <div className="mb-5" style={{ width: '80%' }}>
+                                                            <div className="mb-2 col-span-12 md:col-span-9" >
                                                                 <input
                                                                     type="text"
                                                                     id={`sku_${index}`}
@@ -1754,13 +1754,13 @@ console.log('✌️data --->', data);
                                                                 {variantErrors[index]?.sku && <p className="error-message mt-1 text-red-500">{variantErrors[index].sku}</p>}
                                                             </div>
                                                         </div>
-                                                        <div className="active flex items-center">
-                                                            <div className="mb-5 mr-4 pr-4" style={{ width: '20%' }}>
+                                                        <div className="active grid grid-cols-12 items-center  mb-3">
+                                                            <div className="mb-2 mr-4  col-span-12 xl:col-span-3">
                                                                 <label htmlFor={`stackMgmt_${index}`} className="block  text-sm font-medium text-gray-700">
                                                                     Stock Management
                                                                 </label>
                                                             </div>
-                                                            <div className="mb-5" style={{ width: '80%' }}>
+                                                            <div className="mb-2 col-span-12 xl:col-span-9" >
                                                                 <input
                                                                     type="checkbox"
                                                                     id={`stackMgmt_${index}`}
@@ -1774,13 +1774,13 @@ console.log('✌️data --->', data);
                                                             </div>
                                                         </div>
                                                         {/* {item.stackMgmt && ( */}
-                                                        <div className="active flex items-center">
-                                                            <div className="mb-5 mr-4 " style={{ width: '20%' }}>
+                                                        <div className="active grid grid-cols-12 items-center  mb-3">
+                                                            <div className="mb-2 mr-4  col-span-12 md:col-span-3" >
                                                                 <label htmlFor={`quantity_${index}`} className="block  text-sm font-medium text-gray-700">
                                                                     Quantity
                                                                 </label>
                                                             </div>
-                                                            <div className="mb-5" style={{ width: '80%' }}>
+                                                            <div className="mb-2 col-span-12 md:col-span-9" >
                                                                 <input
                                                                     type="number"
                                                                     id={`quantity_${index}`}
@@ -1795,13 +1795,13 @@ console.log('✌️data --->', data);
                                                             </div>
                                                         </div>
                                                         {/* )} */}
-                                                        <div className="active flex items-center">
-                                                            <div className="mb-5 mr-4" style={{ width: '20%' }}>
+                                                        <div className="active grid grid-cols-12 items-center mb-2">
+                                                            <div className="mb-2 mr-4 col-span-12 md:col-span-3" >
                                                                 <label htmlFor={`regularPrice_${index}`} className="block pr-5 text-sm font-medium text-gray-700">
                                                                     Regular Price
                                                                 </label>
                                                             </div>
-                                                            <div className="mb-5" style={{ width: '80%' }}>
+                                                            <div className="mb-2 col-span-12 md:col-span-9" >
                                                                 <input
                                                                     type="number"
                                                                     id={`regularPrice_${index}`}
@@ -1994,7 +1994,7 @@ console.log('✌️data --->', data);
                                                 </div>
                                             </Tab.Panel>
                                             <Tab.Panel>
-                                                <div className="active flex items-center">
+                                                <div className="active flex items-center justify-between">
                                                     <div className="mb-5 mr-4 pr-6">
                                                         <label htmlFor="upsells" className="block pr-5 text-sm font-medium text-gray-700">
                                                             Upsells
@@ -2013,8 +2013,8 @@ console.log('✌️data --->', data);
                                                     </div>
                                                 </div>
 
-                                                <div className="active flex items-center">
-                                                    <div className="mb-5 mr-4">
+                                                <div className="active flex items-center justify-between">
+                                                    <div className="mb-5 mr-4 pr-6">
                                                         <label htmlFor="cross-sells" className="block pr-5 text-sm font-medium text-gray-700">
                                                             Cross-sells
                                                         </label>
@@ -2054,7 +2054,7 @@ console.log('✌️data --->', data);
                             </div>
                         </div>
                     </div>
-                    <div className="col-span-12 md:col-span-3">
+                    <div className="col-span-12 md:col-span-4">
                         <div className="panel order-4 md:order-1">
                             <div className="mb-5 border-b border-gray-200 pb-2">
                                 <h5 className=" block text-lg font-medium text-gray-700">Publish</h5>
@@ -2325,14 +2325,14 @@ console.log('✌️data --->', data);
                                         ) : (
                                             <>
                                                 <div className="grid grid-cols-12 pt-5">
-                                                    <div className="col-span-9 h-[450px] overflow-y-scroll border-r border-gray-200 pr-5">
+                                                    <div className="col-span-9 h-[500px] md:h-[700px] xl:h-[700px] overflow-y-scroll border-r border-gray-200 pr-5">
                                                         <div className="flex gap-4">
                                                             <div>
                                                                 <div>Filter by type</div>
                                                                 <div className="flex justify-between gap-3 pt-3">
                                                                     <div className="flex gap-3">
                                                                         {/* <select className="form-select w-40 flex-1"> */}
-                                                                        <select className="form-select w-60 flex-1" value={mediaType} onChange={(e) => filterMediaByType(e.target.value)}>
+                                                                        <select className="form-select w-40 xl:w-60 flex-1" value={mediaType} onChange={(e) => filterMediaByType(e.target.value)}>
                                                                             <option value="all">All Data</option>
                                                                             <option value="Image">Images</option>
                                                                             <option value="Video">Videos</option>
@@ -2350,7 +2350,7 @@ console.log('✌️data --->', data);
                                                                 <div className="flex justify-between gap-3 pt-3">
                                                                     <div className="flex gap-3">
                                                                         {/* <select className="form-select w-40 flex-1"> */}
-                                                                        <select className="form-select w-60 flex-1" value={mediaMonth} onChange={(e) => filterMediaByMonth(e.target.value)}>
+                                                                        <select className="form-select w-40 xl:w-60 flex-1" value={mediaMonth} onChange={(e) => filterMediaByMonth(e.target.value)}>
                                                                             <option value="all">All Data</option>
                                                                             {months.map((month, index) => (
                                                                                 <option key={month} value={`${month}/2024`}>{`${month} 2024`}</option>
@@ -2360,7 +2360,7 @@ console.log('✌️data --->', data);
                                                                     <div>
                                                                         <input
                                                                             type="text"
-                                                                            className="form-input mr-2  w-80 "
+                                                                            className="form-input mr-2  w-40 xl:w-60 "
                                                                             placeholder="Search..."
                                                                             value={mediaSearch}
                                                                             onChange={(e) => searchMediaByName(e.target.value)}
@@ -2373,13 +2373,13 @@ console.log('✌️data --->', data);
                                                             {loading ? (
                                                                 <CommonLoader />
                                                             ) : (
-                                                                <div className="grid grid-cols-6 pt-5 ">
+                                                                <div className="grid grid-cols-12 pt-5 ">
                                                                     {imageList?.length > 0 ? (
                                                                         imageList?.map((item) => {
                                                                             return (
                                                                                 <div
                                                                                     key={item.node?.fileUrl}
-                                                                                    className={`flex h-[150px] w-[150px] overflow-hidden p-2 ${
+                                                                                    className={`col-span-2  overflow-hidden p-2 ${
                                                                                         selectedImages.includes(item) ? 'border-4 border-blue-500' : ''
                                                                                     }`}
                                                                                     onMouseDown={() => handleMouseDown(item)}
@@ -2420,7 +2420,7 @@ console.log('✌️data --->', data);
                                                         </div>
                                                     </div>
                                                     {selectedImg && (
-                                                        <div className="col-span-3 h-[450px] overflow-y-scroll pl-5">
+                                                        <div className="col-span-3 h-[700px] overflow-y-scroll pl-5">
                                                             {/* <div className="border-b border-gray-200 pb-5"> */}
                                                             <div className="">
                                                                 <div>
@@ -2669,12 +2669,12 @@ console.log('✌️data --->', data);
                                     <input name="name" type="text" id="name" placeholder="Enter Name" className="form-input" value={formData.name} onChange={handleCatChange} />
                                 </div>
 
-                                <div>
-                                    <label htmlFor="description">Description </label>
+                                <div className='mt-3'>
+                                    <label htmlFor="description ">Description </label>
                                     <textarea name="description" id="description" placeholder="Enter Description" className="form-input" value={formData.description} onChange={handleCatChange} />
                                 </div>
 
-                                <div>
+                                <div className='mt-3'>
                                     <label htmlFor="parentCategory">Parent Category</label>
                                     <select name="parentCategory" className="form-select" value={formData.parentCategory} onChange={handleCatChange}>
                                         <option value="">Open this select</option>
@@ -2706,7 +2706,7 @@ console.log('✌️data --->', data);
                         <div className="fixed inset-0" />
                     </Transition.Child>
                     <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
-                        <div className="flex min-h-screen items-start justify-center px-4">
+                        <div className="flex min-h-screen items-center justify-center px-4">
                             <Transition.Child
                                 as={Fragment}
                                 enter="ease-out duration-300"

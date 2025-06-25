@@ -35,6 +35,7 @@ import IconUsers from '../Icon/IconUsers';
 import IconUserPlus from '../Icon/IconUserPlus';
 import { useMutation, useQuery } from '@apollo/client';
 import { LOGOUT, USER_INFO } from '@/query/product';
+import IconMenuUsers from '../Icon/Menu/IconMenuUsers';
 
 const Header = () => {
     const router = useRouter();
@@ -468,12 +469,13 @@ const Header = () => {
                                 offset={[0, 8]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
                                 btnClassName="relative group block"
-                                button={<img className="h-9 w-9 rounded-full object-cover saturate-50 group-hover:saturate-100" src="/assets/images/logo.png" alt="userProfile" />}
+                                button={<IconUser className="h-10 w-10 rounded-[50px] object-cover bg-[#f5f5f5] p-2 "/>}
                             >
                                 <ul className="w-[230px] !py-0 font-semibold text-dark dark:text-white-dark dark:text-white-light/90">
                                     <li>
                                         <div className="flex items-center px-4 py-4">
-                                            <img className="h-10 w-10 rounded-md object-cover" src="/assets/images/logo.png" alt="userProfile" />
+                                            {/* <img className="h-10 w-10 rounded-md object-cover" src="/assets/images/logo.png" alt="userProfile" /> */}
+                                            <IconUser className="h-10 w-10 rounded-[50px] object-cover bg-[#f5f5f5] p-2 "/>
 
                                             {token ? (
                                                 <div className="truncate ltr:pl-4 rtl:pr-4">

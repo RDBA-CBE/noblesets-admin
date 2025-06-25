@@ -660,7 +660,13 @@ console.log('✌️data --->', data);
             // productId: id,
             relateProducts,
             youMayLike,
+            priceBreakup:tableHtml,
+            brand:selectedBrand,
+            sizeguide:selectedSizeGuide
+
         };
+console.log('✌️data --->', data);
+
 
         setPreviewData(data);
         setIsOpenPreview(true);

@@ -95,7 +95,7 @@ const Orders = () => {
     const [currencyPopup, setCurrencyPopup] = useState('');
 
     useEffect(() => {
-        getOrderList();
+        // getOrderList();
     }, []);
 
     const getOrderList = async () => {

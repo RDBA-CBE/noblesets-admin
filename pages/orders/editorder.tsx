@@ -65,6 +65,7 @@ import {
     objIsEmpty,
     profilePic,
     roundOff,
+    roundIndianRupee,
     sampleParams,
     showDeleteAlert,
     updateOrderLinesWithRefund,
@@ -426,7 +427,7 @@ const Editorder = () => {
                 setIsGiftWrap(orderDetails?.order?.isGiftWrap);
                 setLoading(false);
                 if (orderDetails?.order?.status == 'PARTIALLY_FULFILLED') {
-                    setOrderStatus('UNFULFILLED');
+                    setOrderStatus('FULFILLED');
                 } else {
                     setOrderStatus(orderDetails?.order?.status);
                 }
@@ -775,19 +776,17 @@ const Editorder = () => {
                         };
                     });
                 } else if (hasDigitalProduct) {
-                    lines = fullfillData?.map((item: any) => {
-                        const isDigital = item.variant?.product?.productType?.isDigital;
+                    const exceptGiftCard = fullfillData?.filter((item) => item.variant?.product?.productType?.isDigital === false);
+                    lines = exceptGiftCard?.map((item: any) => {
+                        // const isDigital = item.variant?.product?.productType?.isDigital;
 
                         return {
                             orderLineId: item.id,
-                            ...(!isDigital
-                                ? {
-                                      stocks: item?.variant?.stocks?.map((data: any) => ({
-                                          quantity: item?.quantity,
-                                          warehouse: data?.warehouse?.id,
-                                      })),
-                                  }
-                                : { stocks: [] }),
+
+                            stocks: item?.variant?.stocks?.map((data: any) => ({
+                                quantity: item?.quantity,
+                                warehouse: data?.warehouse?.id,
+                            })),
                         };
                     });
                 } else {
@@ -1359,7 +1358,7 @@ const Editorder = () => {
                 if (manualAmount == null && manualAmount == '') {
                     Failure('Please enter valid amount');
                 } else {
-                    input.amountToRefund = Number(manualAmount);
+                    input.amountToRefund = roundIndianRupee(manualAmount);
                     const response = await orderFullfilmentRefund({
                         variables: {
                             input,
@@ -1385,7 +1384,7 @@ const Editorder = () => {
                     }
                 }
             } else {
-                if (maxRefundAmt < totalAmount) {
+                if (roundIndianRupee(maxRefundAmt) < roundIndianRupee(totalAmount)) {
                     Failure(`Not allwed to Refund Amount.${'\n'}Max Refund Amount is ${addCommasToNumber(maxRefundAmt)}`);
                 } else {
                     const filteredData = Object.entries(quantities)
@@ -1452,7 +1451,7 @@ const Editorder = () => {
         } else if (hasDigitalProduct) {
             show = false;
         } else {
-            if (totalRefunded < without_shipping_amount && (data?.paymentStatus == 'FULLY_CHARGED' || data?.paymentStatus == 'PARTIALLY_REFUNDED' || data.isPaid)) {
+            if (roundIndianRupee(totalRefunded) < roundIndianRupee(without_shipping_amount) && (data?.paymentStatus == 'FULLY_CHARGED' || data?.paymentStatus == 'PARTIALLY_REFUNDED' || data.isPaid)) {
                 show = true;
             }
         }
@@ -1549,7 +1548,7 @@ const Editorder = () => {
                     </button>
                 </div>
                 <div className="grid grid-cols-12 gap-5 ">
-                    <div className=" col-span-9 mb-5  ">
+                    <div className=" col-span-12 mb-5 md:col-span-8  ">
                         <div className="panel mb-5 p-5">
                             <div className="flex justify-between">
                                 <div className="flex items-center gap-3">
@@ -2449,7 +2448,7 @@ const Editorder = () => {
                         </>
                     </div>
 
-                    <div className="col-span-3">
+                    <div className="col-span-12 md:col-span-4">
                         {orderStatus != 'UNCONFIRMED' && (
                             <>
                                 <div className="panel mb-5 p-5">
@@ -2620,11 +2619,11 @@ const Editorder = () => {
                             {orderData?.invoices?.length > 0 ? (
                                 <div className="pt-4">
                                     <div className="flex justify-between">
-                                        <p>Number</p>
+                                        <p>Number :</p>
                                         <p>{orderData?.invoices[0]?.number}</p>
                                     </div>
                                     <div className="flex justify-between">
-                                        <p>Date</p>
+                                        <p>Date :</p>
                                         <p>{moment(orderData?.invoices[0]?.createdAt).format('DD/MM/YYYY')}</p>
                                     </div>
                                     <div className="flex justify-between pt-3">

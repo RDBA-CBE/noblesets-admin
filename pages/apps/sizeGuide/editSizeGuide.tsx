@@ -330,10 +330,10 @@ const UpdateSizeGuide = () => {
                     <div className="flex  items-center gap-4">
                         <img src={state.imagePreview} alt="Uploaded" className="max-h-[400px] rounded shadow" />
                         <div className="flex gap-3">
-                            <button onClick={() => document.getElementById('image-upload').click()} className="rounded bg-blue-600 px-4 py-2 text-white">
+                            <button onClick={() => document.getElementById('image-upload').click()} className="btn btn-outline-primary">
                                 Replace Image
                             </button>
-                            <button onClick={removeImage} className="rounded bg-red-500 px-4 py-2 text-white">
+                            <button onClick={removeImage} className="btn btn-primary">
                                 Remove
                             </button>
                         </div>
@@ -343,13 +343,13 @@ const UpdateSizeGuide = () => {
             </div>
             {state.errors?.image && <div className="mt-1 text-danger">{state.errors?.image}</div>}
 
-            <div>
+            <div className='mt-5 mb-4'>
                 <div className="flex justify-between">
                     <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                         Size Chart
                     </label>
                     {state.tableHTML &&
-                    <button onClick={() => setState({ tableHTML: '', columns: [], rows: [] })} className="rounded bg-red-500 px-4 py-2 text-white">
+                    <button onClick={() => setState({ tableHTML: '', columns: [], rows: [] })} className="btn btn-primary">
                         Remove
                     </button>
                     }

@@ -232,7 +232,7 @@ const Sidebar = () => {
                                                 </Link>
                                             </div>
 
-                                            <div className={currentMenu !== 'product' ? '-rotate-90 rtl:rotate-90' : ''} onClick={() => toggleMenu('products')}>
+                                            <div className={currentMenu !== 'product' ? '-rotate-90 rtl:rotate-90' : ''} >
                                                 <IconCaretDown />
                                             </div>
                                         </button>
@@ -421,7 +421,7 @@ const Sidebar = () => {
                                                 </Link>
                                             </div>
 
-                                            <div className={currentMenu !== 'Stock Management' ? '-rotate-90 rtl:rotate-90' : ''} onClick={() => toggleMenu('products')}>
+                                            <div className={currentMenu !== 'Stock Management' ? '-rotate-90 rtl:rotate-90' : ''} >
                                                 <IconCaretDown />
                                             </div>
                                         </button>

@@ -583,7 +583,7 @@ const Brands = () => {
                                                 <div className=" items-center gap-4">
                                                     <img src={state.imagePreview} alt="Uploaded" className="max-h-[400px] rounded shadow" />
                                                     <div className="flex gap-3 pt-4">
-                                                        <button type="button" onClick={() => document.getElementById('image-upload').click()} className="rounded bg-blue-600 px-4 py-2 text-white">
+                                                        <button type="button" onClick={() => document.getElementById('image-upload').click()} className="btn btn-outline-primary">
                                                             Replace Image
                                                         </button>
                                                     </div>

@@ -1709,7 +1709,7 @@ console.log('✌️data --->', data);
                                                 {variants?.map((item, index) => (
                                                     <div key={index} className="mb-5 border-b border-gray-200">
                                                         {index !== 0 && ( // Render remove button only for items after the first one
-                                                            <div className="active flex items-center justify-end text-danger">
+                                                            <div className="active flex items-center justify-end text-danger mb-4">
                                                                 <button onClick={() => handleRemoveVariants(index)}>
                                                                     <IconTrashLines />
                                                                 </button>
@@ -1994,7 +1994,7 @@ console.log('✌️data --->', data);
                                                 </div>
                                             </Tab.Panel>
                                             <Tab.Panel>
-                                                <div className="active flex items-center">
+                                                <div className="active flex items-center justify-between">
                                                     <div className="mb-5 mr-4 pr-6">
                                                         <label htmlFor="upsells" className="block pr-5 text-sm font-medium text-gray-700">
                                                             Upsells
@@ -2013,8 +2013,8 @@ console.log('✌️data --->', data);
                                                     </div>
                                                 </div>
 
-                                                <div className="active flex items-center">
-                                                    <div className="mb-5 mr-4">
+                                                <div className="active flex items-center justify-between">
+                                                    <div className="mb-5 mr-4 pr-6">
                                                         <label htmlFor="cross-sells" className="block pr-5 text-sm font-medium text-gray-700">
                                                             Cross-sells
                                                         </label>
@@ -2669,12 +2669,12 @@ console.log('✌️data --->', data);
                                     <input name="name" type="text" id="name" placeholder="Enter Name" className="form-input" value={formData.name} onChange={handleCatChange} />
                                 </div>
 
-                                <div>
-                                    <label htmlFor="description">Description </label>
+                                <div className='mt-3'>
+                                    <label htmlFor="description ">Description </label>
                                     <textarea name="description" id="description" placeholder="Enter Description" className="form-input" value={formData.description} onChange={handleCatChange} />
                                 </div>
 
-                                <div>
+                                <div className='mt-3'>
                                     <label htmlFor="parentCategory">Parent Category</label>
                                     <select name="parentCategory" className="form-select" value={formData.parentCategory} onChange={handleCatChange}>
                                         <option value="">Open this select</option>

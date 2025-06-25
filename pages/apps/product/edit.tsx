@@ -269,7 +269,7 @@ const ProductEdit = (props: any) => {
     const [productPreview, setPreviewData] = useState(null);
     const [previewSelectedImg, setPreviewSelectedImg] = useState(null);
     const [tableHtml, setTableHtml] = useState(null);
-console.log('✌️tableHtml --->', tableHtml);
+    console.log('✌️tableHtml --->', tableHtml);
 
     const [imageUrl, setImageUrl] = useState([]);
 
@@ -946,9 +946,9 @@ console.log('✌️tableHtml --->', tableHtml);
 
                                 order_no: menuOrder,
                                 attributes: att,
-                                brand: selectedBrand?.value?selectedBrand?.value:null,
+                                brand: selectedBrand?.value ? selectedBrand?.value : null,
 
-                                size_guide: selectedSizeGuide?.value?selectedSizeGuide?.value:null,
+                                size_guide: selectedSizeGuide?.value ? selectedSizeGuide?.value : null,
                                 taxClass: TAX_CLASS,
                             },
                             firstValues: 10,
@@ -1000,8 +1000,8 @@ console.log('✌️tableHtml --->', tableHtml);
                                 crosssells,
                                 slug: slug ? ConvertToSlug(slug) : '',
                                 order_no: menuOrder,
-                                brand: selectedBrand?.value?selectedBrand?.value:null,
-                                size_guide: selectedSizeGuide?.value?selectedSizeGuide?.value:null,
+                                brand: selectedBrand?.value ? selectedBrand?.value : null,
+                                size_guide: selectedSizeGuide?.value ? selectedSizeGuide?.value : null,
 
                                 taxClass: TAX_CLASS,
                             },
@@ -1778,7 +1778,7 @@ console.log('✌️tableHtml --->', tableHtml);
                 </div>
 
                 <div className="grid grid-cols-12 gap-4">
-                    <div className=" col-span-9">
+                    <div className="  col-span-12 md:col-span-8">
                         <div className="panel mb-5">
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                                 Product Name
@@ -1826,9 +1826,8 @@ console.log('✌️tableHtml --->', tableHtml);
                             </label>
                             <ReactQuill id="editor" theme="snow" value={value} onChange={setValue} />
                         </div> */}
-                       
 
-                        <div className="panel mb-5">
+                        <div className="panel mb-5 mt-5">
                             <label htmlFor="editor" className="block text-sm font-medium text-gray-700">
                                 Product Short description
                             </label>
@@ -1882,8 +1881,8 @@ console.log('✌️tableHtml --->', tableHtml);
                             <div className="flex flex-col  md:flex-row">
                                 {isMounted && (
                                     <Tab.Group>
-                                        <div className="mx-10 mb-5 sm:mb-0">
-                                            <Tab.List className="mb-5 flex w-32 flex-row text-center font-semibold  md:m-auto md:mb-0 md:flex-col ">
+                                        <div className="mb-5 sm:mb-0 md:me-10 ">
+                                            <Tab.List className="w-100 mb-5 flex flex-row overflow-x-scroll text-center font-semibold  md:m-auto md:mb-0 md:w-32 md:flex-col ">
                                                 {/* <Tab as={Fragment}>
                                                     {({ selected }) => (
                                                         <button
@@ -1976,19 +1975,25 @@ console.log('✌️tableHtml --->', tableHtml);
                                                     return (
                                                         <div key={index} className="mb-5 border-b border-gray-200">
                                                             {index !== 0 && ( // Render remove button only for items after the first one
-                                                                <div className="active flex items-center justify-end text-danger">
+                                                                <div className="active flex items-center justify-end text-danger mb-4">
                                                                     <button onClick={() => handleRemoveVariants(item, index)}>
                                                                         <IconTrashLines />
                                                                     </button>
                                                                 </div>
                                                             )}
-                                                            <div className="active flex items-center">
-                                                                <div className="mb-5 mr-4" style={{ width: '20%' }}>
+                                                            <div className="active mb-3 grid grid-cols-12 items-center">
+                                                                <div
+                                                                    className="col-span-12 mb-2 mr-4 md:col-span-3"
+                                                                    // style={{ width: '20%' }}
+                                                                >
                                                                     <label htmlFor={`name${index}`} className="block pr-5 text-sm font-medium text-gray-700">
                                                                         Variant
                                                                     </label>
                                                                 </div>
-                                                                <div className="mb-5" style={{ width: '80%' }}>
+                                                                <div
+                                                                    className="col-span-12 mb-2 md:col-span-9"
+                                                                    //  style={{ width: '80%' }}
+                                                                >
                                                                     <input
                                                                         type="text"
                                                                         id={`name${index}`}
@@ -2001,13 +2006,19 @@ console.log('✌️tableHtml --->', tableHtml);
                                                                     />
                                                                 </div>
                                                             </div>
-                                                            <div className="active flex items-center">
-                                                                <div className="mb-5 mr-4" style={{ width: '20%' }}>
+                                                            <div className="active mb-3 grid grid-cols-12 items-center">
+                                                                <div
+                                                                    className="col-span-12 mb-2 mr-4 md:col-span-3"
+                                                                    // style={{ width: '20%' }}
+                                                                >
                                                                     <label htmlFor={`sku_${index}`} className="block pr-5 text-sm font-medium text-gray-700">
                                                                         SKU
                                                                     </label>
                                                                 </div>
-                                                                <div className="mb-5" style={{ width: '80%' }}>
+                                                                <div
+                                                                    className="col-span-12 mb-2 md:col-span-9"
+                                                                    // style={{ width: '80%' }}
+                                                                >
                                                                     <input
                                                                         type="text"
                                                                         id={`sku_${index}`}
@@ -2023,13 +2034,19 @@ console.log('✌️tableHtml --->', tableHtml);
                                                                     {/* {skuErrMsg && <p className="error-message mt-1 text-red-500 ">{skuErrMsg}</p>} */}
                                                                 </div>
                                                             </div>
-                                                            <div className="active flex items-center">
-                                                                <div className="mb-5 mr-4 pr-4" style={{ width: '20%' }}>
+                                                            <div className="active mb-3 grid grid-cols-12  items-center">
+                                                                <div
+                                                                    className="col-span-12 mb-2  mr-4 xl:col-span-3"
+                                                                    // style={{ width: '20%' }}
+                                                                >
                                                                     <label htmlFor={`stackMgmt_${index}`} className="block  text-sm font-medium text-gray-700">
                                                                         Stock Management
                                                                     </label>
                                                                 </div>
-                                                                <div className="mb-5" style={{ width: '80%' }}>
+                                                                <div
+                                                                    className="col-span-12 mb-2 xl:col-span-9"
+                                                                    // style={{ width: '80%' }}
+                                                                >
                                                                     <input
                                                                         type="checkbox"
                                                                         id={`stackMgmt_${index}`}
@@ -2043,13 +2060,19 @@ console.log('✌️tableHtml --->', tableHtml);
                                                                 </div>
                                                             </div>
                                                             {/* {item.stackMgmt && ( */}
-                                                            <div className="active flex items-center">
-                                                                <div className="mb-5 mr-4 " style={{ width: '20%' }}>
+                                                            <div className="active mb-3 grid grid-cols-12  items-center">
+                                                                <div
+                                                                    className="col-span-12 mb-2  mr-4 md:col-span-3"
+                                                                    // style={{ width: '20%' }}
+                                                                >
                                                                     <label htmlFor={`quantity_${index}`} className="block  text-sm font-medium text-gray-700">
                                                                         Quantity
                                                                     </label>
                                                                 </div>
-                                                                <div className="mb-5" style={{ width: '80%' }}>
+                                                                <div
+                                                                    className="col-span-12 mb-2 md:col-span-9"
+                                                                    //  style={{ width: '80%' }}
+                                                                >
                                                                     <input
                                                                         type="number"
                                                                         id={`quantity_${index}`}
@@ -2064,13 +2087,19 @@ console.log('✌️tableHtml --->', tableHtml);
                                                                 </div>
                                                             </div>
                                                             {/* )} */}
-                                                            <div className="active flex items-center">
-                                                                <div className="mb-5 mr-4" style={{ width: '20%' }}>
+                                                            <div className="active mb-2 grid grid-cols-12 items-center">
+                                                                <div
+                                                                    className="col-span-12 mb-2 mr-4 md:col-span-3"
+                                                                    // style={{ width: '20%' }}
+                                                                >
                                                                     <label htmlFor={`regularPrice_${index}`} className="block pr-5 text-sm font-medium text-gray-700">
                                                                         Regular Price
                                                                     </label>
                                                                 </div>
-                                                                <div className="mb-5" style={{ width: '80%' }}>
+                                                                <div
+                                                                    className="col-span-12 mb-2 md:col-span-9"
+                                                                    // style={{ width: '80%' }}
+                                                                >
                                                                     <input
                                                                         type="number"
                                                                         id={`regularPrice_${index}`}
@@ -2273,7 +2302,7 @@ console.log('✌️tableHtml --->', tableHtml);
                                             </Tab.Panel>
 
                                             <Tab.Panel>
-                                                <div className="active flex items-center">
+                                                <div className="active flex items-center justify-between ">
                                                     <div className="mb-5 mr-4 pr-6">
                                                         <label htmlFor="upsells" className="block pr-5 text-sm font-medium text-gray-700">
                                                             Upsells
@@ -2292,8 +2321,8 @@ console.log('✌️tableHtml --->', tableHtml);
                                                     </div>
                                                 </div>
 
-                                                <div className="active flex items-center">
-                                                    <div className="mb-5 mr-4">
+                                                <div className="active flex items-center justify-between">
+                                                    <div className="mb-5 mr-4 pr-6">
                                                         <label htmlFor="cross-sells" className="block pr-5 text-sm font-medium text-gray-700">
                                                             Cross-sells
                                                         </label>
@@ -2333,8 +2362,8 @@ console.log('✌️tableHtml --->', tableHtml);
                             </div>
                         </div>
                     </div>
-                    <div className="col-span-3">
-                        <div className="panel">
+                    <div className="col-span-12 md:col-span-4">
+                        <div className="panel order-4 md:order-1">
                             <div className="mb-5 border-b border-gray-200 pb-2">
                                 <h5 className=" block text-lg font-medium text-gray-700">Publish</h5>
                             </div>
@@ -2710,14 +2739,14 @@ console.log('✌️tableHtml --->', tableHtml);
                                         ) : (
                                             <>
                                                 <div className="grid grid-cols-12 pt-5">
-                                                    <div className="col-span-9 h-[450px] overflow-y-scroll border-r border-gray-200 pr-5">
+                                                    <div className="col-span-9 hh-[500px] md:h-[700px] xl:h-[700px] overflow-y-scroll border-r border-gray-200 pr-5">
                                                         <div className="flex gap-4">
                                                             <div>
                                                                 <div>Filter by type</div>
                                                                 <div className="flex justify-between gap-3 pt-3">
                                                                     <div className="flex gap-3">
                                                                         {/* <select className="form-select w-40 flex-1"> */}
-                                                                        <select className="form-select w-60 flex-1" value={mediaType} onChange={(e) => setMediaType(e.target.value)}>
+                                                                        <select className="form-select w-40 xl:w-60 flex-1" value={mediaType} onChange={(e) => setMediaType(e.target.value)}>
                                                                             <option value="all">All Data</option>
                                                                             <option value="image">Images</option>
                                                                             <option value="video">Videos</option>
@@ -2733,7 +2762,7 @@ console.log('✌️tableHtml --->', tableHtml);
                                                                 <div>Filter by month</div>
                                                                 <div className="flex justify-between gap-3 pt-3">
                                                                     <div className="flex gap-3">
-                                                                        <select className="form-select w-60 flex-1" value={mediaMonth} onChange={(e) => filterMediaByMonth(e.target.value)}>
+                                                                        <select className="form-select w-40 xl:w-60 flex-1" value={mediaMonth} onChange={(e) => filterMediaByMonth(e.target.value)}>
                                                                             {/* <select className="form-select w-40 flex-1" value={mediaDate} onChange={(e) => filterMediaByMonth(e.target.value)}> */}
                                                                             <option value="all">All Data</option>
                                                                             {months.map((month, index) => (
@@ -2744,7 +2773,7 @@ console.log('✌️tableHtml --->', tableHtml);
                                                                     <div>
                                                                         <input
                                                                             type="text"
-                                                                            className="form-input mr-2 w-auto"
+                                                                            className="form-input mr-2 w-40 xl:w-60"
                                                                             placeholder="Search..."
                                                                             value={mediaSearch}
                                                                             onChange={(e) => searchMediaByName(e.target.value)}
@@ -2754,12 +2783,12 @@ console.log('✌️tableHtml --->', tableHtml);
                                                             </div>
                                                         </div>
 
-                                                        <div className="grid grid-cols-6 gap-3 pt-5">
+                                                        <div className="grid grid-cols-12 pt-5">
                                                             {mediaImages?.length > 0 ? (
                                                                 mediaImages?.map((item) => (
                                                                     <div
                                                                         key={item.node?.fileUrl}
-                                                                        className={`flex h-[150px] w-[150px] overflow-hidden p-2 ${selectedImages.includes(item) ? 'border-4 border-blue-500' : ''}`}
+                                                                        className={`col-span-2  overflow-hidden p-2 ${selectedImages.includes(item) ? 'border-4 border-blue-500' : ''}`}
                                                                         onMouseDown={() => handleMouseDown(item)}
                                                                         onMouseUp={handleMouseUp}
                                                                         onMouseLeave={handleMouseLeave}
@@ -2795,7 +2824,7 @@ console.log('✌️tableHtml --->', tableHtml);
                                                         </div>
                                                     </div>
                                                     {selectedImg && (
-                                                        <div className="col-span-3 h-[450px] overflow-y-scroll pl-5">
+                                                        <div className="col-span-3 h-[700px] overflow-y-scroll pl-5">
                                                             {/* <div className="border-b border-gray-200 pb-5"> */}
                                                             <div className="">
                                                                 <div>
@@ -2918,34 +2947,34 @@ console.log('✌️tableHtml --->', tableHtml);
                                     </div>
                                     <div className="flex h-full w-full justify-center gap-3">
                                         <div
-                                            className="panel scrollbar-hide  flex h-[600px] w-2/12 flex-col items-center overflow-scroll"
+                                            className=" scrollbar-hide  flex h-[600px] w-1/12 flex-col items-center overflow-scroll p-0 rounded-xl"
                                             style={{ overflowY: 'scroll', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                                         >
                                             {productPreview?.image?.length > 0 ? (
                                                 <div className="overflow-auto">
                                                     {productPreview?.image?.map((item, index) => (
-                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden p-2" onClick={() => setPreviewSelectedImg(item?.url)}>
-                                                            <img src={item?.url} alt="image" className="object-contain" />
+                                                        <div key={index} className="h-auto w-[100%] cursor-pointer overflow-hidden rounded-xl mb-2" onClick={() => setPreviewSelectedImg(item?.url)}>
+                                                            <img src={item?.url} alt="image" className="object-contain object-center rounded-xl" />
                                                         </div>
                                                     ))}
                                                 </div>
                                             ) : (
-                                                <div className="h-100 w-[200px] cursor-pointer overflow-hidden p-2">
-                                                    <img src={'/assets/images/placeholder.png'} alt="image" className="object-contain" />
+                                                <div className="h-[140px] w-[100%] cursor-pointer overflow-hidden p-2 ">
+                                                    <img src={'/assets/images/placeholder.png'} alt="image" className="object-contain " />
                                                 </div>
                                             )}
                                         </div>
                                         {productPreview?.image?.length > 0 ? (
-                                            <div className="panel h-[500px] w-4/12">
-                                                <img src={previewSelectedImg ? previewSelectedImg : productPreview?.image[0]?.url} alt="image" style={{ width: '100%', height: '100%' }} />
+                                            <div className=" h-[600px] w-5/12 p-0 rounded-xl" >
+                                                <img className='rounded-xl' src={previewSelectedImg ? previewSelectedImg : productPreview?.image[0]?.url} alt="image" style={{ width: '100%', height: '100%' }} />
                                             </div>
                                         ) : (
-                                            <div className="panel h-[500px] w-4/12">
+                                            <div className="panel h-[100%] w-4/12">
                                                 <img src={'/assets/images/placeholder.png'} alt="image" style={{ width: '100%', height: '100%' }} />
                                             </div>
                                         )}
 
-                                        <div className="panel h-full w-5/12">
+                                        <div className="panel  w-5/12">
                                             {productPreview?.name && (
                                                 <label htmlFor="name" className="block text-2xl font-medium text-gray-700">
                                                     {productPreview?.name}
@@ -3100,18 +3129,18 @@ console.log('✌️tableHtml --->', tableHtml);
                                         </div>
                                     </div>
                                     {productPreview?.youMayLike?.length > 0 && (
-                                        <div className="p-5">
+                                        <div className="p-5 ">
                                             <div className="mb-5  border-b border-gray-200 pb-2">
                                                 <h5 className=" block text-lg font-medium text-gray-700">You May Also Like ..</h5>
                                             </div>
                                             <div className="flex gap-4 overflow-x-scroll">
                                                 {productPreview?.youMayLike?.map((item, index) => (
                                                     <div className=" flex flex-col items-center ">
-                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden p-2" onClick={() => setPreviewSelectedImg(item?.url)}>
+                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden p-2 rounded-xl" onClick={() => setPreviewSelectedImg(item?.url)}>
                                                             {item?.image ? (
-                                                                <img src={item?.image} alt="image" className="object-contain" />
+                                                                <img src={item?.image} alt="image" className="object-contain rounded-xl" />
                                                             ) : (
-                                                                <img src={'/assets/images/placeholder.png'} alt="image" className="object-contain" />
+                                                                <img src={'/assets/images/placeholder.png'} alt="image" className="object-contain rounded-xl" />
                                                             )}
                                                         </div>
                                                         <div>{item?.name}</div>
@@ -3130,14 +3159,14 @@ console.log('✌️tableHtml --->', tableHtml);
                                             <div className="flex gap-4 overflow-x-scroll">
                                                 {productPreview?.relateProducts?.map((item, index) => (
                                                     <div className=" flex flex-col items-center ">
-                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden p-2" onClick={() => setPreviewSelectedImg(item?.url)}>
+                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden p-2 rounded-xl" onClick={() => setPreviewSelectedImg(item?.url)}>
                                                             {item?.image ? (
-                                                                <img src={item?.image} alt="image" className="object-contain" />
+                                                                <img src={item?.image} alt="image" className="object-contain rounded-xl" />
                                                             ) : (
-                                                                <img src={'/assets/images/placeholder.png'} alt="image" className="object-contain" />
+                                                                <img src={'/assets/images/placeholder.png'} alt="image" className="object-contain rounded-xl" />
                                                             )}
                                                         </div>
-                                                        <div>{item?.name}</div>
+                                                        <div className='text-center'>{item?.name}</div>
                                                         <div>₹{addCommasToNumber(item?.price)}</div>
                                                     </div>
                                                 ))}

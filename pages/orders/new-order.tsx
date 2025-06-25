@@ -1044,7 +1044,7 @@ const NewOrder = () => {
     </button> */}
             </div>
             <div className="grid grid-cols-12 gap-5 ">
-                <div className=" col-span-9 mb-5  ">
+                <div className="col-span-12 md:col-span-8 mb-5  ">
                     <div className="panel mb-5 p-5">
                         <div>
                             <h3 className="text-lg font-semibold">Order Details</h3>
@@ -1092,7 +1092,7 @@ const NewOrder = () => {
                     <div className="panel mt-8 grid grid-cols-12 gap-5 p-5">
                         {/* Billing Address */}
                         <div className="col-span-6 mr-5">
-                            <div className="flex w-52 items-center justify-between">
+                            <div className="flex w-100 items-center justify-between">
                                 <h5 className="mb-3 text-lg font-semibold">Billing</h5>
                                 <button type="button" onClick={() => setState({ showBillingInputs: !state.showBillingInputs })}>
                                     <IconPencil className="cursor-pointer" />
@@ -1380,7 +1380,7 @@ const NewOrder = () => {
 
                         {/* Shipping Address */}
                         <div className="col-span-6 mr-5">
-                            <div className="flex w-52 items-center justify-between">
+                            <div className="flex w-100 items-center justify-between">
                                 <h5 className="mb-3 text-lg font-semibold">Shipping</h5>
                                 <button type="button" onClick={() => setState({ showShippingInputs: !state.showShippingInputs })}>
                                     <IconPencil />
@@ -1699,7 +1699,7 @@ const NewOrder = () => {
                                                 {item?.totalPrice?.gross?.currency} {item?.totalPrice?.gross?.amount}
                                             </td> */}
 
-                                            <td>
+                                            <td className='flex'>
                                                 <button
                                                     type="button"
                                                     onClick={() => {
@@ -1832,7 +1832,7 @@ const NewOrder = () => {
                         </div>
                     </div>
                 </div>
-                <div className=" col-span-3 mb-5  ">
+                <div className="col-span-12 md:col-span-4 mb-5  ">
                     <div className="panel mb-5 p-5">
                         <div className="mb-5  ">
                             <h3 className="text-lg font-semibold">Order Actions</h3>
@@ -1965,7 +1965,7 @@ const NewOrder = () => {
                                 </div>
                             </div>
                         ) : (
-                            <div className="h-[700px] p-5">
+                            <div className="h-auto p-5">
                                 <div className="p-3">
                                     <input type="text" className="form-input w-full p-3" placeholder="Search..." value={state.search} onChange={(e) => setState({ search: e.target.value })} />
                                 </div>
@@ -1977,11 +1977,11 @@ const NewOrder = () => {
                                         {/* Product list */}
                                         {state.productList?.map(({ id: productId, name, variants, thumbnail }) => {
                                             return (
-                                                <div key={productId}>
+                                                <div key={productId} className='bg-[#e09a7a1a] px-2 py-4 m-2 rounded-xl'>
                                                     <div className="flex gap-3">
                                                         <input
                                                             type="checkbox"
-                                                            className="form-checkbox"
+                                                            className="form-checkbox w-[15px] h-[15px]"
                                                             checked={state.selectedItems[productId] && Object.values(state.selectedItems[productId])?.every((value) => value)}
                                                             onChange={() => handleHeadingSelect(productId)}
                                                         />
@@ -1990,12 +1990,12 @@ const NewOrder = () => {
                                                     </div>
                                                     <ul>
                                                         {variants?.map(({ id: variantId, name: variantName, sku, pricing }) => (
-                                                            <li key={variantId} className="py-5 pl-4">
+                                                            <li key={variantId} className="pt-5 pl-8">
                                                                 <div className="flex items-center justify-between">
-                                                                    <div className="flex">
+                                                                    <div className="flex gap-3">
                                                                         <input
                                                                             type="checkbox"
-                                                                            className="form-checkbox"
+                                                                            className="form-checkbox w-[15px] h-[15px] mt-1"
                                                                             checked={state.selectedItems[productId]?.[variantId]}
                                                                             onChange={() => handleSubHeadingSelect(productId, variantId)}
                                                                         />
@@ -2031,7 +2031,7 @@ const NewOrder = () => {
                                 )}
 
                                 {/* Button section */}
-                                <div className="mb-5 flex flex-col items-center gap-5 pt-1">
+                                <div className="mt-5 flex flex-col items-center gap-5 px-2">
                                     {/* Load More Button */}
 
                                     {/* Action Buttons */}
@@ -2040,13 +2040,13 @@ const NewOrder = () => {
                                             onClick={() => {
                                                 setState({ selectedItems: {}, addProductOpen: false, search: '' });
                                             }}
-                                            className="rounded border border-black bg-transparent px-4 py-2 font-semibold text-black hover:border-transparent hover:bg-blue-500 hover:text-white"
+                                            className="btn btn-outline-primary"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             onClick={() => addProducts()}
-                                            className="rounded border border-blue-500 bg-transparent px-4 py-2 font-semibold text-blue-500 hover:border-transparent hover:bg-blue-500 hover:text-white"
+                                            className="btn btn-primary"
                                         >
                                             {state.productLoading ? <IconLoader /> : 'Confirm'}
                                         </button>
@@ -2107,7 +2107,7 @@ const NewOrder = () => {
                             {fixedErrMsg && <div className="mt-1 text-red-500">{fixedErrMsg}</div>}{' '}
                             <div className="mt-5 flex justify-end gap-5">
                                 <button
-                                    className="rounded border border-black bg-transparent px-4 py-2 font-semibold text-black hover:border-transparent hover:bg-blue-500 hover:text-white"
+                                    className="btn btn-outline-primary"
                                     onClick={() => setState({ isOpenCoupen: false })}
                                 >
                                     Cancel
@@ -2120,7 +2120,7 @@ const NewOrder = () => {
                                         addDiscount();
                                         // }
                                     }}
-                                    className="rounded border border-blue-500 bg-transparent px-4 py-2 font-semibold text-blue-500 hover:border-transparent hover:bg-blue-500 hover:text-white"
+                                    className="btn btn-primary"
                                 >
                                     Confirm
                                 </button>

@@ -16,10 +16,10 @@ const ReviewSection = (props) => {
         <div className="review-sec container py-5">
             <div className="row g-4">
                 <div className="col-lg-12">
-                    <div className="review-box rounded bg-white p-4 shadow-sm">
+                    <div className="review-box  ">
                         {reviews?.map((review, index) => {
                             return (
-                                <div key={index} className="mb-4">
+                                <div key={index} className="mb-4 bg-[#e09a7a1a] shadow-sm rounded-lg  p-4 mb-3">
                                     <div className="align-items-center mb-2 flex">
                                         <img src={review.user?.avatar ? review.user?.avatar : '/assets/images/user.png'} alt="avatar" className="rounded-circle me-2" width={50} />
                                         <div>

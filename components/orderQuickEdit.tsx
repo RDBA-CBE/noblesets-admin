@@ -710,7 +710,7 @@ const OrderQuickEdit = (props: any) => {
         <>
             <h3 className="text-lg font-semibold dark:text-white-light">QUICK EDIT</h3>
 
-            <div className="mt-3 w-[92%]">
+            <div className="mt-3 w-[100%]">
                 <div className=" col-span-9 mb-5  ">
                     <div className="panel mb-5 p-5">
                         <div className="flex justify-between">
@@ -929,7 +929,7 @@ const OrderQuickEdit = (props: any) => {
                                     </button>
                                     <button
                                         type="submit"
-                                        className="btn btn-danger "
+                                        className="btn btn-outline-primary"
                                         onClick={() => {
                                             closeExpand();
                                         }}
@@ -956,7 +956,7 @@ const OrderQuickEdit = (props: any) => {
                             </div>
 
                             <div className="mt-8 flex items-center justify-end">
-                                <button type="button" className="btn btn-outline-danger gap-2" onClick={() => setIsPaymentOpen(false)}>
+                                <button type="button" className="btn btn-outline-primary gap-2" onClick={() => setIsPaymentOpen(false)}>
                                     Cancel
                                 </button>
                                 <button type="button" onClick={() => updatePaymentStatus()} className="btn btn-primary ltr:ml-4 rtl:mr-4">
@@ -1001,7 +1001,7 @@ const OrderQuickEdit = (props: any) => {
                             <div className="mt-8 flex items-center justify-end">
                                 <button
                                     type="button"
-                                    className="btn btn-outline-danger gap-2"
+                                    className="btn btn-outline-primary gap-2"
                                     onClick={() => {
                                         setPaySlipNameError('');
                                         setPaySlipDateError('');
@@ -1070,7 +1070,7 @@ const OrderQuickEdit = (props: any) => {
                             <div className="mt-8 flex items-center justify-end">
                                 <button
                                     type="button"
-                                    className="btn btn-outline-danger gap-2"
+                                    className="btn btn-outline-primary gap-2"
                                     onClick={() => {
                                         setInvoiceDateError('');
                                         setInvoiceNameError('');
@@ -1138,14 +1138,14 @@ const OrderQuickEdit = (props: any) => {
                                     onClick={() => {
                                         setIsOrderOpen(false);
                                     }}
-                                    className="rounded border border-black bg-transparent px-4 py-2 font-semibold text-black hover:border-transparent hover:bg-blue-500 hover:text-white"
+                                    className="btn btn-outline-primary "
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     // disabled={!isFullfiled()}
                                     onClick={() => orderStateUpdate()}
-                                    className="rounded border border-blue-500 bg-transparent px-4 py-2 font-semibold text-blue-500 hover:border-transparent hover:bg-blue-500 hover:text-white"
+                                    className="btn btn-primary"
                                 >
                                     {orderStatusLoading ? <IconLoader /> : 'Confirm'}
                                 </button>

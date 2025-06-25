@@ -142,7 +142,7 @@ export default function DynamicSizeTable(props) {
     return (
         <div className="p-2">
             {!tableInitialized ? (
-                <button onClick={createTable} className="rounded bg-blue-600 px-4 py-2 text-white">
+                <button onClick={createTable} className="btn btn-primary">
                     Create Table
                 </button>
             ) : (
@@ -184,8 +184,8 @@ export default function DynamicSizeTable(props) {
                                 ))}
                             </tbody>
                         </table>
-                    </div>
-                    <div className="mb-4 mt-4 flex flex-wrap justify-between xl:space-x-2">
+                    </div> 
+                    <div className="mb-4 mt-4 flex flex-wrap justify-between xl:space-x-2 space-y-2">
                         <div>{<p className="error-message mt-1 text-blue-500 ">Fill the column values and then click the submit button to update the data</p>}</div>
                         <div className="flex flex-wrap xl:justify-end sm:space-x-2 mt-3 xl:mt-0">
                             <button onClick={addColumn} className="rounded bg-[#e09a7a] w-[100%] sm:w-auto px-3 py-1 text-white  ">

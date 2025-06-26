@@ -177,8 +177,8 @@ const SweetAlert = () => {
         } else if (type === 11) {
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
-                    confirmButton: 'btn btn-secondary',
-                    cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
+                    confirmButton: 'btn btn-primary',
+                    cancelButton: 'btn btn-outline-primary ltr:mr-3 rtl:ml-3',
                     popup: 'sweet-alerts',
                 },
                 buttonsStyling: false,
@@ -822,7 +822,7 @@ const showAlert = async (type: number) => {
 
 <div className="mb-5">
     <div className="flex items-center justify-center">
-        <button type="button" className="btn btn-success" onClick={() => showAlert(10)}>
+        <button type="button" className="btn btn-primary" onClick={() => showAlert(10)}>
             Confirm
         </button>
     </div>
@@ -859,8 +859,8 @@ const showAlert = async (type: number) => {
      if (type === 11) {
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
+                confirmButton: 'btn btn-primary',
+                cancelButton: 'btn btn-outline-primary ltr:mr-3 rtl:ml-3',
                 popup: 'sweet-alerts',
             },
             buttonsStyling: false,

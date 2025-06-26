@@ -157,8 +157,8 @@ const ProductList = () => {
     const showDeleteAlert = (onConfirm: () => void, onCancel: () => void) => {
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
+                confirmButton: 'btn-outline-primary',
+                cancelButton: 'btn btn-outline-primary ltr:mr-3 rtl:ml-3',
                 popup: 'sweet-alerts',
             },
             buttonsStyling: false,

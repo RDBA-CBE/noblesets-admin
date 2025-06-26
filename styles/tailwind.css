@@ -718,3 +718,7 @@ pre.hljs {
     background-color: rgba(0, 0, 0, 0.1);
 }
 
+.swal2-popup .swal2-styled.swal2-confirm{
+    background-color: #e09a7a;
+}
+

@@ -516,7 +516,7 @@ const Scrumboard = () => {
                                                     setIsDeleteModal(false);
                                                 }}
                                                 type="button"
-                                                className="btn btn-outline-danger"
+                                                className="btn btn-outline-primary"
                                             >
                                                 Cancel
                                             </button>

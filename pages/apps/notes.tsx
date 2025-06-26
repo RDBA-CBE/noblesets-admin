@@ -796,7 +796,7 @@ const Notes = () => {
                                                 <div className="mx-auto mt-5 sm:w-3/4">Are you sure you want to delete Notes?</div>
 
                                                 <div className="mt-8 flex items-center justify-center">
-                                                    <button type="button" className="btn btn-outline-danger" onClick={() => setIsDeleteNoteModal(false)}>
+                                                    <button type="button" className="btn btn-outline-primary" onClick={() => setIsDeleteNoteModal(false)}>
                                                         Cancel
                                                     </button>
                                                     <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={deleteNote}>

@@ -2247,20 +2247,21 @@ const Editorder = () => {
                                         <div>Items Subtotal:</div>
                                         <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${addCommasToNumber(orderData?.subtotal?.net?.amount)}`}</div>
                                     </div>
-                                    {orderDetails?.order?.giftCards?.length > 0 && (
-                                        <div className="mt-4 flex  justify-between">
-                                            <div>Coupon Amount</div>
-                                            <div>
-                                                <div className="ml-[94px] items-end">{`${formatCurrency(coupenAmt?.currency)}${addCommasToNumber(coupenAmt?.amount)}`}</div>
-                                            </div>
-                                        </div>
-                                    )}
+                                  
                                     {orderData?.discounts?.length > 0 && (
                                         <div className="mt-4 flex items-center justify-between">
-                                            <div>Discount</div>
+                                            <div>Coupon Amount</div>
                                             <div>
                                                 {orderData?.discounts[0]?.amount?.currency == 'USD' ? '$' : '₹'}
                                                 {addCommasToNumber(orderData?.discounts[0]?.amount?.amount)}
+                                            </div>
+                                        </div>
+                                    )}
+                                      {orderDetails?.order?.giftCards?.length > 0 && (
+                                        <div className="mt-4 flex  justify-between">
+                                            <div>Gift Voucher Amount</div>
+                                            <div>
+                                                <div className="ml-[94px] items-end">{`${formatCurrency(coupenAmt?.currency)}${addCommasToNumber(coupenAmt?.amount)}`}</div>
                                             </div>
                                         </div>
                                     )}

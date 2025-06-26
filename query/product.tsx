@@ -20078,3 +20078,25 @@ export const MEDIA_PAGINATION = gql`
         }
     }
 `;
+
+export const GET_BRAND = gql`
+    query BrandQuery($id: ID!) {
+        brand(id: $id) {
+            logo
+            name
+            slug
+            description
+        }
+    }
+`;
+
+export const GET_SIZEGUIDE = gql`
+    query SizeGuideQuery($id: ID!) {
+        sizeGuid(id: $id) {
+            name
+            sizedetail
+            sizeimg
+            slug
+        }
+    }
+`;

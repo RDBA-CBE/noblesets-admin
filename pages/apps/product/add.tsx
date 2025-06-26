@@ -3020,6 +3020,98 @@ const ProductAdd = () => {
                                                         </ul>
                                                     </div>
                                                 )}
+
+                                                {productPreview?.priceBreakup && (
+                                                    <div
+                                                        style={{
+                                                            borderBottom: '1px solid #EAEBED',
+                                                            paddingBottom: '15px',
+                                                            marginBottom: '15px',
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                justifyContent: 'space-between',
+                                                                cursor: 'pointer',
+                                                            }}
+                                                        >
+                                                            <div>About Brand</div>
+                                                            {/* <div>▲</div> */}
+                                                        </div>
+                                                        <ul
+                                                            style={{
+                                                                listStyleType: 'none',
+                                                                paddingTop: '10px',
+                                                                // gap: 5,
+                                                            }}
+                                                        >
+                                                            
+                                                                <div className="flex flex-wrap gap-3" key={productPreview?.brand?.id}>
+                                                                    <span style={{ fontWeight: 'bold' }}>{productPreview?.brand?.name}  </span>
+
+                                                                     <p style={{ color: 'gray', marginBottom: '5px' }}>
+                                                                            {productPreview?.brand?.description && (
+                                                                                <span
+                                                                                    dangerouslySetInnerHTML={{
+                                                                                        __html: productPreview?.brand?.description,
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                        </p>
+                                                                    
+                                                                </div>
+                                                      
+                                                        </ul>
+                                                    </div>
+                                                )}
+
+                                                                                                {productPreview?.priceBreakup && (
+                                                    <div
+                                                        style={{
+                                                            borderBottom: '1px solid #EAEBED',
+                                                            paddingBottom: '15px',
+                                                            marginBottom: '15px',
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                justifyContent: 'space-between',
+                                                                cursor: 'pointer',
+                                                            }}
+                                                        >
+                                                            <div>Price Breakup</div>
+                                                            {/* <div>▲</div> */}
+                                                        </div>
+                                                        <ul
+                                                            style={{
+                                                                listStyleType: 'none',
+                                                                paddingTop: '10px',
+                                                                // gap: 5,
+                                                            }}
+                                                        >
+                                                            
+                                                                <div className="flex flex-wrap gap-3" >
+                                                                    <div dangerouslySetInnerHTML={{__html:productPreview?.priceBreakup}}></div>
+                                                                    {/* <span style={{ fontWeight: 'bold' }}>{productPreview?.brand?.name}  </span>
+
+                                                                     <p style={{ color: 'gray', marginBottom: '5px' }}>
+                                                                            {productPreview?.brand?.description && (
+                                                                                <span
+                                                                                    dangerouslySetInnerHTML={{
+                                                                                        __html: productPreview?.brand?.description,
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                        </p> */}
+                                                                    
+                                                                </div>
+                                                      
+                                                        </ul>
+                                                    </div>
+                                                )}
+
                                                 {productPreview?.variants?.length > 0 && productPreview?.variants[0]?.sku !== '' && (
                                                     <div className="flex flex-wrap gap-3">
                                                         <span style={{ fontWeight: 'bold' }}>SKU : </span>

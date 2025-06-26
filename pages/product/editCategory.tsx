@@ -222,34 +222,33 @@ const EditCategory = () => {
 
     const assignParentCategorys = async () => {
         try {
-          const res = await assignParentCategory({
-            variables: {
-              id: catId,
-              input: {},
-              parentId: selectedCat?.value,
-            },
-          });
-      
-          Success('Category updated successfully');
-          router.replace('/product/category');
+            const res = await assignParentCategory({
+                variables: {
+                    id: catId,
+                    input: {},
+                    parentId: selectedCat?.value,
+                },
+            });
+
+            Success('Category updated successfully');
+            router.replace('/product/category');
         } catch (error) {
-          // Handle GraphQL errors
-          if (error.graphQLErrors && error.graphQLErrors.length > 0) {
-            const message = error.graphQLErrors[0].message;
-            console.error('GraphQL Error:', message);
-            Failure(message)
-            // Error(message); // You can show this in a toast or alert
-          } 
-        //   else if (error.networkError) {
-        //     console.error('Network Error:', error.networkError);
-        //     Error('Network error occurred. Please try again.');
-        //   } else {
-        //     console.error('Unknown Error:', error);
-        //     Error('Something went wrong. Please try again.');
-        //   }
+            // Handle GraphQL errors
+            if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+                const message = error.graphQLErrors[0].message;
+                console.error('GraphQL Error:', message);
+                Failure(message);
+                // Error(message); // You can show this in a toast or alert
+            }
+            //   else if (error.networkError) {
+            //     console.error('Network Error:', error.networkError);
+            //     Error('Network error occurred. Please try again.');
+            //   } else {
+            //     console.error('Unknown Error:', error);
+            //     Error('Something went wrong. Please try again.');
+            //   }
         }
-      };
-      
+    };
 
     const searchMediaByName = async (e) => {
         setMediaSearch(e);
@@ -654,14 +653,14 @@ const EditCategory = () => {
                                         ) : (
                                             <>
                                                 <div className="grid grid-cols-12 pt-5">
-                                                    <div className="col-span-9 h-[450px] overflow-y-scroll border-r border-gray-200 pr-5">
+                                                    <div className="col-span-9 h-[500px] overflow-y-scroll border-r border-gray-200 pr-5 md:h-[700px] xl:h-[700px]">
                                                         <div>
                                                             <div>Filter by month</div>
                                                         </div>
                                                         <div className="flex justify-between gap-3 pt-3">
                                                             <div className="flex gap-3">
                                                                 <select
-                                                                    className="form-select w-60 flex-1"
+                                                                    className="form-select w-40 flex-1 xl:w-60"
                                                                     value={mediaMonth}
                                                                     onChange={(e) => {
                                                                         const res = getMonthNumber(e.target.value);
@@ -686,12 +685,12 @@ const EditCategory = () => {
                                                             </div>
                                                         </div>
 
-                                                        <div className="grid grid-cols-6 gap-3 pt-5">
+                                                        <div className="grid grid-cols-12 pt-5">
                                                             {mediaImages?.length > 0 ? (
                                                                 mediaImages?.map((item) => (
                                                                     <div
                                                                         key={item?.node?.fileUrl}
-                                                                        className={`flex h-[200px] w-[170px] overflow-hidden p-2  ${
+                                                                        className={`col-span-2  overflow-hidden p-2  ${
                                                                             selectedImg == item?.node?.fileUrl ? 'border-4 border-blue-500' : ''
                                                                         }`}
                                                                         // onMouseDown={() => handleMouseDown(item)}
@@ -723,14 +722,14 @@ const EditCategory = () => {
                                                         </div>
                                                     </div>
                                                     {selectedImg && (
-                                                        <div className="col-span-3 h-[450px] overflow-y-scroll pl-5">
+                                                        <div className="col-span-3 h-[700px] overflow-y-scroll pl-5">
                                                             {/* <div className="border-b border-gray-200 pb-5"> */}
                                                             <div className="">
                                                                 <div>
                                                                     <p className="mb-2 text-lg font-semibold">ATTACHMENT DETAILS</p>
                                                                 </div>
                                                                 {selectedImg?.endsWith('.mp4') ? (
-                                                                    <video controls src={selectedImg} className="h-full w-full object-cover" style={{ height: '300px' }}>
+                                                                    <video controls src={selectedImg} className="h-full w-full object-cover" >
                                                                         Your browser does not support the video tag.
                                                                     </video>
                                                                 ) : (

@@ -1548,7 +1548,7 @@ const Editorder = () => {
                     </button>
                 </div>
                 <div className="grid grid-cols-12 gap-5 ">
-                    <div className=" col-span-12 mb-5 md:col-span-8  ">
+                    <div className=" col-span-12 mb-5 md:col-span-7 ">
                         <div className="panel mb-5 p-5">
                             <div className="flex justify-between">
                                 <div className="flex items-center gap-3">
@@ -1636,7 +1636,7 @@ const Editorder = () => {
 
                             <div className="mt-8 grid grid-cols-12 gap-5">
                                 <div className="col-span-6 mr-5">
-                                    <div className="flex w-52 items-center justify-between">
+                                    <div className="flex w-100 items-center justify-between">
                                         <h5 className="mb-3 text-lg font-semibold">Billing</h5>
                                         {/* <button type="button" onClick={() => BillingInputs()}>
                                             <IconPencil className="cursor-pointer" />
@@ -1903,7 +1903,7 @@ const Editorder = () => {
                                 </div>
                                 {!isAllGiftCartLine && (
                                     <div className="col-span-6 mr-5">
-                                        <div className="flex w-52 items-center justify-between">
+                                        <div className="flex w-100 items-center justify-between">
                                             <h5 className="mb-3 text-lg font-semibold">Shipping</h5>
                                             {/* <button type="button" onClick={() => ShippingInputs()}>
                                             <IconPencil />
@@ -2242,7 +2242,7 @@ const Editorder = () => {
                             </div>
                             <div className="mt-6 flex flex-col justify-between px-4 sm:flex-row">
                                 <div className="mb-6 sm:mb-0"></div>
-                                <div className="sm:w-2/5">
+                                <div className="sm:w-3/5">
                                     <div className="flex items-center justify-between">
                                         <div>Items Subtotal:</div>
                                         <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${addCommasToNumber(orderData?.subtotal?.net?.amount)}`}</div>
@@ -2449,7 +2449,7 @@ const Editorder = () => {
                         </>
                     </div>
 
-                    <div className="col-span-12 md:col-span-4">
+                    <div className="col-span-12 md:col-span-5">
                         {orderStatus != 'UNCONFIRMED' && (
                             <>
                                 <div className="panel mb-5 p-5">

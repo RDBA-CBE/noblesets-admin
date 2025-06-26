@@ -2780,7 +2780,7 @@ const ProductEdit = (props: any) => {
                                         ) : (
                                             <>
                                                 <div className="grid grid-cols-12 pt-5">
-                                                    <div className="hh-[500px] col-span-9 overflow-y-scroll border-r border-gray-200 pr-5 md:h-[700px] xl:h-[700px]">
+                                                    <div className="h-[500px] col-span-9 overflow-y-scroll border-r border-gray-200 pr-5 md:h-[700px] xl:h-[700px]">
                                                         <div className="flex gap-4">
                                                             <div>
                                                                 <div>Filter by type</div>
@@ -2979,7 +2979,7 @@ const ProductEdit = (props: any) => {
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel as="div" className="panel my-8 w-[95%] overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark xl:w-[70%]">
+                                <Dialog.Panel as="div" className="panel my-8 w-[98%] overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark xl:w-[70%]">
                                     <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
                                         <div className="text-lg font-bold">Preview</div>
                                         <button type="button" className="text-white-dark hover:text-dark" onClick={() => setIsOpenPreview(false)}>

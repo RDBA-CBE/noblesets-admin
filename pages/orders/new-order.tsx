@@ -1044,7 +1044,7 @@ const NewOrder = () => {
     </button> */}
             </div>
             <div className="grid grid-cols-12 gap-5 ">
-                <div className="col-span-12 md:col-span-8 mb-5  ">
+                <div className="col-span-12 md:col-span-7 mb-5  ">
                     <div className="panel mb-5 p-5">
                         <div>
                             <h3 className="text-lg font-semibold">Order Details</h3>
@@ -1719,7 +1719,7 @@ const NewOrder = () => {
                         </div>
                         <div className="mt-6 flex flex-col justify-between px-4 sm:flex-row">
                             <div className="mb-6 sm:mb-0"></div>
-                            <div className="sm:w-2/5">
+                            <div className="sm:w-3/5">
                                 <div className="flex items-center justify-between">
                                     <div>Items Subtotal:</div>
                                     <div>
@@ -1832,7 +1832,7 @@ const NewOrder = () => {
                         </div>
                     </div>
                 </div>
-                <div className="col-span-12 md:col-span-4 mb-5  ">
+                <div className="col-span-12 md:col-span-5 mb-5  ">
                     <div className="panel mb-5 p-5">
                         <div className="mb-5  ">
                             <h3 className="text-lg font-semibold">Order Actions</h3>

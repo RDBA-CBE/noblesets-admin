@@ -1602,7 +1602,7 @@ const Editorder = () => {
                     </button>
                 </div>
                 <div className="grid grid-cols-12 gap-5 ">
-                    <div className=" col-span-9 mb-5  ">
+                    <div className=" col-span-12 md:col-span-7 mb-5  ">
                         <div className="panel mb-5 p-5">
                             <div className="flex justify-between">
                                 <div className="flex items-center gap-3">
@@ -2296,7 +2296,7 @@ const Editorder = () => {
                             </div>
                             <div className="mt-6 flex flex-col justify-between px-4 sm:flex-row">
                                 <div className="mb-6 sm:mb-0"></div>
-                                <div className="sm:w-2/5">
+                                <div className="sm:w-3/5">
                                     <div className="flex items-center justify-between">
                                         <div>Items Subtotal:</div>
                                         <div>{`${formatCurrency(orderData?.subtotal?.gross?.currency)}${addCommasToNumber(orderData?.subtotal?.gross?.amount)}`}</div>
@@ -2503,7 +2503,7 @@ const Editorder = () => {
                         </>
                     </div>
 
-                    <div className="col-span-3">
+                    <div className="col-span-12 md:col-span-5 mb-5">
                         {orderStatus != 'UNCONFIRMED' && (
                             <>
                                 <div className="panel mb-5 p-5">

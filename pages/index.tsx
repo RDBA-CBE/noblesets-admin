@@ -1261,7 +1261,7 @@ const Index = () => {
                 </span>
             </div>
 
-            <div className="panel mb-5 mt-5 gap-4 md:mt-0 md:flex md:justify-between">
+            <div className="panel mb-5 mt-5 gap-2 xl:gap-4 px-2 md:mt-0 md:flex md:justify-between">
                 {/* Search Input */}
                 <input type="text" className="form-input mb-3 mr-2 h-[40px] flex-1 md:mb-0 md:w-auto" placeholder="Search..." value={search} onChange={(e) => handleSearchChange(e.target.value)} />
 

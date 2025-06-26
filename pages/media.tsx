@@ -475,13 +475,13 @@ const Media = () => {
             </div>
             <div className="panel   w-full overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
                 <div className="m-5">
-                    <div className="flex gap-5">
+                    <div className="flex gap-5 ">
                         <button
                             onClick={() => {
                                 setState({ tab: 0, search: '', date: 'all', mediaType: 'all' });
                                 // getMediaImage();
                             }}
-                            className={`${state.tab == 0 ? 'bg-primary text-white !outline-none' : ''}
+                            className={`${state.tab == 0 ? 'btn btn-primary' : ''}
                                                     -mb-[1px] flex items-center rounded p-3.5 py-2 text-lg before:inline-block`}
                         >
                             Upload Files
@@ -492,7 +492,7 @@ const Media = () => {
 
                                 // getMediaImage();
                             }}
-                            className={`${state.tab == 1 ? 'bg-primary text-white !outline-none' : ''}
+                            className={`${state.tab == 1 ? 'btn btn-primary' : ''}
                                                     -mb-[1px] flex items-center rounded p-3.5 py-2 text-lg before:inline-block`}
                         >
                             Media Library
@@ -531,7 +531,7 @@ const Media = () => {
                                             <div className="flex justify-between gap-3 pt-3">
                                                 <div className="flex gap-3">
                                                     {/* <select className="form-select w-40 flex-1"> */}
-                                                    <select className="form-select w-60 flex-1" value={state.mediaType} onChange={(e) => setState({ mediaType: e.target.value })}>
+                                                    <select className="form-select w-40 xl:w-60  flex-1" value={state.mediaType} onChange={(e) => setState({ mediaType: e.target.value })}>
                                                         <option value="all">All Data</option>
                                                         <option value="Image">Images</option>
                                                         <option value="Video">Videos</option>
@@ -549,7 +549,7 @@ const Media = () => {
                                             <div className="flex justify-between gap-3 pt-3">
                                                 <div className="flex gap-3">
                                                     <select
-                                                        className="form-select w-60 flex-1"
+                                                        className="form-select w-40 xl:w-60  flex-1"
                                                         value={state.date}
                                                         onChange={(e) => {
                                                             filterMediaByMonth(e.target.value);
@@ -567,7 +567,7 @@ const Media = () => {
                                                 <div>
                                                     <input
                                                         type="text"
-                                                        className="form-input mr-2  w-80 "
+                                                        className="form-input mr-2  w-40 xl:w-60  "
                                                         placeholder="Search..."
                                                         value={state.search}
                                                         onChange={(e) => searchMediaByName(e.target.value)}
@@ -581,16 +581,16 @@ const Media = () => {
                                         {getLoading || loading ? (
                                             <CommonLoader />
                                         ) : (
-                                            <div className="grid grid-cols-6 pt-5 ">
+                                            <div className="grid grid-cols-12 pt-5 ">
                                                 {state.imageList?.length > 0 ? (
                                                     state.imageList?.map((item) => {
                                                         return (
                                                             <div
                                                                 key={item.node?.fileUrl}
-                                                                className={`relative flex h-[150px] w-[150px] cursor-pointer overflow-hidden p-2 ${
+                                                                className={`col-span-2  overflow-hidden p-2 ${
                                                                     state.selectedImages.some((selected) => selected.node?.fileUrl === item.node?.fileUrl)
                                                                         ? 'border-4 border-blue-500'
-                                                                        : 'border-2 border-gray-200'
+                                                                        : ''
                                                                 }`}
                                                                 onClick={() => handleSingleClick(item)}
                                                                 onTouchStart={() => handleLongPressStart(item)}

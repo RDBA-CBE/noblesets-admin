@@ -571,7 +571,7 @@ const Address = () => {
                         </div>
 
                         <div className="mt-8 flex items-center justify-end">
-                            <button type="button" className="btn btn-outline-danger gap-2" onClick={() => clearState()}>
+                            <button type="button" className="btn btn-outline-primary gap-2" onClick={() => clearState()}>
                                 Cancel
                             </button>
                             <button type="button" onClick={() => (objIsEmpty(state.selectedAddress) ? addAddress() : updateAddress())} className="btn btn-primary ltr:ml-4 rtl:mr-4">

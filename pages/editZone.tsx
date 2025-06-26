@@ -227,7 +227,7 @@ const CreateCoupon = () => {
                             <button type="button" className="btn btn-primary  w-full md:mb-0 md:w-auto" onClick={() => updateAmount()}>
                                 {channelListLoading ? <IconLoader className="mr-2 h-4 w-4 animate-spin" /> : 'Submit'}
                             </button>
-                            <button type="button" className="btn btn-danger  w-full md:mb-0 md:w-auto" onClick={() => router.push('/shipping_zone')}>
+                            <button type="button" className="btn btn-outline-primary  w-full md:mb-0 md:w-auto" onClick={() => router.push('/shipping_zone')}>
                                 {'Cancel'}
                             </button>
                         </div>

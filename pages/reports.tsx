@@ -1652,7 +1652,7 @@ const Reports = () => {
                     {state.activeTab == 'Orders' ? (
                         <div className="panel mt-5 ">
                             {/* Filter By last 7 days,last month year */}
-                            <div className="flex items-center justify-between">
+                            <div className="flex flex-wrap items-center justify-between">
                                 <div className="flex  items-center  ">
                                     {orderFilter?.map((link, index) => (
                                         <React.Fragment key={index}>
@@ -1759,7 +1759,7 @@ const Reports = () => {
                                                 </button>
                                                 {state.activeAccordion === 'search' && (
                                                     <div className="border border-t-0 border-gray-300 p-4 dark:border-gray-700">
-                                                        <div className="pl-4">
+                                                        <div className="">
                                                             <ProductSelect
                                                                 loading={productLoading}
                                                                 queryFunc={fetchProducts}
@@ -1783,7 +1783,7 @@ const Reports = () => {
                                                                 }}
                                                             /> */}
                                                         </div>
-                                                        <div className="flex items-center justify-between">
+                                                        <div className="flex flex-wrap items-center  xl:justify-between">
                                                             <button type="button" className="btn btn-primary mt-3 h-9" onClick={() => getSalesBySingleProduct('search', state.productSearch?.value)}>
                                                                 Submit
                                                             </button>
@@ -1925,7 +1925,7 @@ const Reports = () => {
                         </div>
                     ) : state.activeTab == 'Customers' ? (
                         <div className="panel  ">
-                            <div className={`flex items-center ${state.customerTab == 'Customer list' ? 'justify-end' : ' justify-between'}`}>
+                            <div className={`flex flex-wrap items-center ${state.customerTab == 'Customer list' ? 'justify-end' : ' justify-between'}`}>
                                 {state.customerTab !== 'Customer list' && (
                                     <div className="flex  items-center  ">
                                         {orderFilter?.map((link, index) => (
@@ -2022,7 +2022,7 @@ const Reports = () => {
                     ) : (
                         <div className="panel mt-5 ">
                             {/* Filter By last 7 days,last month year */}
-                            <div className="flex items-center justify-between">
+                            <div className="flex  flex-wrap items-center justify-between">
                                 <div className="flex  items-center  ">
                                     {orderFilter?.map((link, index) => (
                                         <React.Fragment key={index}>

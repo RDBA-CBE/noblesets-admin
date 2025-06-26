@@ -1091,7 +1091,7 @@ const NewOrder = () => {
                     </div>
                     <div className="panel mt-8 grid grid-cols-12 gap-5 p-5">
                         {/* Billing Address */}
-                        <div className="col-span-6 mr-5">
+                        <div className="col-span-12 xl:col-span-6 mr-5">
                             <div className="flex w-100 items-center justify-between">
                                 <h5 className="mb-3 text-lg font-semibold">Billing</h5>
                                 <button type="button" onClick={() => setState({ showBillingInputs: !state.showBillingInputs })}>
@@ -1379,7 +1379,7 @@ const NewOrder = () => {
                         </div>
 
                         {/* Shipping Address */}
-                        <div className="col-span-6 mr-5">
+                        <div className="col-span-12 xl:col-span-6 mr-5">
                             <div className="flex w-100 items-center justify-between">
                                 <h5 className="mb-3 text-lg font-semibold">Shipping</h5>
                                 <button type="button" onClick={() => setState({ showShippingInputs: !state.showShippingInputs })}>

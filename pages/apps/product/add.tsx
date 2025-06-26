@@ -55,6 +55,8 @@ import {
     GET_ATTRIBUTE_BY_PRODUCT_TYPE,
     NEW_PARENT_CATEGORY_LIST,
     ATTRIBUTE_LIST,
+    GET_BRAND,
+    GET_SIZEGUIDE,
 } from '@/query/product';
 import {
     CHANNEL_USD,
@@ -297,7 +299,6 @@ const ProductAdd = () => {
         },
     });
 
-
     const handleNextPage = () => {
         fetchNextPage({
             variables: {
@@ -326,7 +327,7 @@ const ProductAdd = () => {
     };
 
     const commonPagination = (data) => {
-console.log('✌️data --->', data);
+        console.log('✌️data --->', data);
         setImageList(data.files.edges);
         setMediaStartCussor(data.files.pageInfo.startCursor);
         setMediaEndCursor(data.files.pageInfo.endCursor);
@@ -375,6 +376,11 @@ console.log('✌️data --->', data);
     });
 
     const [addFormData, { loading: createLoad }] = useMutation(CREATE_PRODUCT);
+
+    const { data: getBrands, loading: brandLoading, refetch: getBrand } = useQuery(GET_BRAND);
+
+    const { data: getSizeGuides, loading: getSizeGuideLoading, refetch: getSizeGuide } = useQuery(GET_SIZEGUIDE);
+
     const [deleteProducts, { loading: deleteLoad }] = useMutation(DELETE_PRODUCTS);
     const [updateProductChannelList, { loading: channelLoad }] = useMutation(UPDATE_PRODUCT_CHANNEL);
     const [createVariant, { loading: createVariantLoad }] = useMutation(CREATE_VARIANT);
@@ -639,6 +645,23 @@ console.log('✌️data --->', data);
             img = imageUrl?.filter((item) => !item.endsWith('.mp4'));
         }
 
+        let brand = null;
+        if (selectedBrand) {
+            const res = await getBrand({
+                id: selectedBrand?.value,
+            });
+            brand = res?.data?.brand;
+        }
+
+        let sizeguide = null;
+        if (selectedSizeGuide) {
+            const res = await getSizeGuide({
+                id: selectedSizeGuide?.value,
+            });
+            sizeguide = res?.data?.sizeGuid;
+
+        }
+
         const data = {
             name: productName,
             slug,
@@ -660,13 +683,11 @@ console.log('✌️data --->', data);
             // productId: id,
             relateProducts,
             youMayLike,
-            priceBreakup:tableHtml,
-            brand:selectedBrand,
-            sizeguide:selectedSizeGuide
-
+            priceBreakup: tableHtml,
+            brand: brand,
+            sizeguide: sizeguide,
         };
-console.log('✌️data --->', data);
-
+        console.log('✌️data --->', data);
 
         setPreviewData(data);
         setIsOpenPreview(true);
@@ -1658,15 +1679,14 @@ console.log('✌️data --->', data);
 
                             <DynamicSizeTable tableData={tableData} htmlTableString={tableHtml} />
                             {priceBreakUpError && <p className="error-message mt-1 text-red-500 ">{priceBreakUpError}</p>}
-
                         </div>
 
                         <div className="panel mb-5 ">
                             <div className="flex flex-col  md:flex-row ">
                                 {isMounted && (
                                     <Tab.Group>
-                                        <div className="md:me-10 mb-5 sm:mb-0 ">
-                                            <Tab.List className="mb-5 flex  w-100 md:w-32 flex-row text-center font-semibold  md:m-auto md:mb-0 md:flex-col overflow-x-scroll">
+                                        <div className="mb-5 sm:mb-0 md:me-10 ">
+                                            <Tab.List className="w-100 mb-5  flex flex-row overflow-x-scroll text-center font-semibold  md:m-auto md:mb-0 md:w-32 md:flex-col">
                                                 <Tab as={Fragment}>
                                                     {({ selected }) => (
                                                         <button
@@ -1715,19 +1735,19 @@ console.log('✌️data --->', data);
                                                 {variants?.map((item, index) => (
                                                     <div key={index} className="mb-5 border-b border-gray-200">
                                                         {index !== 0 && ( // Render remove button only for items after the first one
-                                                            <div className="active flex items-center justify-end text-danger mb-4">
+                                                            <div className="active mb-4 flex items-center justify-end text-danger">
                                                                 <button onClick={() => handleRemoveVariants(index)}>
                                                                     <IconTrashLines />
                                                                 </button>
                                                             </div>
                                                         )}
-                                                        <div className="active grid grid-cols-12 items-center mb-3">
-                                                            <div className="mb-2 mr-4 col-span-12 md:col-span-3" >
+                                                        <div className="active mb-3 grid grid-cols-12 items-center">
+                                                            <div className="col-span-12 mb-2 mr-4 md:col-span-3">
                                                                 <label htmlFor={`name${index}`} className="block pr-5 text-sm font-medium text-gray-700">
                                                                     Variant:
                                                                 </label>
                                                             </div>
-                                                            <div className="mb-2 col-span-12 md:col-span-9" >
+                                                            <div className="col-span-12 mb-2 md:col-span-9">
                                                                 <input
                                                                     type="text"
                                                                     id={`name${index}`}
@@ -1740,13 +1760,13 @@ console.log('✌️data --->', data);
                                                                 />
                                                             </div>
                                                         </div>
-                                                        <div className="active grid grid-cols-12 items-center mb-3">
-                                                            <div className="mb-2 mr-4 col-span-12 md:col-span-3" >
+                                                        <div className="active mb-3 grid grid-cols-12 items-center">
+                                                            <div className="col-span-12 mb-2 mr-4 md:col-span-3">
                                                                 <label htmlFor={`sku_${index}`} className="block pr-5 text-sm font-medium text-gray-700">
                                                                     SKU
                                                                 </label>
                                                             </div>
-                                                            <div className="mb-2 col-span-12 md:col-span-9" >
+                                                            <div className="col-span-12 mb-2 md:col-span-9">
                                                                 <input
                                                                     type="text"
                                                                     id={`sku_${index}`}
@@ -1760,13 +1780,13 @@ console.log('✌️data --->', data);
                                                                 {variantErrors[index]?.sku && <p className="error-message mt-1 text-red-500">{variantErrors[index].sku}</p>}
                                                             </div>
                                                         </div>
-                                                        <div className="active grid grid-cols-12 items-center  mb-3">
-                                                            <div className="mb-2 mr-4  col-span-12 xl:col-span-3">
+                                                        <div className="active mb-3 grid grid-cols-12  items-center">
+                                                            <div className="col-span-12 mb-2  mr-4 xl:col-span-3">
                                                                 <label htmlFor={`stackMgmt_${index}`} className="block  text-sm font-medium text-gray-700">
                                                                     Stock Management
                                                                 </label>
                                                             </div>
-                                                            <div className="mb-2 col-span-12 xl:col-span-9" >
+                                                            <div className="col-span-12 mb-2 xl:col-span-9">
                                                                 <input
                                                                     type="checkbox"
                                                                     id={`stackMgmt_${index}`}
@@ -1780,13 +1800,13 @@ console.log('✌️data --->', data);
                                                             </div>
                                                         </div>
                                                         {/* {item.stackMgmt && ( */}
-                                                        <div className="active grid grid-cols-12 items-center  mb-3">
-                                                            <div className="mb-2 mr-4  col-span-12 md:col-span-3" >
+                                                        <div className="active mb-3 grid grid-cols-12  items-center">
+                                                            <div className="col-span-12 mb-2  mr-4 md:col-span-3">
                                                                 <label htmlFor={`quantity_${index}`} className="block  text-sm font-medium text-gray-700">
                                                                     Quantity
                                                                 </label>
                                                             </div>
-                                                            <div className="mb-2 col-span-12 md:col-span-9" >
+                                                            <div className="col-span-12 mb-2 md:col-span-9">
                                                                 <input
                                                                     type="number"
                                                                     id={`quantity_${index}`}
@@ -1801,13 +1821,13 @@ console.log('✌️data --->', data);
                                                             </div>
                                                         </div>
                                                         {/* )} */}
-                                                        <div className="active grid grid-cols-12 items-center mb-2">
-                                                            <div className="mb-2 mr-4 col-span-12 md:col-span-3" >
+                                                        <div className="active mb-2 grid grid-cols-12 items-center">
+                                                            <div className="col-span-12 mb-2 mr-4 md:col-span-3">
                                                                 <label htmlFor={`regularPrice_${index}`} className="block pr-5 text-sm font-medium text-gray-700">
                                                                     Regular Price
                                                                 </label>
                                                             </div>
-                                                            <div className="mb-2 col-span-12 md:col-span-9" >
+                                                            <div className="col-span-12 mb-2 md:col-span-9">
                                                                 <input
                                                                     type="number"
                                                                     id={`regularPrice_${index}`}
@@ -2086,7 +2106,7 @@ console.log('✌️data --->', data);
                                         previewClick();
                                     }}
                                 >
-                                    {previewLoading ? <IconLoader className="mr-2 h-4 w-4 animate-spin" /> : 'Preview'}
+                                    {previewLoading || brandLoading || getSizeGuideLoading ? <IconLoader className="mr-2 h-4 w-4 animate-spin" /> : 'Preview'}
                                 </button>
                             </div>
                         </div>
@@ -2331,14 +2351,14 @@ console.log('✌️data --->', data);
                                         ) : (
                                             <>
                                                 <div className="grid grid-cols-12 pt-5">
-                                                    <div className="col-span-9 h-[500px] md:h-[700px] xl:h-[700px] overflow-y-scroll border-r border-gray-200 pr-5">
+                                                    <div className="col-span-9 h-[500px] overflow-y-scroll border-r border-gray-200 pr-5 md:h-[700px] xl:h-[700px]">
                                                         <div className="flex gap-4">
                                                             <div>
                                                                 <div>Filter by type</div>
                                                                 <div className="flex justify-between gap-3 pt-3">
                                                                     <div className="flex gap-3">
                                                                         {/* <select className="form-select w-40 flex-1"> */}
-                                                                        <select className="form-select w-40 xl:w-60 flex-1" value={mediaType} onChange={(e) => filterMediaByType(e.target.value)}>
+                                                                        <select className="form-select w-40 flex-1 xl:w-60" value={mediaType} onChange={(e) => filterMediaByType(e.target.value)}>
                                                                             <option value="all">All Data</option>
                                                                             <option value="Image">Images</option>
                                                                             <option value="Video">Videos</option>
@@ -2356,7 +2376,7 @@ console.log('✌️data --->', data);
                                                                 <div className="flex justify-between gap-3 pt-3">
                                                                     <div className="flex gap-3">
                                                                         {/* <select className="form-select w-40 flex-1"> */}
-                                                                        <select className="form-select w-40 xl:w-60 flex-1" value={mediaMonth} onChange={(e) => filterMediaByMonth(e.target.value)}>
+                                                                        <select className="form-select w-40 flex-1 xl:w-60" value={mediaMonth} onChange={(e) => filterMediaByMonth(e.target.value)}>
                                                                             <option value="all">All Data</option>
                                                                             {months.map((month, index) => (
                                                                                 <option key={month} value={`${month}/2024`}>{`${month} 2024`}</option>
@@ -2385,9 +2405,7 @@ console.log('✌️data --->', data);
                                                                             return (
                                                                                 <div
                                                                                     key={item.node?.fileUrl}
-                                                                                    className={`col-span-2  overflow-hidden p-2 ${
-                                                                                        selectedImages.includes(item) ? 'border-4 border-blue-500' : ''
-                                                                                    }`}
+                                                                                    className={`col-span-2  overflow-hidden p-2 ${selectedImages.includes(item) ? 'border-4 border-blue-500' : ''}`}
                                                                                     onMouseDown={() => handleMouseDown(item)}
                                                                                     onMouseUp={handleMouseUp}
                                                                                     onMouseLeave={handleMouseLeave}
@@ -2675,12 +2693,12 @@ console.log('✌️data --->', data);
                                     <input name="name" type="text" id="name" placeholder="Enter Name" className="form-input" value={formData.name} onChange={handleCatChange} />
                                 </div>
 
-                                <div className='mt-3'>
+                                <div className="mt-3">
                                     <label htmlFor="description ">Description </label>
                                     <textarea name="description" id="description" placeholder="Enter Description" className="form-input" value={formData.description} onChange={handleCatChange} />
                                 </div>
 
-                                <div className='mt-3'>
+                                <div className="mt-3">
                                     <label htmlFor="parentCategory">Parent Category</label>
                                     <select name="parentCategory" className="form-select" value={formData.parentCategory} onChange={handleCatChange}>
                                         <option value="">Open this select</option>
@@ -3002,6 +3020,98 @@ console.log('✌️data --->', data);
                                                         </ul>
                                                     </div>
                                                 )}
+
+                                                {productPreview?.priceBreakup && (
+                                                    <div
+                                                        style={{
+                                                            borderBottom: '1px solid #EAEBED',
+                                                            paddingBottom: '15px',
+                                                            marginBottom: '15px',
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                justifyContent: 'space-between',
+                                                                cursor: 'pointer',
+                                                            }}
+                                                        >
+                                                            <div>About Brand</div>
+                                                            {/* <div>▲</div> */}
+                                                        </div>
+                                                        <ul
+                                                            style={{
+                                                                listStyleType: 'none',
+                                                                paddingTop: '10px',
+                                                                // gap: 5,
+                                                            }}
+                                                        >
+                                                            
+                                                                <div className="flex flex-wrap gap-3" key={productPreview?.brand?.id}>
+                                                                    <span style={{ fontWeight: 'bold' }}>{productPreview?.brand?.name}  </span>
+
+                                                                     <p style={{ color: 'gray', marginBottom: '5px' }}>
+                                                                            {productPreview?.brand?.description && (
+                                                                                <span
+                                                                                    dangerouslySetInnerHTML={{
+                                                                                        __html: productPreview?.brand?.description,
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                        </p>
+                                                                    
+                                                                </div>
+                                                      
+                                                        </ul>
+                                                    </div>
+                                                )}
+
+                                                                                                {productPreview?.priceBreakup && (
+                                                    <div
+                                                        style={{
+                                                            borderBottom: '1px solid #EAEBED',
+                                                            paddingBottom: '15px',
+                                                            marginBottom: '15px',
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                justifyContent: 'space-between',
+                                                                cursor: 'pointer',
+                                                            }}
+                                                        >
+                                                            <div>Price Breakup</div>
+                                                            {/* <div>▲</div> */}
+                                                        </div>
+                                                        <ul
+                                                            style={{
+                                                                listStyleType: 'none',
+                                                                paddingTop: '10px',
+                                                                // gap: 5,
+                                                            }}
+                                                        >
+                                                            
+                                                                <div className="flex flex-wrap gap-3" >
+                                                                    <div dangerouslySetInnerHTML={{__html:productPreview?.priceBreakup}}></div>
+                                                                    {/* <span style={{ fontWeight: 'bold' }}>{productPreview?.brand?.name}  </span>
+
+                                                                     <p style={{ color: 'gray', marginBottom: '5px' }}>
+                                                                            {productPreview?.brand?.description && (
+                                                                                <span
+                                                                                    dangerouslySetInnerHTML={{
+                                                                                        __html: productPreview?.brand?.description,
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                        </p> */}
+                                                                    
+                                                                </div>
+                                                      
+                                                        </ul>
+                                                    </div>
+                                                )}
+
                                                 {productPreview?.variants?.length > 0 && productPreview?.variants[0]?.sku !== '' && (
                                                     <div className="flex flex-wrap gap-3">
                                                         <span style={{ fontWeight: 'bold' }}>SKU : </span>

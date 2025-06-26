@@ -42,6 +42,8 @@ import {
     UPDATED_PRODUCT_PAGINATION,
     NEW_PARENT_CATEGORY_LIST,
     VARIANT_UPDATES,
+    GET_BRAND,
+    GET_SIZEGUIDE,
 } from '@/query/product';
 import {
     CHANNEL_USD,
@@ -132,6 +134,10 @@ const ProductEdit = (props: any) => {
     const [mediaDescription, setMediaDescription] = useState('');
     const [selectedCollection, setSelectedCollection] = useState<any>([]);
     const [publish, setPublish] = useState('published');
+
+    const { data: getBrands, loading: brandLoading, refetch: getBrand } = useQuery(GET_BRAND);
+
+    const { data: getSizeGuides, loading: getSizeGuideLoading, refetch: getSizeGuide } = useQuery(GET_SIZEGUIDE);
 
     // error message start
 
@@ -1601,6 +1607,23 @@ const ProductEdit = (props: any) => {
         if (images?.length > 0) {
             img = images?.filter((item) => !item.url.endsWith('.mp4'));
         }
+
+        let brand = null;
+        if (selectedBrand) {
+            const res = await getBrand({
+                id: selectedBrand?.value,
+            });
+            brand = res?.data?.brand;
+        }
+
+        let sizeguide = null;
+        if (selectedSizeGuide) {
+            const res = await getSizeGuide({
+                id: selectedSizeGuide?.value,
+            });
+            sizeguide = res?.data?.sizeGuid;
+        }
+
         const data = {
             name: productName,
             slug,
@@ -1622,10 +1645,15 @@ const ProductEdit = (props: any) => {
             productId: id,
             relateProducts,
             youMayLike,
+            priceBreakup: tableHtml,
+            brand: brand,
+            sizeguide: sizeguide,
         };
         setPreviewData(data);
         setIsOpenPreview(true);
         setPreviewLoading(false);
+
+        console.log('data', data);
     };
 
     const handleClickImage = async (item) => {
@@ -1975,7 +2003,7 @@ const ProductEdit = (props: any) => {
                                                     return (
                                                         <div key={index} className="mb-5 border-b border-gray-200">
                                                             {index !== 0 && ( // Render remove button only for items after the first one
-                                                                <div className="active flex items-center justify-end text-danger mb-4">
+                                                                <div className="active mb-4 flex items-center justify-end text-danger">
                                                                     <button onClick={() => handleRemoveVariants(item, index)}>
                                                                         <IconTrashLines />
                                                                     </button>
@@ -2739,14 +2767,14 @@ const ProductEdit = (props: any) => {
                                         ) : (
                                             <>
                                                 <div className="grid grid-cols-12 pt-5">
-                                                    <div className="col-span-9 hh-[500px] md:h-[700px] xl:h-[700px] overflow-y-scroll border-r border-gray-200 pr-5">
+                                                    <div className="hh-[500px] col-span-9 overflow-y-scroll border-r border-gray-200 pr-5 md:h-[700px] xl:h-[700px]">
                                                         <div className="flex gap-4">
                                                             <div>
                                                                 <div>Filter by type</div>
                                                                 <div className="flex justify-between gap-3 pt-3">
                                                                     <div className="flex gap-3">
                                                                         {/* <select className="form-select w-40 flex-1"> */}
-                                                                        <select className="form-select w-40 xl:w-60 flex-1" value={mediaType} onChange={(e) => setMediaType(e.target.value)}>
+                                                                        <select className="form-select w-40 flex-1 xl:w-60" value={mediaType} onChange={(e) => setMediaType(e.target.value)}>
                                                                             <option value="all">All Data</option>
                                                                             <option value="image">Images</option>
                                                                             <option value="video">Videos</option>
@@ -2762,7 +2790,7 @@ const ProductEdit = (props: any) => {
                                                                 <div>Filter by month</div>
                                                                 <div className="flex justify-between gap-3 pt-3">
                                                                     <div className="flex gap-3">
-                                                                        <select className="form-select w-40 xl:w-60 flex-1" value={mediaMonth} onChange={(e) => filterMediaByMonth(e.target.value)}>
+                                                                        <select className="form-select w-40 flex-1 xl:w-60" value={mediaMonth} onChange={(e) => filterMediaByMonth(e.target.value)}>
                                                                             {/* <select className="form-select w-40 flex-1" value={mediaDate} onChange={(e) => filterMediaByMonth(e.target.value)}> */}
                                                                             <option value="all">All Data</option>
                                                                             {months.map((month, index) => (
@@ -2947,14 +2975,14 @@ const ProductEdit = (props: any) => {
                                     </div>
                                     <div className="flex h-full w-full justify-center gap-3">
                                         <div
-                                            className=" scrollbar-hide  flex h-[600px] w-1/12 flex-col items-center overflow-scroll p-0 rounded-xl"
+                                            className=" scrollbar-hide  flex h-[600px] w-1/12 flex-col items-center overflow-scroll rounded-xl p-0"
                                             style={{ overflowY: 'scroll', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                                         >
                                             {productPreview?.image?.length > 0 ? (
                                                 <div className="overflow-auto">
                                                     {productPreview?.image?.map((item, index) => (
-                                                        <div key={index} className="h-auto w-[100%] cursor-pointer overflow-hidden rounded-xl mb-2" onClick={() => setPreviewSelectedImg(item?.url)}>
-                                                            <img src={item?.url} alt="image" className="object-contain object-center rounded-xl" />
+                                                        <div key={index} className="mb-2 h-auto w-[100%] cursor-pointer overflow-hidden rounded-xl" onClick={() => setPreviewSelectedImg(item?.url)}>
+                                                            <img src={item?.url} alt="image" className="rounded-xl object-contain object-center" />
                                                         </div>
                                                     ))}
                                                 </div>
@@ -2965,8 +2993,13 @@ const ProductEdit = (props: any) => {
                                             )}
                                         </div>
                                         {productPreview?.image?.length > 0 ? (
-                                            <div className=" h-[600px] w-5/12 p-0 rounded-xl" >
-                                                <img className='rounded-xl' src={previewSelectedImg ? previewSelectedImg : productPreview?.image[0]?.url} alt="image" style={{ width: '100%', height: '100%' }} />
+                                            <div className=" h-[600px] w-5/12 rounded-xl p-0">
+                                                <img
+                                                    className="rounded-xl"
+                                                    src={previewSelectedImg ? previewSelectedImg : productPreview?.image[0]?.url}
+                                                    alt="image"
+                                                    style={{ width: '100%', height: '100%' }}
+                                                />
                                             </div>
                                         ) : (
                                             <div className="panel h-[100%] w-4/12">
@@ -2999,13 +3032,7 @@ const ProductEdit = (props: any) => {
                                                 </label>
                                             )}
                                             <div className=" w-full ">
-                                                <div
-                                                    style={{
-                                                        borderBottom: '1px solid #EAEBED',
-                                                        paddingBottom: '15px',
-                                                        marginBottom: '15px',
-                                                    }}
-                                                >
+                                                <div>
                                                     {productPreview?.description?.blocks?.length > 0 && (
                                                         <div
                                                             style={{
@@ -3014,7 +3041,7 @@ const ProductEdit = (props: any) => {
                                                                 cursor: 'pointer',
                                                             }}
                                                         >
-                                                            <div className={`${productPreview?.description ? 'theme-color' : ''}`}>MAINTENANCE TIPS</div>
+                                                            <div className={`${productPreview?.description ? 'theme-color' : ''}`}>Product Details</div>
                                                             {/* <div>{productPreview.description ? '▲' : '▼'}</div> */}
                                                         </div>
                                                     )}
@@ -3067,7 +3094,7 @@ const ProductEdit = (props: any) => {
                                                                 cursor: 'pointer',
                                                             }}
                                                         >
-                                                            <div>ADDITIONAL INFORMATION</div>
+                                                            <div>Additional Information</div>
                                                             {/* <div>▲</div> */}
                                                         </div>
                                                         <ul
@@ -3091,6 +3118,92 @@ const ProductEdit = (props: any) => {
                                                         </ul>
                                                     </div>
                                                 )}
+
+                                                {productPreview?.priceBreakup && (
+                                                    <div
+                                                        style={{
+                                                            borderBottom: '1px solid #EAEBED',
+                                                            paddingBottom: '15px',
+                                                            marginBottom: '15px',
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                justifyContent: 'space-between',
+                                                                cursor: 'pointer',
+                                                            }}
+                                                        >
+                                                            <div>About Brand</div>
+                                                            {/* <div>▲</div> */}
+                                                        </div>
+                                                        <ul
+                                                            style={{
+                                                                listStyleType: 'none',
+                                                                paddingTop: '10px',
+                                                                // gap: 5,
+                                                            }}
+                                                        >
+                                                            <div className="flex flex-wrap gap-3" key={productPreview?.brand?.id}>
+                                                                <span style={{ fontWeight: 'bold' }}>{productPreview?.brand?.name} </span>
+
+                                                                <p style={{ color: 'gray', marginBottom: '5px' }}>
+                                                                    {productPreview?.brand?.description && (
+                                                                        <span
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html: productPreview?.brand?.description,
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                </p>
+                                                            </div>
+                                                        </ul>
+                                                    </div>
+                                                )}
+
+                                                {productPreview?.priceBreakup && (
+                                                    <div
+                                                        style={{
+                                                            borderBottom: '1px solid #EAEBED',
+                                                            paddingBottom: '15px',
+                                                            marginBottom: '15px',
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                justifyContent: 'space-between',
+                                                                cursor: 'pointer',
+                                                            }}
+                                                        >
+                                                            <div>Price Breakup</div>
+                                                            {/* <div>▲</div> */}
+                                                        </div>
+                                                        <ul
+                                                            style={{
+                                                                listStyleType: 'none',
+                                                                paddingTop: '10px',
+                                                                // gap: 5,
+                                                            }}
+                                                        >
+                                                            <div className="flex flex-wrap gap-3">
+                                                                <div dangerouslySetInnerHTML={{ __html: productPreview?.priceBreakup }}></div>
+                                                                {/* <span style={{ fontWeight: 'bold' }}>{productPreview?.brand?.name}  </span>
+
+                                                                     <p style={{ color: 'gray', marginBottom: '5px' }}>
+                                                                            {productPreview?.brand?.description && (
+                                                                                <span
+                                                                                    dangerouslySetInnerHTML={{
+                                                                                        __html: productPreview?.brand?.description,
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                        </p> */}
+                                                            </div>
+                                                        </ul>
+                                                    </div>
+                                                )}
+
                                                 {productPreview?.variants?.length > 0 && productPreview?.variants[0]?.sku !== '' && (
                                                     <div className="flex flex-wrap gap-3">
                                                         <span style={{ fontWeight: 'bold' }}>SKU : </span>
@@ -3136,11 +3249,11 @@ const ProductEdit = (props: any) => {
                                             <div className="flex gap-4 overflow-x-scroll">
                                                 {productPreview?.youMayLike?.map((item, index) => (
                                                     <div className=" flex flex-col items-center ">
-                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden p-2 rounded-xl" onClick={() => setPreviewSelectedImg(item?.url)}>
+                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden rounded-xl p-2" onClick={() => setPreviewSelectedImg(item?.url)}>
                                                             {item?.image ? (
-                                                                <img src={item?.image} alt="image" className="object-contain rounded-xl" />
+                                                                <img src={item?.image} alt="image" className="rounded-xl object-contain" />
                                                             ) : (
-                                                                <img src={'/assets/images/placeholder.png'} alt="image" className="object-contain rounded-xl" />
+                                                                <img src={'/assets/images/placeholder.png'} alt="image" className="rounded-xl object-contain" />
                                                             )}
                                                         </div>
                                                         <div>{item?.name}</div>
@@ -3159,14 +3272,14 @@ const ProductEdit = (props: any) => {
                                             <div className="flex gap-4 overflow-x-scroll">
                                                 {productPreview?.relateProducts?.map((item, index) => (
                                                     <div className=" flex flex-col items-center ">
-                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden p-2 rounded-xl" onClick={() => setPreviewSelectedImg(item?.url)}>
+                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden rounded-xl p-2" onClick={() => setPreviewSelectedImg(item?.url)}>
                                                             {item?.image ? (
-                                                                <img src={item?.image} alt="image" className="object-contain rounded-xl" />
+                                                                <img src={item?.image} alt="image" className="rounded-xl object-contain" />
                                                             ) : (
-                                                                <img src={'/assets/images/placeholder.png'} alt="image" className="object-contain rounded-xl" />
+                                                                <img src={'/assets/images/placeholder.png'} alt="image" className="rounded-xl object-contain" />
                                                             )}
                                                         </div>
-                                                        <div className='text-center'>{item?.name}</div>
+                                                        <div className="text-center">{item?.name}</div>
                                                         <div>₹{addCommasToNumber(item?.price)}</div>
                                                     </div>
                                                 ))}

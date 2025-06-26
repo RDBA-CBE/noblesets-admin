@@ -163,7 +163,7 @@ const EditCoupon = () => {
                 startDate: formatDateTimeLocal(data?.startDate),
                 couponValue: data?.type == 'SHIPPING' ? null : data?.channelListings[1]?.discountValue,
                 usageValue: data?.usageLimit,
-                specificInfo: data?.type == 'SPECIFIC_PRODUCT' ? { value: 'Specific products', label: 'Specific products' } : { value: 'All products', label: 'All products' },
+                // specificInfo: data?.type == 'SPECIFIC_PRODUCT' ? { value: 'Specific products', label: 'Specific products' } : { value: 'All products', label: 'All products' },
                 minimumReq:
                     data?.channelListings[1]?.minSpent == null
                         ? { value: 'None', label: 'None' }
@@ -323,7 +323,7 @@ const EditCoupon = () => {
                 endDate: state.isEndDate ? state.endDate : null,
                 minCheckoutItemsQuantity: state.minimumReq?.value == 'Minimum quantity of items' ? state.minimumReqValue : 0,
                 startDate: state.startDate,
-                type: state.codeType?.value == 'Free Shipping' ? 'SHIPPING' : state.specificInfo?.value == 'Specific products' ? 'SPECIFIC_PRODUCT' : 'ENTIRE_ORDER',
+                type: state.codeType?.value == 'Free Shipping' ? 'SHIPPING' : 'SPECIFIC_PRODUCT',
                 usageLimit: state.usageLimit?.value == 'Limit number of times this discount can be used in total' ? (state.usageValue ? state.usageValue : null) : null,
                 singleUse: state.usageLimit?.value == 'Limit to voucher code use once' ? true : false,
                 autoApply: state?.autoApply,
@@ -387,16 +387,9 @@ const EditCoupon = () => {
                     updateMetaData(id);
                 }
 
-                if (state.specificInfo?.value == 'Specific products') {
-                    extraDatas(id);
-                }
-                if (state.specificInfo?.value == 'All products') {
-                    setState({ selectedExcludeCategory: [], selectedCategory: [], selectedProduct: [] });
-                    router.push(`/coupon`);
-                    Success('Coupon updated Successfully');
-                }
+                extraDatas(id);
 
-                if (state.description == '' && state.specificInfo?.value != 'Specific products') {
+                if (state.description == '' ) {
                     router.push(`/coupon`);
                     Success('Coupon updated Successfully');
                 }
@@ -590,7 +583,7 @@ const EditCoupon = () => {
                             columns={[
                                 {
                                     accessor: 'code',
-                                    
+
                                     render: (row, index) => {
                                         return (
                                             <>
@@ -601,7 +594,7 @@ const EditCoupon = () => {
                                 },
                                 {
                                     accessor: 'status',
-                                    
+
                                     render: (row, index) => {
                                         return (
                                             <>
@@ -767,7 +760,7 @@ const EditCoupon = () => {
                         <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                             Coupon Specific Information
                         </label>
-                        <Select
+                        {/* <Select
                             placeholder="Minimum Requirements"
                             options={state.specificInfoOption}
                             value={state.specificInfo}
@@ -775,27 +768,26 @@ const EditCoupon = () => {
                                 setState({ specificInfo: e });
                             }}
                             isSearchable={false}
-                        />
+                        /> */}
                     </div>
-                    {state.specificInfo?.value == 'Specific products' && (
-                        <>
-                            <div className="mt-5 flex w-full gap-5">
-                                <div className="col-6 md:w-6/12">
-                                    {/* <ProductSelect
+                    <>
+                        <div className="mt-5 flex w-full gap-5">
+                            <div className="col-6 md:w-6/12">
+                                {/* <ProductSelect
                                         queryFunc={fetchProducts}
                                         selectedCategory={state.selectedProduct}
                                         onCategoryChange={(data) => setState({ selectedProduct: data })}
                                         loading={productLoading}
                                     /> */}
 
-                                    <ProductSelect
-                                        loading={productLoading}
-                                        queryFunc={fetchProducts}
-                                        selectedCategory={state.selectedProduct}
-                                        onCategoryChange={(data) => setState({ selectedProduct: data })}
-                                    />
+                                <ProductSelect
+                                    loading={productLoading}
+                                    queryFunc={fetchProducts}
+                                    selectedCategory={state.selectedProduct}
+                                    onCategoryChange={(data) => setState({ selectedProduct: data })}
+                                />
 
-                                    {/* 
+                                {/* 
                                     <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                                         Products
                                     </label>
@@ -809,9 +801,9 @@ const EditCoupon = () => {
                                         isClearable
                                         onInputChange={(inputValue) => setState({ searchProduct: inputValue })}
                                     /> */}
-                                </div>
-                                <div className="col-6 md:w-6/12">
-                                    {/* <label htmlFor="name" className="block text-lg font-medium text-gray-700">
+                            </div>
+                            <div className="col-6 md:w-6/12">
+                                {/* <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                                         Categories
                                     </label>
                                     <Select
@@ -823,30 +815,30 @@ const EditCoupon = () => {
                                         isMulti={true}
                                     /> */}
 
-                                    <CategorySelect
-                                        queryFunc={fetchCategories} // Pass the function to fetch categories
-                                        selectedCategory={state.selectedCategory} // Use 'selectedCategory' instead of 'value'
-                                        onCategoryChange={(data) => setState({ selectedCategory: data })} // Use 'onCategoryChange' instead of 'onChange'
-                                        placeholder="Select categories"
-                                    />
-                                    {/* <CategorySelect
+                                <CategorySelect
+                                    queryFunc={fetchCategories} // Pass the function to fetch categories
+                                    selectedCategory={state.selectedCategory} // Use 'selectedCategory' instead of 'value'
+                                    onCategoryChange={(data) => setState({ selectedCategory: data })} // Use 'onCategoryChange' instead of 'onChange'
+                                    placeholder="Select categories"
+                                />
+                                {/* <CategorySelect
                                         queryFunc={fetchCategories} // Pass the function to fetch categories
                                         value={state.selectedCategory} // Selected categories
                                         onChange={(data: any) => setState({ selectedCategory: data })}
                                         // Handle category change
                                         placeholder="Select categories"
                                     /> */}
-                                </div>
                             </div>
-                            <div className="col-6 mt-5 md:w-6/12">
-                                <CategorySelect
-                                    queryFunc={fetchCategories} // Pass the function to fetch categories
-                                    selectedCategory={state.selectedExcludeCategory} // Use 'selectedCategory' instead of 'value'
-                                    onCategoryChange={(data) => setState({ selectedExcludeCategory: data })} // Use 'onCategoryChange' instead of 'onChange'
-                                    placeholder="Select categories"
-                                    title="Exclude Categories"
-                                />
-                                {/* <label htmlFor="name" className="block text-lg font-medium text-gray-700">
+                        </div>
+                        <div className="col-6 mt-5 md:w-6/12">
+                            <CategorySelect
+                                queryFunc={fetchCategories} // Pass the function to fetch categories
+                                selectedCategory={state.selectedExcludeCategory} // Use 'selectedCategory' instead of 'value'
+                                onCategoryChange={(data) => setState({ selectedExcludeCategory: data })} // Use 'onCategoryChange' instead of 'onChange'
+                                placeholder="Select categories"
+                                title="Exclude Categories"
+                            />
+                            {/* <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                                     Exclude Categories
                                 </label>
                                 <Select
@@ -858,9 +850,8 @@ const EditCoupon = () => {
                                     isMulti={true}
                                     title="Exclude Categories"
                                 /> */}
-                            </div>
-                        </>
-                    )}
+                        </div>
+                    </>
                 </div>
             )}
 

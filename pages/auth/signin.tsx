@@ -130,7 +130,7 @@ const LoginBoxed = () => {
 
             <div className="absolute inset-0">
                 <div className='flex justify-center'>
-                    <img className="w-100  ltr:-ml-1 rtl:-mr-1 mt-5" src="/assets/images/logo.png" alt="logo" />
+                    <img className="w-100  ltr:-ml-1 rtl:-mr-1 mt-5 xl:mt-20" src="/assets/images/logo.png" alt="logo" />
                 </div>
             </div>
 
@@ -140,7 +140,7 @@ const LoginBoxed = () => {
                 <img src="/assets/images/auth/coming-soon-object3.png" alt="image" className="absolute right-0 top-0 h-[300px]" />
                 <img src="/assets/images/auth/polygon-object.svg" alt="image" className="absolute bottom-0 end-[28%]" /> */}
                 <div className="relative w-full max-w-[600px]  p-2 dark:bg-[linear-gradient(52.22deg,#0E1726_0%,rgba(14,23,38,0)_18.66%,rgba(14,23,38,0)_51.04%,rgba(14,23,38,0)_80.07%,#0E1726_100%)]">
-                    <div className="relative flex flex-col justify-center rounded-[30px] bg-[#fff] px-6 py-20  dark:bg-black/50 lg:min-h-[500px]">
+                    <div className="relative flex flex-col  rounded-[30px] bg-[#fff] px-6 py-10  dark:bg-black/50 lg:min-h-[400px]">
                         <div className="absolute end-6 top-6">
                             <div className="dropdown">
                                 {flag && (

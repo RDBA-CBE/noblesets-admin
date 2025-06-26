@@ -100,6 +100,7 @@ import SizeGuideSelect from '@/components/Layouts/SizeGuideSelect';
 import DynamicSizeTable from '@/components/Layouts/DynamicTable';
 import Link from 'next/link';
 import { CREATE_PRICE_BREAKUP } from '@/query/priceBreakUp';
+import ProductTabs from '@/components/Layouts/ProductTabs';
 
 const ProductAdd = () => {
     const router = useRouter();
@@ -125,6 +126,7 @@ const ProductAdd = () => {
     const [mediaEndCursor, setMediaEndCursor] = useState('');
     const [mediaHasNextPage, setMediaHasNextPage] = useState(false);
     const [mediaPreviousPage, setMediaPreviousPage] = useState(false);
+    const [activeTab, setActiveTab] = useState('Product Details');
 
     useEffect(() => {
         setIsMounted(true);
@@ -659,7 +661,14 @@ const ProductAdd = () => {
                 id: selectedSizeGuide?.value,
             });
             sizeguide = res?.data?.sizeGuid;
+        }
 
+        let minPrice = null;
+        let maxPrice = null;
+        if (variants.length > 1) {
+            const prices = variants.map((product) => product.regularPrice);
+             minPrice = Math.min(...prices); 
+             maxPrice = Math.max(...prices);
         }
 
         const data = {
@@ -671,6 +680,8 @@ const ProductAdd = () => {
             description: savedContent,
             category: selectedCat,
             variants,
+            minPrice:minPrice,
+            maxPrice:maxPrice,
             collection: selectedCollection,
             tags: selectedTag,
             upsell: selectedUpsell,
@@ -2871,71 +2882,97 @@ const ProductAdd = () => {
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel as="div" className="panel my-8 w-[70%] overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
+                                <Dialog.Panel as="div" className="panel my-8 w-[95%] overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark xl:w-[70%]">
                                     <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
                                         <div className="text-lg font-bold">Preview</div>
                                         <button type="button" className="text-white-dark hover:text-dark" onClick={() => setIsOpenPreview(false)}>
                                             <IconX />
                                         </button>
                                     </div>
-                                    <div className="flex h-full w-full justify-center gap-3">
-                                        <div className="panel flex  h-[600px] w-2/12 flex-col items-center overflow-scroll">
-                                            {productPreview?.image?.length > 0 ? (
-                                                <div className="overflow-auto">
-                                                    {productPreview?.image?.map((item, index) => (
-                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden p-2" onClick={() => setPreviewSelectedImg(item)}>
-                                                            <img src={item} alt="image" className="object-contain" />
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <div className="h-100 w-[200px] cursor-pointer overflow-hidden p-2">
-                                                    <img src={'/assets/images/placeholder.png'} alt="image" className="object-contain" />
-                                                </div>
-                                            )}
+                                    <div className="my-4 flex h-full w-full justify-center gap-3">
+                                        <div
+                                            className=" scrollbar-hide flex  h-[500px] w-1/12 flex-col items-center overflow-scroll rounded-xl p-0"
+                                            style={{ overflowY: 'scroll', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                                        >
+                                            {
+                                                productPreview?.image?.length > 1 && (
+                                                    <div className="overflow-auto">
+                                                        {productPreview?.image?.map((item, index) => (
+                                                            <div key={index} className="mb-2 h-auto w-[100%] cursor-pointer overflow-hidden rounded-xl" onClick={() => setPreviewSelectedImg(item)}>
+                                                                <img src={item} alt="image" className="object-contain" />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )
+                                                // : (
+                                                //     <div className="h-100 w-[200px] cursor-pointer overflow-hidden p-2">
+                                                //         <img src={'/assets/images/placeholder.png'} alt="image" className="object-contain" />
+                                                //     </div>
+                                                // )
+                                            }
                                         </div>
                                         {productPreview?.image?.length > 0 ? (
-                                            <div className="panel h-[500px] w-4/12">
-                                                <img src={previewSelectedImg ? previewSelectedImg : productPreview?.image[0]} alt="image" style={{ width: '100%', height: '100%' }} />
+                                            <div className=" h-[500px] w-4/12 rounded-xl p-0">
+                                                <img
+                                                    className="rounded-xl"
+                                                    src={previewSelectedImg ? previewSelectedImg : productPreview?.image[0]}
+                                                    alt="image"
+                                                    style={{ width: '100%', height: '100%' }}
+                                                />
                                             </div>
                                         ) : (
-                                            <div className="panel h-[500px] w-4/12">
+                                            <div className="panel h-[100%] w-4/12">
                                                 <img src={'/assets/images/placeholder.png'} alt="image" style={{ width: '100%', height: '100%' }} />
                                             </div>
                                         )}
 
-                                        <div className="panel h-full w-5/12">
-                                            {productPreview?.name && (
-                                                <label htmlFor="name" className="block text-2xl font-medium text-gray-700">
-                                                    {productPreview?.name}
-                                                </label>
-                                            )}
-                                            {productPreview?.variants?.length > 0 && (
-                                                <div className="flex flex-wrap gap-4">
-                                                    {productPreview?.variants?.map(
-                                                        (item, index) =>
-                                                            item?.regularPrice !== 0 && (
-                                                                <label key={index} htmlFor="name" className="block text-2xl font-medium text-gray-700">
-                                                                    ₹{addCommasToNumber(item?.regularPrice)}
-                                                                </label>
-                                                            )
-                                                    )}
-                                                </div>
-                                            )}
-                                            {productPreview?.shortDescription && (
-                                                <label htmlFor="name" className="text-md block font-medium text-gray-700">
-                                                    {productPreview?.shortDescription}
-                                                </label>
-                                            )}
-                                            <div className="panel w-full ">
-                                                <div
+                                        <div className="scrollbar-hide scrollbar-thin h-[500px] w-5/12 overflow-y-scroll">
+                                            <div className=" mb-3 w-full rounded-lg bg-[#f5f5f5] p-4">
+                                                {productPreview?.name && (
+                                                    <label htmlFor="name" className="block text-2xl font-medium text-gray-700">
+                                                        {productPreview?.name}
+                                                    </label>
+                                                )}
+                                                {productPreview?.variants?.length > 1 ? (
+                                                    <div className="flex flex-wrap gap-4">
+                                                        <label htmlFor="name" className="block text-2xl font-bold text-[#b4633a]">
+                                                            ₹{addCommasToNumber(productPreview?.minPrice)} -
+                                                        </label>
+                                                        <label htmlFor="name" className="block text-2xl font-bold text-[#b4633a]">
+                                                            ₹{addCommasToNumber(productPreview?.maxPrice)}
+                                                        </label>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex flex-wrap gap-4">
+                                                        {/* {productPreview?.variants?.map(
+                                                                                                            (item, index) => ( */}
+
+                                                        <label htmlFor="name" className="block text-2xl font-bold text-[#b4633a]">
+                                                            ₹{addCommasToNumber(productPreview?.variants[0]?.salePrice)}
+                                                        </label>
+                                                        {/* )
+                                                                                                            
+                                                                                                        )} */}
+                                                    </div>
+                                                )}
+                                                {productPreview?.shortDescription && (
+                                                    <label htmlFor="name" className="text-md block text-[14px] font-medium text-gray-700">
+                                                        {productPreview?.shortDescription}
+                                                    </label>
+                                                )}
+                                            </div>
+
+                                            <div className="mb-3 w-full rounded-lg bg-[#f5f5f5] p-4">
+                                                <ProductTabs productPreview={productPreview} />
+
+                                                {/* <div
                                                     style={{
                                                         borderBottom: '1px solid #EAEBED',
                                                         paddingBottom: '15px',
                                                         marginBottom: '15px',
                                                     }}
-                                                >
-                                                    {productPreview?.description?.blocks?.length > 0 && (
+                                                > */}
+                                                {/* {productPreview?.description?.blocks?.length > 0 && (
                                                         <div
                                                             style={{
                                                                 display: 'flex',
@@ -2944,7 +2981,6 @@ const ProductAdd = () => {
                                                             }}
                                                         >
                                                             <div className={`${productPreview?.description ? 'theme-color' : ''}`}>MAINTENANCE TIPS</div>
-                                                            {/* <div>{productPreview.description ? '▲' : '▼'}</div> */}
                                                         </div>
                                                     )}
                                                     {productPreview?.description && (
@@ -2979,9 +3015,9 @@ const ProductAdd = () => {
                                                                 </div>
                                                             ))}
                                                         </>
-                                                    )}
-                                                </div>
-                                                {productPreview?.attributes?.length > 0 && (
+                                                    )} */}
+
+                                                {/* {productPreview?.attributes?.length > 0 && (
                                                     <div
                                                         style={{
                                                             borderBottom: '1px solid #EAEBED',
@@ -2997,13 +3033,11 @@ const ProductAdd = () => {
                                                             }}
                                                         >
                                                             <div>ADDITIONAL INFORMATION</div>
-                                                            {/* <div>▲</div> */}
                                                         </div>
                                                         <ul
                                                             style={{
                                                                 listStyleType: 'none',
                                                                 paddingTop: '10px',
-                                                                // gap: 5,
                                                             }}
                                                         >
                                                             {productPreview?.attributes?.map((key: any) => (
@@ -3037,36 +3071,31 @@ const ProductAdd = () => {
                                                             }}
                                                         >
                                                             <div>About Brand</div>
-                                                            {/* <div>▲</div> */}
                                                         </div>
                                                         <ul
                                                             style={{
                                                                 listStyleType: 'none',
                                                                 paddingTop: '10px',
-                                                                // gap: 5,
                                                             }}
                                                         >
-                                                            
-                                                                <div className="flex flex-wrap gap-3" key={productPreview?.brand?.id}>
-                                                                    <span style={{ fontWeight: 'bold' }}>{productPreview?.brand?.name}  </span>
+                                                            <div className="flex flex-wrap gap-3" key={productPreview?.brand?.id}>
+                                                                <span style={{ fontWeight: 'bold' }}>{productPreview?.brand?.name} </span>
 
-                                                                     <p style={{ color: 'gray', marginBottom: '5px' }}>
-                                                                            {productPreview?.brand?.description && (
-                                                                                <span
-                                                                                    dangerouslySetInnerHTML={{
-                                                                                        __html: productPreview?.brand?.description,
-                                                                                    }}
-                                                                                />
-                                                                            )}
-                                                                        </p>
-                                                                    
-                                                                </div>
-                                                      
+                                                                <p style={{ color: 'gray', marginBottom: '5px' }}>
+                                                                    {productPreview?.brand?.description && (
+                                                                        <span
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html: productPreview?.brand?.description,
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                </p>
+                                                            </div>
                                                         </ul>
                                                     </div>
                                                 )}
 
-                                                                                                {productPreview?.priceBreakup && (
+                                                {productPreview?.priceBreakup && (
                                                     <div
                                                         style={{
                                                             borderBottom: '1px solid #EAEBED',
@@ -3082,41 +3111,29 @@ const ProductAdd = () => {
                                                             }}
                                                         >
                                                             <div>Price Breakup</div>
-                                                            {/* <div>▲</div> */}
                                                         </div>
                                                         <ul
                                                             style={{
                                                                 listStyleType: 'none',
                                                                 paddingTop: '10px',
-                                                                // gap: 5,
                                                             }}
                                                         >
-                                                            
-                                                                <div className="flex flex-wrap gap-3" >
-                                                                    <div dangerouslySetInnerHTML={{__html:productPreview?.priceBreakup}}></div>
-                                                                    {/* <span style={{ fontWeight: 'bold' }}>{productPreview?.brand?.name}  </span>
-
-                                                                     <p style={{ color: 'gray', marginBottom: '5px' }}>
-                                                                            {productPreview?.brand?.description && (
-                                                                                <span
-                                                                                    dangerouslySetInnerHTML={{
-                                                                                        __html: productPreview?.brand?.description,
-                                                                                    }}
-                                                                                />
-                                                                            )}
-                                                                        </p> */}
-                                                                    
-                                                                </div>
-                                                      
+                                                            <div className="flex flex-wrap gap-3">
+                                                                <div dangerouslySetInnerHTML={{ __html: productPreview?.priceBreakup }}></div>
+                                                            </div>
                                                         </ul>
                                                     </div>
-                                                )}
+                                                )} */}
+                                            </div>
 
+                                            <div className="mb-3 w-full rounded-lg bg-[#f5f5f5] p-4">
                                                 {productPreview?.variants?.length > 0 && productPreview?.variants[0]?.sku !== '' && (
                                                     <div className="flex flex-wrap gap-3">
-                                                        <span style={{ fontWeight: 'bold' }}>SKU : </span>
+                                                        <span className="text-[14px]" style={{ fontWeight: 'bold' }}>
+                                                            SKU :{' '}
+                                                        </span>
                                                         {productPreview?.variants?.map((item, index) => (
-                                                            <span key={item?.value} style={{ marginRight: '3px', cursor: 'pointer' }}>
+                                                            <span className="text-[14px]" key={item?.value} style={{ marginRight: '3px', cursor: 'pointer' }}>
                                                                 {item?.sku}
                                                                 {index < productPreview?.variants?.length - 1 ? ', ' : ''}
                                                             </span>
@@ -3125,9 +3142,11 @@ const ProductAdd = () => {
                                                 )}
                                                 {productPreview?.category?.length > 0 && (
                                                     <div className="flex flex-wrap  gap-2 pt-2">
-                                                        <span style={{ fontWeight: 'bold' }}>Categories : </span>
+                                                        <span className="text-[14px]" style={{ fontWeight: 'bold' }}>
+                                                            Categories :{' '}
+                                                        </span>
                                                         {productPreview?.category?.map((item, index) => (
-                                                            <span key={item?.value} style={{ marginRight: '3px', cursor: 'pointer' }}>
+                                                            <span className="text-[14px]" key={item?.value} style={{ marginRight: '3px', cursor: 'pointer' }}>
                                                                 {item?.label}
                                                                 {index < productPreview?.category?.length - 1 ? ', ' : ''}
                                                             </span>
@@ -3137,9 +3156,11 @@ const ProductAdd = () => {
 
                                                 {productPreview?.tags?.length > 0 && (
                                                     <div className="flex flex-wrap  gap-2 pt-2">
-                                                        <span style={{ fontWeight: 'bold' }}>Tags : </span>
+                                                        <span className="text-[14px]" style={{ fontWeight: 'bold' }}>
+                                                            Tags :{' '}
+                                                        </span>
                                                         {productPreview?.tags?.map((item, index) => (
-                                                            <span key={item?.value} style={{ marginRight: '3px', cursor: 'pointer' }}>
+                                                            <span className="text-[14px]" key={item?.value} style={{ marginRight: '3px', cursor: 'pointer' }}>
                                                                 {item?.label}
                                                                 {index < productPreview?.tags?.length - 1 ? ', ' : ''}
                                                             </span>
@@ -3149,22 +3170,23 @@ const ProductAdd = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    {productPreview?.youMayLike?.length > 0 && (
-                                        <div className="p-5">
+
+                                    {productPreview?.relateProducts?.length > 0 && (
+                                        <div className="m-auto mt-8 w-[90%] p-5">
                                             <div className="mb-5  border-b border-gray-200 pb-2">
-                                                <h5 className=" block text-lg font-medium text-gray-700">You May Also Like ..</h5>
+                                                <h5 className=" block text-lg font-medium text-gray-700">Related Products</h5>
                                             </div>
                                             <div className="flex gap-4 overflow-x-scroll">
-                                                {productPreview?.youMayLike?.map((item, index) => (
+                                                {productPreview?.relateProducts?.map((item, index) => (
                                                     <div className=" flex flex-col items-center ">
-                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden p-2" onClick={() => setPreviewSelectedImg(item?.url)}>
+                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden rounded-xl p-2" onClick={() => setPreviewSelectedImg(item?.url)}>
                                                             {item?.image ? (
-                                                                <img src={item?.image} alt="image" className="object-contain" />
+                                                                <img src={item?.image} alt="image" className="rounded-xl object-contain" />
                                                             ) : (
-                                                                <img src={'/assets/images/placeholder.png'} alt="image" className="object-contain" />
+                                                                <img src={'/assets/images/placeholder.png'} alt="image" className="rounded-xl object-contain" />
                                                             )}
                                                         </div>
-                                                        <div>{item?.name}</div>
+                                                        <div className="w-[200px] text-center"> {item?.name}</div>
                                                         <div>₹{addCommasToNumber(item?.price)}</div>
                                                     </div>
                                                 ))}
@@ -3172,22 +3194,22 @@ const ProductAdd = () => {
                                         </div>
                                     )}
 
-                                    {productPreview?.relateProducts?.length > 0 && (
-                                        <div className="p-5">
+                                    {productPreview?.youMayLike?.length > 0 && (
+                                        <div className="m-auto w-[90%] p-5 ">
                                             <div className="mb-5  border-b border-gray-200 pb-2">
-                                                <h5 className=" block text-lg font-medium text-gray-700">Related Products</h5>
+                                                <h5 className=" block text-lg font-medium text-gray-700">You May Also Like ..</h5>
                                             </div>
                                             <div className="flex gap-4 overflow-x-scroll">
-                                                {productPreview?.relateProducts?.map((item, index) => (
+                                                {productPreview?.youMayLike?.map((item, index) => (
                                                     <div className=" flex flex-col items-center ">
-                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden p-2" onClick={() => setPreviewSelectedImg(item?.url)}>
+                                                        <div key={index} className="h-100 w-[200px] cursor-pointer overflow-hidden rounded-xl p-2" onClick={() => setPreviewSelectedImg(item?.url)}>
                                                             {item?.image ? (
-                                                                <img src={item?.image} alt="image" className="object-contain" />
+                                                                <img src={item?.image} alt="image" className="rounded-xl object-contain" />
                                                             ) : (
-                                                                <img src={'/assets/images/placeholder.png'} alt="image" className="object-contain" />
+                                                                <img src={'/assets/images/placeholder.png'} alt="image" className="rounded-xl object-contain" />
                                                             )}
                                                         </div>
-                                                        <div>{item?.name}</div>
+                                                        <div className="w-[200px] text-center">{item?.name}</div>
                                                         <div>₹{addCommasToNumber(item?.price)}</div>
                                                     </div>
                                                 ))}

@@ -114,13 +114,16 @@ export const Success = (message: string) => {
         position: 'top',
         showConfirmButton: false,
         timer: 3000,
+        
         // Merge provided options with default options
     });
 
     toast.fire({
         icon: 'success',
         title: message,
-        padding: '10px 20px',
+        padding: '5px 10px',
+   
+        
     });
 };
 
@@ -136,7 +139,7 @@ export const Failure = (message: string) => {
     toast.fire({
         icon: 'error',
         title: message,
-        padding: '10px 20px',
+       padding: '5px 10px',
     });
 };
 

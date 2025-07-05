@@ -12,6 +12,9 @@ import { COUPON_CHANNEL_UPDATE, COUPON_META_DATA, CREATE_COUPEN } from '@/query/
 import { Description } from '@headlessui/react/dist/components/description/description';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import IconLoader from '@/components/Icon/IconLoader';
+import DateTimeField from '@/components/DateTimePicker';
+import dayjs from 'dayjs';
+import moment from 'moment';
 
 const CreateCoupon = () => {
     const router = useRouter();
@@ -45,7 +48,7 @@ const CreateCoupon = () => {
         minimumReqValue: '',
         usageValue: '',
         isEndDate: false,
-        startDate: new Date().toISOString().slice(0, 16),
+        startDate: dayjs().toISOString(),
         endDate: '',
         description: '',
         codeType: { value: 'Fixed Amount', label: 'Fixed Amount' },
@@ -138,8 +141,12 @@ const CreateCoupon = () => {
             if (generatedCodes.length === 0) {
                 errors.generatedCodesError = 'At least one coupon code is required';
             }
-            if (codeType.value !== 'Free Shipping' && !couponValue) {
-                errors.couponValueError = 'Coupon value is required';
+            if (codeType.value !== 'Free Shipping') {
+                if (!couponValue && couponValue !== 0) {  // Checks for null/undefined/empty string
+                    errors.couponValueError = 'Coupon value is required';
+                } else if (couponValue <= 0) {
+                    errors.couponValueError = 'Coupon value must be greater than 0';
+                }
             }
             if (minimumReq.value !== 'None' && !minimumReqValue) {
                 errors.minimumReqValueError = 'Minimum requirement value is required';
@@ -166,9 +173,9 @@ const CreateCoupon = () => {
                 onlyForStaff: usageLimit.value === 'Limit to staff only',
                 addCodes: generatedCodes,
                 discountValueType: codeType.value === 'Fixed Amount' ? 'FIXED' : 'PERCENTAGE',
-                endDate: isEndDate ? endDate : null,
+                endDate: isEndDate ? dayjs(endDate).toISOString() : null,
                 minCheckoutItemsQuantity: minimumReq.value === 'Minimum quantity of items' ? minimumReqValue : 0,
-                startDate: startDate,
+                startDate: dayjs(startDate).toISOString(),
                 type: codeType.value === 'Free Shipping' ? 'SHIPPING' : 'ENTIRE_ORDER',
                 usageLimit: usageLimit.value === 'Limit number of times this discount can be used in total' ? (usageValue ? usageValue : null) : null,
                 singleUse: usageLimit.value === 'Limit to voucher code use once',
@@ -335,7 +342,7 @@ const CreateCoupon = () => {
                             columns={[
                                 {
                                     accessor: 'code',
-                                    
+
                                     render: (row, index) => {
                                         return (
                                             <>
@@ -346,7 +353,7 @@ const CreateCoupon = () => {
                                 },
                                 {
                                     accessor: 'status',
-                                    
+
                                     render: (row, index) => {
                                         return (
                                             <>
@@ -568,11 +575,18 @@ const CreateCoupon = () => {
             <div className="panel">
                 <div className=" flex w-full gap-5 pt-5">
                     <div className="col-6 md:w-6/12">
-                        <label htmlFor="name" className="block text-lg font-medium text-gray-700">
-                            Active Dates
-                        </label>
-
-                        <input
+                        {/* <label htmlFor="name" className="block text-lg font-medium text-gray-700">
+                           
+                        </label> */}
+                        <DateTimeField
+                            label=" Active Dates"
+                            placeholder="Select Date"
+                            className="form-input"
+                            value={state.startDate}
+                            onChange={(e) => setState({ startDate: e, endDate: '' })}
+                            fromDate={new Date()}
+                        />
+                        {/* <input
                             value={state.startDate}
                             onChange={handleStartDateChange}
                             type="datetime-local"
@@ -581,9 +595,9 @@ const CreateCoupon = () => {
                             className="form-input"
                             required
                             min={new Date().toISOString().slice(0, 16)}
-                        />
+                        /> */}
                     </div>
-                    <div className="col-6 flex flex-col  justify-center md:w-6/12">
+                    <div className="col-6 flex flex-col  md:w-6/12">
                         <div className="mb-3 flex items-center gap-3">
                             <input
                                 type="checkbox"
@@ -595,7 +609,9 @@ const CreateCoupon = () => {
                         </div>
                         {state.isEndDate && (
                             <>
-                                <input
+                                <DateTimeField fromDate={state.startDate} label="" placeholder="Select Date" className="form-input" value={state.endDate} onChange={(e) => setState({ endDate: e })} />
+
+                                {/* <input
                                     value={state.endDate}
                                     onChange={handleEndDateChange}
                                     type="datetime-local"
@@ -603,9 +619,9 @@ const CreateCoupon = () => {
                                     name="endDate"
                                     className="form-input"
                                     required
-                                    min={state.startDate}
+                                    min={state.startDate?dayjs(state.startDate):""}
                                     max={new Date(new Date(state.startDate).setFullYear(new Date(state.startDate).getFullYear() + 1)).toISOString().slice(0, 16)}
-                                />
+                                /> */}
                             </>
                         )}
                         {state.errors?.endDateError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.endDateError}</p>}

@@ -108,8 +108,8 @@ const Reports = () => {
         analysisTab: 'Order Analysis',
         orderStartDate: '',
         orderEndDate: '',
-        orderCurrency: 'All Currencies',
-        analysisCurrency: 'All Currencies',
+        orderCurrency: 'INR',
+        analysisCurrency: 'INR',
         tableData: [],
         salesByDate: [],
         productList: [],
@@ -1570,9 +1570,9 @@ const Reports = () => {
                                             orderSubMenu: 'Sales by date',
                                             orderDateFilter: 'Last 7 Days',
                                             dateFilter: 'Last 7 Days',
-                                            orderCurrency: 'All Currencies',
+                                            orderCurrency: 'INR',
                                             analysisTab: 'Order Analysis',
-                                            analysisCurrency: 'All Currencies',
+                                            analysisCurrency: 'INR',
                                             productSearch: '',
                                             analysisDateFilter: 'Last 7 Days',
                                             customerDateFilter: 'Last 7 Days',
@@ -1683,7 +1683,7 @@ const Reports = () => {
                                             </div>
                                         </React.Fragment>
                                     ))}
-                                    {state.orderSubMenu !== 'Coupons by date' && (
+                                    {/* {state.orderSubMenu !== 'Coupons by date' && (
                                         <div className="pl-4">
                                             <select className="form-select w-[180px]" value={state.orderCurrency} onChange={(e) => setState({ orderCurrency: e.target.value })}>
                                                 <option value="All Currencies">All Currencies</option>
@@ -1691,7 +1691,7 @@ const Reports = () => {
                                                 <option value="USD">USD</option>
                                             </select>
                                         </div>
-                                    )}
+                                    )} */}
                                 </div>
 
                                 <div className="flex cursor-pointer gap-2 border p-3" onClick={() => downloadCSV('Orders')}>
@@ -2094,7 +2094,7 @@ const Reports = () => {
                                             </div>
                                         </React.Fragment>
                                     ))}
-                                    {state.analysisTab !== 'Order Analysis' && state.analysisTab !== 'Product by Country' && state.analysisTab !== 'Product Revenue' && (
+                                    {/* {state.analysisTab !== 'Order Analysis' && state.analysisTab !== 'Product by Country' && state.analysisTab !== 'Product Revenue' && (
                                         <div className="pl-4">
                                             <select className="form-select w-[180px]" value={state.analysisCurrency} onChange={(e) => setState({ analysisCurrency: e.target.value })}>
                                                 <option value="All Currencies">All Currencies</option>
@@ -2102,7 +2102,7 @@ const Reports = () => {
                                                 <option value="USD">USD</option>
                                             </select>
                                         </div>
-                                    )}
+                                    )} */}
                                 </div>
                                 <div className="flex cursor-pointer gap-2 border p-3" onClick={() => downloadCSV('Analysis')}>
                                     <IconDownload />

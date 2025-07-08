@@ -114,7 +114,7 @@ export const Success = (message: string) => {
         position: 'top',
         showConfirmButton: false,
         timer: 3000,
-        
+
         // Merge provided options with default options
     });
 
@@ -122,8 +122,6 @@ export const Success = (message: string) => {
         icon: 'success',
         title: message,
         padding: '5px 10px',
-   
-        
     });
 };
 
@@ -139,7 +137,7 @@ export const Failure = (message: string) => {
     toast.fire({
         icon: 'error',
         title: message,
-       padding: '5px 10px',
+        padding: '5px 10px',
     });
 };
 
@@ -1581,6 +1579,10 @@ export const formatKeysArray = (arr) => {
                 formattedKey = 'COD Amount';
             } else if (key === 'Dates') {
                 formattedKey = 'Date';
+            } else if (key === 'discountAmount') {
+                formattedKey = 'Coupon Amount';
+            } else if (key === 'giftcardAmountList') {
+                formattedKey = 'E-Gift Voucher Amount';
             } else {
                 // Remove unwanted characters like '--' or non-alphanumeric characters
                 formattedKey = key
@@ -1642,12 +1644,12 @@ export const generate4DigitRandomNumber = () => {
 };
 
 export const roundIndianRupee = (value) => {
-    const num = Number(value.toString().replace(/,/g, ""));
+    const num = Number(value.toString().replace(/,/g, ''));
     if (isNaN(num)) return String(value);
-  
+
     const integerPart = Math.floor(num);
     const decimalPart = num - integerPart;
     const rounded = decimalPart > 0.5 ? Math.ceil(num) : Math.floor(num);
-  
+
     return rounded;
-  };
+};

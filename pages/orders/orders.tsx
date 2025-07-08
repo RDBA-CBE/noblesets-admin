@@ -18,6 +18,7 @@ import Link from 'next/link';
 import OrderQuickEdit from '@/components/orderQuickEdit';
 import Modal from '@/components/Modal';
 import IconLoader from '@/components/Icon/IconLoader';
+import DateTimeField from '@/components/DateTimePicker';
 
 const PAGE_SIZE = 10;
 
@@ -55,7 +56,7 @@ const AbandonedCarts = () => {
     const [status, setStatus] = useState(null);
     const [endDate, setEndDate] = useState('');
     const [expandedRow, setExpandedRows] = useState(null);
-    const [startDate, setStartDate] = useState(getCurrentDateTime());
+    const [startDate, setStartDate] = useState('');
 
     const [draftOrder, { loading: draftLoading }] = useMutation(CREATE_DRAFT_ORDER);
 
@@ -338,7 +339,7 @@ const AbandonedCarts = () => {
 
     const filterByDates = async (e: any) => {
         try {
-            setEndDate(e);
+            setEndDate(dayjs(e).format('YYYY-MM-DD HH:mm:ss'));
 
             const response = {
                 gte: startDate,
@@ -459,10 +460,21 @@ const AbandonedCarts = () => {
                 {duration == 'custom' && (
                     <div className="flex space-x-4 pb-4">
                         <div className="col-span-4">
-                            <label htmlFor="dateTimeCreated" className="block pr-2 text-sm font-medium text-gray-700">
+                            {/* <label htmlFor="dateTimeCreated" className="block pr-2 text-sm font-medium text-gray-700">
                                 Start Date:
-                            </label>
-                            <input
+                            </label> */}
+                            <DateTimeField
+                                label=""
+                                placeholder="Select Date"
+                                className="form-select"
+                                value={startDate}
+                                onChange={(e) => {
+                                    setStartDate(dayjs(e).format('YYYY-MM-DD HH:mm:ss'));
+                                    setEndDate('');
+                                }}
+                                // fromDate={new Date()}
+                            />
+                            {/* <input
                                 type="datetime-local"
                                 value={startDate}
                                 onChange={(e) => {
@@ -473,13 +485,23 @@ const AbandonedCarts = () => {
                                 name="dateTimeCreated"
                                 className="form-input"
                                 max={getCurrentDateTime()}
-                            />
+                            /> */}
                         </div>
                         <div className="col-span-4">
-                            <label htmlFor="dateTimeCreated" className="block pr-2 text-sm font-medium text-gray-700">
+                            {/* <label htmlFor="dateTimeCreated" className="block pr-2 text-sm font-medium text-gray-700">
                                 End date:
-                            </label>
-                            <input
+                            </label> */}
+                            <DateTimeField
+                                label=""
+                                placeholder="Select Date"
+                                className="form-select"
+                                value={endDate}
+                                onChange={(e) => {
+                                    filterByDates(e);
+                                }}
+                                fromDate={startDate}
+                            />
+                            {/* <input
                                 type="datetime-local"
                                 value={endDate}
                                 onChange={(e) => {
@@ -490,7 +512,7 @@ const AbandonedCarts = () => {
                                 className="form-input"
                                 max={getCurrentDateTime()}
                                 min={mintDateTime(startDate || new Date())}
-                            />
+                            /> */}
                         </div>
                     </div>
                 )}
@@ -507,7 +529,7 @@ const AbandonedCarts = () => {
                             columns={[
                                 {
                                     accessor: 'order',
-                                    
+
                                     render: (row) => (
                                         <>
                                             <div className="">{row.order}</div>
@@ -519,11 +541,11 @@ const AbandonedCarts = () => {
                                         </>
                                     ),
                                 },
-                                { accessor: 'invoice',  title: 'Invoice Number' },
-                                { accessor: 'date',  },
+                                { accessor: 'invoice', title: 'Invoice Number' },
+                                { accessor: 'date' },
                                 {
                                     accessor: 'status',
-                                    
+
                                     title: 'Order status',
                                     render: (row) => (
                                         <div
@@ -545,7 +567,7 @@ const AbandonedCarts = () => {
                                 },
                                 {
                                     accessor: 'paymentStatus',
-                                    
+
                                     title: 'Payment status',
                                     render: (row) => (
                                         <div
@@ -569,7 +591,7 @@ const AbandonedCarts = () => {
                                 },
                                 {
                                     accessor: 'shipmentTracking',
-                                    
+
                                     title: 'Shipment Tracking',
                                     render: (item) => {
                                         return item?.courierPartner && item?.fulfillments?.length > 0 ? (
@@ -582,7 +604,7 @@ const AbandonedCarts = () => {
                                         );
                                     },
                                 },
-                                { accessor: 'total',  },
+                                { accessor: 'total' },
                                 {
                                     accessor: 'actions',
                                     title: 'Actions',

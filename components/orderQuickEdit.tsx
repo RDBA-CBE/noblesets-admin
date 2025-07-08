@@ -73,6 +73,8 @@ import { useDispatch } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import ErrorMessage from './Layouts/ErrorMessage';
+import DateTimeField from './DateTimePicker';
+import dayjs from 'dayjs';
 
 const OrderQuickEdit = (props: any) => {
     const { id, closeExpand, updateList } = props;
@@ -128,7 +130,7 @@ const OrderQuickEdit = (props: any) => {
 
     const [invoiceNumber, setInvoiceNumber] = useState('');
 
-    const [invoiceDate, setInvoiceDate] = useState('');
+    const [invoiceDate, setInvoiceDate] = useState(null);
     const [paySlipNameError, setPaySlipNameError] = useState('');
     const [paySlipDateError, setPaySlipDateError] = useState('');
     const [invoiceNameError, setInvoiceNameError] = useState('');
@@ -211,13 +213,13 @@ const OrderQuickEdit = (props: any) => {
 
         //Payslip
         if (data?.order?.metadata?.length > 0) {
-            setSlipDate(mintDateTime(data?.order?.metadata[0]?.value));
+            setSlipDate(dayjs(data?.order?.metadata[0]?.value).toISOString());
             setSlipNumber(data?.order?.metadata[1]?.value);
         }
 
         if (data?.order?.invoices?.length > 0) {
             setInvoiceNumber(data?.order?.invoices[0]?.number?.slice(-4));
-            setInvoiceDate(mintDateTime(data?.order?.invoices[0]?.createdAt));
+            setInvoiceDate(dayjs(data?.order?.invoices[0]?.createdAt).toISOString());
         }
     };
 
@@ -594,7 +596,7 @@ const OrderQuickEdit = (props: any) => {
                         const newInvoiceReqRes = await newInvoiceReq({
                             variables: {
                                 // id: orderData?.invoices[0]?.id,
-                                createdAt: invoiceDate,
+                                createdAt: dayjs(invoiceDate),
                                 orderId: id,
                                 number: 'NS2425' + invoiceNumber,
                             },
@@ -606,7 +608,7 @@ const OrderQuickEdit = (props: any) => {
                             setOpenInvoice(false);
                             getOrderData();
                             updateList();
-                            setInvoiceNameError("")
+                            setInvoiceNameError('');
                             Success('Invoice Updated Successfully');
                         }
                     }
@@ -623,7 +625,7 @@ const OrderQuickEdit = (props: any) => {
         try {
             if (slipNumber == '') {
                 setPaySlipNameError('Please enter payslip number');
-            } else if (!validateDateTime(slipDate)) {
+            } else if (slipDate == '') {
                 setPaySlipDateError('Please enter payslip date');
             } else {
                 setSlipLoading(true);
@@ -985,7 +987,7 @@ const OrderQuickEdit = (props: any) => {
                             </div>
 
                             <div className=" w-full">
-                                <input
+                                {/* <input
                                     type="datetime-local"
                                     min={getCurrentDateTime()}
                                     value={moment(slipDate).format('YYYY-MM-DDTHH:mm')}
@@ -993,7 +995,9 @@ const OrderQuickEdit = (props: any) => {
                                     id="dateTimeCreated"
                                     name="dateTimeCreated"
                                     className="form-input"
-                                />
+                                /> */}
+
+                                <DateTimeField label="" placeholder="Select Date" className="form-input" value={slipDate} onChange={(e) => setSlipDate(dayjs(e).format('YYYY-MM-DD HH:mm:ss'))} />
                                 <ErrorMessage message={paySlipDateError} />
                                 {/* <input type="text" className="form-input" placeholder="Slip Date" value={slipDate} onChange={(e: any) => slipDate(e.target.value)} /> */}
                             </div>
@@ -1053,15 +1057,17 @@ const OrderQuickEdit = (props: any) => {
                                     </div>
                                 </div>
                                 <div className="pt-5">
+                                    {/* <DateTimeField disabled label="" placeholder="Select Date" className="form-input" value={invoiceDate} onChange={(e) => setInvoiceDate(e)} /> */}
                                     <input
                                         type="datetime-local"
                                         // min={mintDateTime(slipDate) || getCurrentDateTime()}
                                         // max={getCurrentDateTime()}
                                         value={moment(invoiceDate).format('YYYY-MM-DDTHH:mm')}
-                                        onChange={(e) => setInvoiceDate(e.target.value)}
+                                        // onChange={(e) => setInvoiceDate(e.target.value)}
                                         id="dateTimeCreated"
                                         name="dateTimeCreated"
                                         className="form-input cursor-not-allowed bg-white text-black opacity-100"
+                                        disabled
                                     />
                                     {/* <ErrorMessage message={invoiceDateError} /> */}
                                 </div>

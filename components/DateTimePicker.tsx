@@ -4,8 +4,9 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import IconClock from './Icon/IconClock';
 
-export default function DateTimeField({ label = '', placeholder = '', value, onChange, fromDate = null, error = null, required = false, className }) {
+export default function DateTimeField({ disabled = false, label = '', placeholder = '', value, onChange, fromDate = null, error = null, required = false, className, max = null }) {
     return (
         <div className="flex flex-col">
             <label className="mb-2 block text-sm font-bold text-gray-700">
@@ -15,10 +16,12 @@ export default function DateTimeField({ label = '', placeholder = '', value, onC
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DateTimePicker
                     className={className ? className : ''}
+                    disabled={disabled ? disabled : false}
                     value={value ? dayjs(value) : null}
-                     format="DD/MM/YYYY hh:mm A"
-                    onChange={(newValue) => onChange(newValue|| null)}
+                    format="DD/MM/YYYY hh:mm A"
+                    onChange={(newValue) => onChange(newValue || null)}
                     minDateTime={fromDate ? dayjs(fromDate) : undefined}
+                    // maxDateTime={max ? dayjs(max) : undefined}
                     ampm={true}
                     slotProps={{
                         textField: {

@@ -8766,6 +8766,12 @@ export const GET_ORDER_DETAILS = gql`
                 id
                 __typename
             }
+            subtotal {
+                gross {
+                    amount
+                    currency
+                }
+            }
         }
         shop {
             countries {
@@ -8793,6 +8799,20 @@ export const GET_ORDER_DETAILS = gql`
         lines {
             ...OrderLineWithMetadata
             __typename
+            variant {
+                pricing {
+                    price {
+                        gross {
+                            amount
+                            currency
+                        }
+                        net {
+                            amount
+                            currency
+                        }
+                    }
+                }
+            }
         }
         __typename
         isGiftWrap
@@ -9330,6 +9350,24 @@ export const GET_ORDER_DETAILS = gql`
                 productName
                 variantName
                 __typename
+                undiscountedUnitPrice {
+                    gross {
+                        amount
+                        currency
+                    }
+                }
+                undiscountedTotalPrice {
+                    gross {
+                        amount
+                        currency
+                    }
+                }
+                totalPrice {
+                    gross {
+                        amount
+                        currency
+                    }
+                }
             }
             __typename
         }
@@ -11441,6 +11479,8 @@ export const SALES_BY_DATE = gql`
             totalItemsSoldListCount
             codAmountListTotal
             giftwrapAmountListTotal
+            giftcardAmountListTotal
+            giftcardAmountList
         }
     }
 `;

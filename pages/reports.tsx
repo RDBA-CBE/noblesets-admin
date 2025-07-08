@@ -48,6 +48,8 @@ import CommonLoader from './elements/commonLoader';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import CategorySelect from '@/components/CategorySelect';
 import ProductSelect from '@/components/ProductSelect';
+import DateTimeField from '@/components/DateTimePicker';
+import dayjs from 'dayjs';
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
 });
@@ -104,8 +106,8 @@ const Reports = () => {
         productSearch: '',
         activeAccordion: null,
         analysisTab: 'Order Analysis',
-        orderStartDate: new Date(),
-        orderEndDate: new Date(),
+        orderStartDate: '',
+        orderEndDate: '',
         orderCurrency: 'All Currencies',
         analysisCurrency: 'All Currencies',
         tableData: [],
@@ -117,8 +119,8 @@ const Reports = () => {
         analysisColumn: [],
         analysisTable: [],
         analysisDateFilter: 'Last 7 Days',
-        analysisStartDate: new Date(),
-        analysisEndDate: new Date(),
+        analysisStartDate: '',
+        analysisEndDate: '',
         analysisProductsearch: '',
         analysisSelectedCountries: [],
         analysisSelectedCategory: [],
@@ -127,8 +129,8 @@ const Reports = () => {
         analysisProductList: [],
         customerDateFilter: 'Last 7 Days',
         customerTab: 'Guests list',
-        customerStartDate: new Date(),
-        customerEndDate: new Date(),
+        customerStartDate: '',
+        customerEndDate: '',
         customerTable: [],
         customerColumn: [],
         orderChartData: {},
@@ -330,6 +332,10 @@ const Reports = () => {
                     name: 'Gift Wrap Amount',
                     value: `${formatCurrency('INR')}${addReportCommasToNumber(response.giftwrapAmountListTotal)}`,
                 },
+                {
+                    name: 'E-Gift Voucher Amount',
+                    value: `${formatCurrency('INR')}${addReportCommasToNumber(response.giftcardAmountListTotal)}`,
+                },
             ];
 
             const tableColumn = [
@@ -342,6 +348,7 @@ const Reports = () => {
                 { accessor: 'productsTotalAmount', title: 'Products Total Amount' },
                 { accessor: 'codAmountList', title: 'COD Amount' },
                 { accessor: 'giftwrapAmountList', title: 'Gift Wrap Amount' },
+                { accessor: 'giftcardAmountList', title: 'E-Gift Voucher Amount' },
             ];
             const tableData = salesBydateTable(response);
             const orderChartData = {
@@ -354,6 +361,7 @@ const Reports = () => {
                     { name: 'Products Total Amount', type: 'line', data: tableData.map((item) => item?.productsTotalAmount) },
                     { name: 'COD Amount ', type: 'line', data: tableData.map((item) => item?.codAmountList) },
                     { name: 'Gift Wrap Amount ', type: 'line', data: tableData.map((item) => item?.giftwrapAmountList) },
+                    { name: 'E-Gift Voucher Amount ', type: 'line', data: tableData.map((item) => item?.giftcardAmountList) },
                 ],
                 options: {
                     chart: {
@@ -759,13 +767,13 @@ const Reports = () => {
 
             const tableColumn = [
                 { accessor: 'date', title: 'Date' },
-                { accessor: 'discountAmount', title: 'Discount Amount' },
+                { accessor: 'discountAmount', title: 'Coupon Amount' },
                 { accessor: 'noOfCouponsUsed', title: 'Number of coupon used' },
             ];
 
             const orderChartData = {
                 series: [
-                    { name: 'Discount Amount', type: 'line', data: table.map((item) => item?.discountAmount) },
+                    { name: 'Coupon Amount', type: 'line', data: table.map((item) => item?.discountAmount) },
                     { name: 'Number of coupon used', type: 'line', data: table.map((item) => item?.noOfCouponsUsed) },
                 ],
                 options: {
@@ -1434,7 +1442,7 @@ const Reports = () => {
     };
 
     const salesBydateTable = (data) => {
-        const { giftwrapAmountList, codAmountList, dates, totalItemsSoldList, shippingAmountList, refundAmountList, noOfOrderList, couponAmountList, productsTotalAmount } = data;
+        const { giftwrapAmountList, codAmountList, dates, totalItemsSoldList, shippingAmountList, refundAmountList, noOfOrderList, couponAmountList, productsTotalAmount, giftcardAmountList } = data;
 
         const table = dates?.map((date, index) => ({
             date,
@@ -1446,6 +1454,7 @@ const Reports = () => {
             productsTotalAmount: productsTotalAmount[index],
             codAmountList: codAmountList[index],
             giftwrapAmountList: giftwrapAmountList[index],
+            giftcardAmountList: giftcardAmountList[index],
         }));
 
         return table;
@@ -1696,7 +1705,19 @@ const Reports = () => {
                                         <label htmlFor="dateTimeCreated" className="block pr-2 text-sm font-medium text-gray-700">
                                             From :
                                         </label>
-                                        <input
+                                        <DateTimeField
+                                            // fromDate={state.startDate}
+                                            label=""
+                                            placeholder="Select Date"
+                                            className="form-input"
+                                            value={state.orderStartDate}
+                                            onChange={(e) => {
+                                                setState({ orderStartDate: dayjs(e).format('DD/MM/YYYY HH:mm:ss'), orderEndDate: '' });
+                                            }}
+                                            // onChange={(e) => setState({ endDate: e })}
+                                        />
+
+                                        {/* <input
                                             type="datetime-local"
                                             value={state.orderStartDate}
                                             onChange={(e) => {
@@ -1707,13 +1728,25 @@ const Reports = () => {
                                             className="form-input"
                                             max={getCurrentDateTime()}
                                             // min={mintDateTime(state.orderStartDate)}
-                                        />
+                                        /> */}
                                     </div>
                                     <div className="">
                                         <label htmlFor="dateTimeCreated" className="block pr-2 text-sm font-medium text-gray-700">
                                             To:
                                         </label>
-                                        <input
+                                        <DateTimeField
+                                            fromDate={state.orderStartDate}
+                                            label=""
+                                            placeholder="Select Date"
+                                            className="form-input"
+                                            value={state.orderEndDate}
+                                            onChange={(e) => {
+                                                setState({ orderEndDate: dayjs(e).format('DD/MM/YYYY HH:mm:ss') });
+                                            }}
+
+                                            // onChange={(e) => setState({ endDate: e })}
+                                        />
+                                        {/* <input
                                             type="datetime-local"
                                             value={state.orderEndDate}
                                             onChange={(e) => {
@@ -1724,7 +1757,7 @@ const Reports = () => {
                                             className="form-input"
                                             max={getCurrentDateTime()}
                                             // min={mintDateTime(state.orderStartDate)}
-                                        />
+                                        /> */}
                                     </div>
                                 </div>
                             )}
@@ -1957,7 +1990,7 @@ const Reports = () => {
                                         <label htmlFor="dateTimeCreated" className="block pr-2 text-sm font-medium text-gray-700">
                                             From :
                                         </label>
-                                        <input
+                                        {/* <input
                                             type="datetime-local"
                                             value={state.customerStartDate}
                                             onChange={(e) => {
@@ -1967,13 +2000,23 @@ const Reports = () => {
                                             name="dateTimeCreated"
                                             className="form-input"
                                             // max={getCurrentDateTime()}
+                                        /> */}
+                                        <DateTimeField
+                                            // fromDate={state.orderStartDate}
+                                            label=""
+                                            placeholder="Select Date"
+                                            className="form-input"
+                                            value={state.customerStartDate}
+                                            onChange={(e) => {
+                                                setState({ customerStartDate: dayjs(e).format('DD/MM/YYYY HH:mm:ss'), customerEndDate: '' });
+                                            }}
                                         />
                                     </div>
                                     <div className="">
                                         <label htmlFor="dateTimeCreated" className="block pr-2 text-sm font-medium text-gray-700">
                                             To:
                                         </label>
-                                        <input
+                                        {/* <input
                                             type="datetime-local"
                                             value={state.customerEndDate}
                                             onChange={(e) => {
@@ -1984,6 +2027,18 @@ const Reports = () => {
                                             className="form-input"
                                             // max={getCurrentDateTime()}
                                             // min={mintDateTime(startDate || new Date())}
+                                        /> */}
+                                        <DateTimeField
+                                            fromDate={state.customerStartDate}
+                                            label=""
+                                            placeholder="Select Date"
+                                            className="form-input"
+                                            value={state.customerEndDate}
+                                            onChange={(e) => {
+                                                setState({ customerEndDate: dayjs(e).format('DD/MM/YYYY HH:mm:ss') });
+                                            }}
+
+                                            // onChange={(e) => setState({ endDate: e })}
                                         />
                                     </div>
                                 </div>
@@ -2060,7 +2115,7 @@ const Reports = () => {
                                         <label htmlFor="dateTimeCreated" className="block pr-2 text-sm font-medium text-gray-700">
                                             From :
                                         </label>
-                                        <input
+                                        {/* <input
                                             type="datetime-local"
                                             value={state.analysisStartDate}
                                             onChange={(e) => {
@@ -2070,13 +2125,36 @@ const Reports = () => {
                                             name="dateTimeCreated"
                                             className="form-input"
                                             // max={getCurrentDateTime()}
+                                        /> */}
+
+                                        <DateTimeField
+                                            // fromDate={state.orderStartDate}
+                                            label=""
+                                            placeholder="Select Date"
+                                            className="form-input"
+                                            value={state.analysisStartDate}
+                                            onChange={(e) => {
+                                                setState({ analysisStartDate: dayjs(e).format('DD/MM/YYYY HH:mm:ss'), analysisEndDate: '' });
+                                            }}
                                         />
                                     </div>
                                     <div className="">
                                         <label htmlFor="dateTimeCreated" className="block pr-2 text-sm font-medium text-gray-700">
                                             To:
                                         </label>
-                                        <input
+                                        <DateTimeField
+                                            fromDate={state.analysisStartDate}
+                                            label=""
+                                            placeholder="Select Date"
+                                            className="form-input"
+                                            value={state.analysisEndDate}
+                                            onChange={(e) => {
+                                                setState({ analysisEndDate: dayjs(e).format('DD/MM/YYYY HH:mm:ss') });
+                                            }}
+
+                                            // onChange={(e) => setState({ endDate: e })}
+                                        />
+                                        {/* <input
                                             type="datetime-local"
                                             value={state.analysisEndDate}
                                             onChange={(e) => {
@@ -2087,7 +2165,7 @@ const Reports = () => {
                                             className="form-input"
                                             // max={getCurrentDateTime()}
                                             // min={mintDateTime(startDate || new Date())}
-                                        />
+                                        /> */}
                                     </div>
                                 </div>
                             )}

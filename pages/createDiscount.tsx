@@ -12,6 +12,8 @@ import { COUPON_CHANNEL_UPDATE, COUPON_META_DATA, CREATE_COUPEN, CREATE_DISCOUNT
 import { Description } from '@headlessui/react/dist/components/description/description';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import IconLoader from '@/components/Icon/IconLoader';
+import DateTimeField from '@/components/DateTimePicker';
+import dayjs from 'dayjs';
 
 const CreateDiscount = () => {
     const router = useRouter();
@@ -29,7 +31,7 @@ const CreateDiscount = () => {
         codeOption: [],
         couponValue: '',
         isEndDate: false,
-        startDate: null,
+        startDate: dayjs().toISOString(),
         endDate: null,
         description: '',
         codeType: { value: 'Fixed Amount', label: 'Fixed Amount' },
@@ -55,6 +57,7 @@ const CreateDiscount = () => {
         });
     };
 
+
     const createDiscount = async () => {
         try {
             let errors: any = {};
@@ -65,8 +68,20 @@ const CreateDiscount = () => {
                 errors.nameError = 'Discount name is required';
             }
 
-            if (couponValue == '') {
-                errors.couponValueError = 'Discount value is required';
+            if (state.codeType?.value == 'Percentage') {
+                if (couponValue == '') {
+                    errors.couponValueError = 'Discount value is required';
+                } else if (parseFloat(couponValue) <= 0) {
+                    errors.couponValueError = 'Percentage discount must be greater than 0';
+                } else if (parseFloat(couponValue) > 100) {
+                    errors.couponValueError = 'Percentage discount cannot exceed 100%';
+                }
+            } else if (state.codeType?.value == 'Fixed Amount') {
+                if (couponValue == '') {
+                    errors.couponValueError = 'Discount value is required';
+                } else if (parseFloat(couponValue) <= 0) {
+                    errors.couponValueError = 'Fixed discount must be greater than 0';
+                }
             }
 
             if (isEndDate && !endDate) {
@@ -81,8 +96,8 @@ const CreateDiscount = () => {
                 variables: {
                     input: {
                         name: couponName,
-                        endDate: state.isEndDate ? new Date(state.endDate).toISOString() : null,
-                        startDate: state.startDate ? new Date(state.startDate).toISOString() : null,
+                        endDate: state.isEndDate ? dayjs(state.endDate).toISOString() : null,
+                        startDate: state.startDate ? dayjs(state.startDate).toISOString() : null,
                         type: codeType.value === 'Fixed Amount' ? 'FIXED' : 'PERCENTAGE',
                         value: null,
                     },
@@ -137,7 +152,7 @@ const CreateDiscount = () => {
                     updateMetaData(id);
                 } else {
                     router.push(`/updateDiscount?id=${id}`);
-                    Success('Coupon Created Successfully');
+                    Success('Discount Created Successfully');
                 }
             }
         } catch (error) {
@@ -255,11 +270,17 @@ const CreateDiscount = () => {
             <div className="panel">
                 <div className=" flex w-full gap-5 pt-5">
                     <div className="col-6 md:w-6/12">
-                        <label htmlFor="name" className="block text-lg font-medium text-gray-700">
+                        {/* <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                             Active Dates
-                        </label>
-
-                        <input
+                        </label> */}
+                        <DateTimeField
+                            label=" Active Dates"
+                            placeholder="Select Date"
+                            className="form-input"
+                            value={state.startDate}
+                            onChange={(e) => setState({ startDate: e, endDate: '' })}
+                        />
+                        {/* <input
                             value={state.startDate}
                             onChange={handleStartDateChange}
                             type="datetime-local"
@@ -268,7 +289,7 @@ const CreateDiscount = () => {
                             className="form-input"
                             required
                             min={new Date().toISOString().slice(0, 16)}
-                        />
+                        /> */}
                     </div>
                     <div className="col-6 flex flex-col  justify-center md:w-6/12">
                         <div className="mb-3 flex items-center gap-3">
@@ -282,7 +303,9 @@ const CreateDiscount = () => {
                         </div>
                         {state.isEndDate && (
                             <>
-                                <input
+                                <DateTimeField fromDate={state.startDate} label="" placeholder="Select Date" className="form-input" value={state.endDate} onChange={(e) => setState({ endDate: e })} />
+
+                                {/* <input
                                     value={state.endDate}
                                     onChange={handleEndDateChange}
                                     type="datetime-local"
@@ -292,7 +315,7 @@ const CreateDiscount = () => {
                                     required
                                     min={state.startDate}
                                     // max={new Date(new Date(state.startDate).setFullYear(new Date(state.startDate).getFullYear() + 1)).toISOString().slice(0, 16)}
-                                />
+                                /> */}
                             </>
                         )}
                         {state.errors?.endDateError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.endDateError}</p>}

@@ -84,6 +84,8 @@ import { useDispatch } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import ErrorMessage from '@/components/Layouts/ErrorMessage';
+import dayjs from 'dayjs';
+import DateTimeField from '@/components/DateTimePicker';
 
 const Editorder = () => {
     const router = useRouter();
@@ -221,6 +223,8 @@ const Editorder = () => {
 
     const [isPaymentOpen, setIsPaymentOpen] = useState(false);
     const [reference, setReference] = useState('');
+
+    const [itemSubTotal, setItemSubTotal] = useState(0);
 
     const [orderStatus, setOrderStatus] = useState('');
     const [giftCartLoading, setGiftCartLoading] = useState(false);
@@ -421,6 +425,13 @@ const Editorder = () => {
                 if (orderDetails?.order?.fulfillments?.length > 0) {
                     setTrackingNumber(orderDetails?.order?.fulfillments[0]?.trackingNumber);
                 }
+
+                const totalUndiscountedGross = orderDetails?.order?.lines?.reduce((sum, line) => {
+                    const lineTotal = (line?.variant?.pricing?.price?.net?.amount || 0) * Number(line?.quantity);
+                    // Multiply by 100, round, then divide by 100 to maintain 2 decimal precision
+                    return Math.round((sum + lineTotal) * 100) / 100;
+                }, 0);
+                setItemSubTotal(totalUndiscountedGross);
 
                 setNotesList(result);
                 setLines(orderDetails?.order?.lines);
@@ -1636,7 +1647,7 @@ const Editorder = () => {
 
                             <div className="mt-8 grid grid-cols-12 gap-5">
                                 <div className="col-span-6 mr-5">
-                                    <div className="flex w-100 items-center justify-between">
+                                    <div className="w-100 flex items-center justify-between">
                                         <h5 className="mb-3 text-lg font-semibold">Billing</h5>
                                         {/* <button type="button" onClick={() => BillingInputs()}>
                                             <IconPencil className="cursor-pointer" />
@@ -1903,7 +1914,7 @@ const Editorder = () => {
                                 </div>
                                 {!isAllGiftCartLine && (
                                     <div className="col-span-6 mr-5">
-                                        <div className="flex w-100 items-center justify-between">
+                                        <div className="w-100 flex items-center justify-between">
                                             <h5 className="mb-3 text-lg font-semibold">Shipping</h5>
                                             {/* <button type="button" onClick={() => ShippingInputs()}>
                                             <IconPencil />
@@ -2197,26 +2208,24 @@ const Editorder = () => {
                                                         </div>
                                                     </td>
                                                     {item?.unitPrice?.net?.currency == 'USD' ? (
-                                                        <td>{`${formatCurrency(item?.unitPrice?.net?.currency)}${addCommasToNumber(item?.unitPrice?.net?.amount)}`} </td>
+                                                        <td>{`${formatCurrency(item?.unitPrice?.net?.currency)}${addCommasToNumber(item?.variant?.pricing?.price?.net?.amount)}`} </td>
                                                     ) : (
-                                                        <td>{`${formatCurrency(item?.unitPrice?.net?.currency)}${addCommasToNumber(item?.unitPrice?.net?.amount)}`} </td>
+                                                        <td>{`${formatCurrency(item?.unitPrice?.net?.currency)}${item?.variant?.pricing?.price?.net?.amount}`} </td>
                                                     )}
                                                     <td>
                                                         <div>× {item?.quantity}</div>
                                                     </td>
                                                     {/* <td>{`${formatCurrency(item?.unitPrice?.gross?.currency)}${addCommasToNumber(item?.unitPrice?.gross?.amount)}`} </td> */}
-                                                    <td>
-                                                        <div> {`${formatCurrency(item?.totalPrice?.gross?.currency)}${addCommasToNumber(item?.totalPrice?.gross?.amount)}`}</div>{' '}
-                                                    </td>
+                                                    <div>{`${formatCurrency(item?.totalPrice?.gross?.currency)}${Number(item?.variant?.pricing?.price?.gross?.amount) * Number(item?.quantity)}`}</div>
                                                     {formData?.billing?.state !== '' && formData?.shipping?.state == 'Tamil Nadu' ? (
                                                         <td>
-                                                            <div>{`SGST: ${formatCurrency(item?.unitPrice?.tax?.currency)}${roundOff(item?.unitPrice?.tax?.amount / 2)}`}</div>
+                                                            <div>{`SGST: ${formatCurrency(item?.unitPrice?.tax?.currency)}${(Number(item?.unitPrice?.tax?.amount) / 2)?.toFixed(2)}`}</div>
                                                             <span className="ml-10">+</span>
-                                                            <div>{`CSGT: ${formatCurrency(item?.unitPrice?.tax?.currency)}${roundOff(item?.unitPrice?.tax?.amount / 2)}`}</div>
+                                                            <div>{`CSGT: ${formatCurrency(item?.unitPrice?.tax?.currency)}${(Number(item?.unitPrice?.tax?.amount) / 2)?.toFixed(2)}`}</div>
                                                         </td>
                                                     ) : (
                                                         <td>
-                                                            <div>{`IGST: ${formatCurrency(item?.unitPrice?.tax?.currency)}${roundOff(item?.unitPrice?.tax?.amount)}`}</div>
+                                                            <div>{`IGST: ${formatCurrency(item?.unitPrice?.tax?.currency)}${Number(item?.unitPrice?.tax?.amount)?.toFixed(2)}`}</div>
                                                         </td>
                                                     )}
                                                     {/* <td>
@@ -2245,23 +2254,32 @@ const Editorder = () => {
                                 <div className="sm:w-3/5">
                                     <div className="flex items-center justify-between">
                                         <div>Items Subtotal:</div>
-                                        <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${addCommasToNumber(orderData?.subtotal?.net?.amount)}`}</div>
+                                        {/* <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${addCommasToNumber(orderData?.subtotal?.net?.amount)}`}</div> */}
+                                        <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${itemSubTotal}`}</div>
+
+                                        {/* <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${addCommasToNumber(itemSubTotal)}`}</div> */}
                                     </div>
-                                  
+
                                     {orderData?.discounts?.length > 0 && (
                                         <div className="mt-4 flex items-center justify-between">
                                             <div>Coupon Amount</div>
-                                            <div>
+                                            <div style={{ color: 'green' }}>
+                                                {orderData?.discounts[0]?.amount?.currency == 'USD' ? '- $' : '- ₹'}
+                                                {orderData?.discounts[0]?.amount?.amount}
+                                            </div>
+                                            {/* <div>
                                                 {orderData?.discounts[0]?.amount?.currency == 'USD' ? '$' : '₹'}
                                                 {addCommasToNumber(orderData?.discounts[0]?.amount?.amount)}
-                                            </div>
+                                            </div> */}
                                         </div>
                                     )}
-                                      {orderDetails?.order?.giftCards?.length > 0 && (
+                                    {orderDetails?.order?.giftCards?.length > 0 && (
                                         <div className="mt-4 flex  justify-between">
                                             <div>Gift Voucher Amount</div>
                                             <div>
-                                                <div className="ml-[94px] items-end">{`${formatCurrency(coupenAmt?.currency)}${addCommasToNumber(coupenAmt?.amount)}`}</div>
+                                                <div className="ml-[94px] items-end">{`${formatCurrency(coupenAmt?.currency)}${coupenAmt?.amount}`}</div>
+
+                                                {/* <div className="ml-[94px] items-end">{`${formatCurrency(coupenAmt?.currency)}${addCommasToNumber(coupenAmt?.amount)}`}</div> */}
                                             </div>
                                         </div>
                                     )}
@@ -2290,7 +2308,9 @@ const Editorder = () => {
                                             <div className="mt-4 flex items-center justify-between">
                                                 <div>SGST:</div>
                                                 <div>
-                                                    <div>{`${formatCurrency(orderData?.total?.tax?.currency)}${addCommasToNumber(orderData?.total?.tax?.amount / 2)}`}</div>
+                                                    <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount / 2)?.toFixed(2)}`}</div>
+
+                                                    {/* <div>{`${formatCurrency(orderData?.total?.tax?.currency)}${addCommasToNumber(orderData?.total?.tax?.amount / 2)}`}</div> */}
 
                                                     {/* {orderData?.subtotal?.tax?.currency} {orderData?.subtotal?.tax?.amount / 2} */}
                                                 </div>
@@ -2298,7 +2318,8 @@ const Editorder = () => {
                                             <div className="mt-4 flex items-center justify-between">
                                                 <div>CSGT:</div>
                                                 <div>
-                                                    <div>{`${formatCurrency(orderData?.total?.tax?.currency)}${addCommasToNumber(orderData?.total?.tax?.amount / 2)}`}</div>
+                                                    <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount / 2)?.toFixed(2)}`}</div>
+                                                    {/* <div>{`${formatCurrency(orderData?.total?.tax?.currency)}${addCommasToNumber(orderData?.total?.tax?.amount / 2)}`}</div> */}
 
                                                     {/* {orderData?.subtotal?.tax?.currency} {orderData?.subtotal?.tax?.amount / 2} */}
                                                 </div>
@@ -2308,7 +2329,9 @@ const Editorder = () => {
                                         <div className="mt-4 flex items-center justify-between">
                                             <div>IGST:</div>
                                             <div>
-                                                <div>{`${formatCurrency(orderData?.total?.tax?.currency)}${addCommasToNumber(orderData?.total?.tax?.amount)}`}</div>
+                                                <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${orderData?.subtotal?.tax?.amount}`}</div>
+
+                                                {/* <div>{`${formatCurrency(orderData?.total?.tax?.currency)}${addCommasToNumber(orderData?.total?.tax?.amount)}`}</div> */}
 
                                                 {/* {orderData?.subtotal?.gross?.currency} {orderData?.subtotal?.gross?.amount} */}
                                             </div>
@@ -2762,7 +2785,7 @@ const Editorder = () => {
                             </div>
 
                             <div className=" w-full">
-                                <input
+                                {/* <input
                                     type="datetime-local"
                                     min={getCurrentDateTime()}
                                     value={moment(slipDate).format('YYYY-MM-DDTHH:mm')}
@@ -2770,7 +2793,9 @@ const Editorder = () => {
                                     id="dateTimeCreated"
                                     name="dateTimeCreated"
                                     className="form-input"
-                                />
+                                /> */}
+                                <DateTimeField label="" placeholder="Select Date" className="form-input" value={slipDate} onChange={(e) => setSlipDate(dayjs(e).format('YYYY-MM-DD HH:mm:ss'))} />
+
                                 {slipDateError && <div className="mt-1 text-danger">{slipDateError}</div>}
 
                                 {/* <input type="text" className="form-input" placeholder="Slip Date" value={slipDate} onChange={(e: any) => slipDate(e.target.value)} /> */}

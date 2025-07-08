@@ -45,6 +45,7 @@ import Link from 'next/link';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import CommonLoader from '../elements/commonLoader';
 import OrderQuickEdit from '@/components/orderQuickEdit';
+import DateTimeField from '@/components/DateTimePicker';
 
 const Orders = () => {
     const isRtl = useSelector((state: any) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -184,7 +185,7 @@ const Orders = () => {
             date: dayjs(item?.node?.created).format('MMM D, YYYY'),
             total: `${item?.node?.total.gross.currency} ${addCommasToNumber(item?.node?.total.gross.amount)}`,
             status: OrderStatus(item?.node?.status),
-            paymentStatus: PaymentStatus(item?.node?.paymentStatus,item?.node?.origin, item?.node?.totalRefunded),
+            paymentStatus: PaymentStatus(item?.node?.paymentStatus, item?.node?.origin, item?.node?.totalRefunded),
             invoice: item?.node?.invoices?.length > 0 ? item?.node?.invoices[0]?.number : '-',
             shipmentTracking: item?.node?.fulfillments?.length > 0 ? `${item?.node?.courierPartner?.name}\n${item?.node?.fulfillments[0]?.trackingNumber}` : '-',
             ...item,
@@ -248,6 +249,20 @@ const Orders = () => {
 
     const excelDownload = async () => {
         try {
+            if (exportBy == '') {           
+                Failure('Please select duration');
+                return;
+            }
+            if(!endDate ) {
+                Failure('Please select end date');
+                return;
+            }
+           
+            if (exportBy == 'custom' && (startDate == '' || endDate == '')) {       
+                Failure('Please select start date and end date');
+                return;
+            }   
+
             setState({ loading: true });
             let hasNextPage = true;
             let after = null;
@@ -369,10 +384,18 @@ const Orders = () => {
                                 {exportBy == 'custom' && (
                                     <div className="flex justify-end gap-4 pb-4">
                                         <div className="col-span-4">
-                                            <label htmlFor="dateTimeCreated" className="block pr-2 text-sm font-medium text-gray-700">
-                                                Start Date:
-                                            </label>
-                                            <input
+                                            <DateTimeField
+                                                label="Start Date:"
+                                                placeholder="Select Date"
+                                                className="form-input"
+                                                value={startDate}
+                                                onChange={(e) => {
+                                                    setStartDate(dayjs(e).format('YYYY-MM-DD HH:mm:ss'));
+                                                    setEndDate(null);
+                                                }}
+                                                // fromDate={new Date()}
+                                            />
+                                            {/* <input
                                                 type="datetime-local"
                                                 value={startDate}
                                                 onChange={(e) => {
@@ -382,13 +405,23 @@ const Orders = () => {
                                                 name="dateTimeCreated"
                                                 className="form-input"
                                                 max={getCurrentDateTime()}
-                                            />
+                                            /> */}
                                         </div>
                                         <div className="col-span-4">
-                                            <label htmlFor="dateTimeCreated" className="block pr-2 text-sm font-medium text-gray-700">
-                                                End date:
-                                            </label>
-                                            <input
+                                            <DateTimeField
+                                                fromDate={startDate}
+                                                max={new Date()}
+                                                label="End date:"
+                                                placeholder="Select Date"
+                                                className="form-input"
+                                                value={endDate}
+                                                onChange={(e) => {
+                                                    setEndDate(dayjs(e).format('YYYY-MM-DD HH:mm:ss'));
+                                                    filterByDates(dayjs(e).format('YYYY-MM-DD HH:mm:ss'));
+                                                }}
+                                            />
+
+                                            {/* <input
                                                 type="datetime-local"
                                                 value={endDate}
                                                 onChange={(e) => {
@@ -400,7 +433,7 @@ const Orders = () => {
                                                 className="form-input"
                                                 max={getCurrentDateTime()}
                                                 min={mintDateTime(startDate || new Date())}
-                                            />
+                                            /> */}
                                         </div>
                                     </div>
                                 )}

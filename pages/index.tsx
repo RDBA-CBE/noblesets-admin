@@ -818,11 +818,11 @@ const Index = () => {
                 deleteDuplicateProduct(productId, row);
                 setLoadingRows((prev) => ({ ...prev, [row.id]: false }));
             } else {
-                if (row?.priceBreakup) {
-                    updatePriceBreakup(productId, row);
-                } else {
-                    createPriceBreakup(productId);
-                }
+                // if (row?.priceBreakup) {
+                //     updatePriceBreakup(productId, row);
+                // } else {
+                createPriceBreakup(productId, row);
+                // }
 
                 // if (selectedTag?.length > 0) {
                 //     assignsTagToProduct(productId);
@@ -831,14 +831,13 @@ const Index = () => {
 
                 // router.push(`/apps/product/edit?id=${productId}`);
                 // window.open(`/apps/product/edit?id=${productId}`, '_blank');
-                duplicate_refresh(row);
             }
         } catch (error) {
             console.log('error: ', error);
         }
     };
 
-    const createPriceBreakup = async (productId: any) => {
+    const createPriceBreakup = async (productId: any, row: any) => {
         try {
             const sampleData = `
         <table>
@@ -870,16 +869,26 @@ const Index = () => {
                     breakupDetails: sampleData,
                 },
             });
+            if (data?.priceBreakupCreate?.errors?.length > 0) {
+                Failure(data?.priceBreakupCreate?.errors[0]?.message);
+                setLoadingRows((prev) => ({ ...prev, [row.id]: false }));
+                deleteDuplicateProduct(productId, row);
+                return;
+            } else {
+                updatePriceBreakup(productId, data,row);
+                duplicate_refresh(row);
+            }
+
         } catch (error) {
             console.log('error: ', error);
         }
     };
 
-    const updatePriceBreakup = async (productId, row) => {
+    const updatePriceBreakup = async (productId,datas:any, row) => {
         try {
             const { data } = await priceBreakupUpdate({
                 variables: {
-                    id: row?.priceBreakup?.id,
+                    id: datas?.priceBreakupCreate?.priceBreakup?.id,
                     product: productId,
                     breakupDetails: row?.priceBreakup?.breakupDetails,
                 },
@@ -1261,7 +1270,7 @@ const Index = () => {
                 </span>
             </div>
 
-            <div className="panel mb-5 mt-5 gap-2 xl:gap-4 px-2 md:mt-0 md:flex md:justify-between">
+            <div className="panel mb-5 mt-5 gap-2 px-2 md:mt-0 md:flex md:justify-between xl:gap-4">
                 {/* Search Input */}
                 <input type="text" className="form-input mb-3 h-[40px] flex-1 md:mb-0 md:w-auto" placeholder="Search..." value={search} onChange={(e) => handleSearchChange(e.target.value)} />
 
@@ -1406,7 +1415,7 @@ const Index = () => {
                             { accessor: 'sku', title: 'SKU' },
 
                             { accessor: 'stock' },
-                            { accessor: 'status'},
+                            { accessor: 'status' },
                             { accessor: 'price' },
                             {
                                 accessor: 'categories',

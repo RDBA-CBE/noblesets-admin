@@ -7,6 +7,12 @@ export const CREATE_PRICE_BREAKUP = gql`
                 code
                 message
                 values
+                __typename
+            }
+            __typename
+            priceBreakup {
+                breakupDetails
+                id
             }
         }
     }

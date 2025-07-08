@@ -2262,28 +2262,29 @@ const Editorder = () => {
                                                         </div>
                                                     </td>
                                                     {item?.unitPrice?.net?.currency == 'USD' ? (
-                                                        <td>{`${formatCurrency(item?.unitPrice?.net?.currency)}${addCommasToNumber(item?.variant?.pricing?.price?.net?.amount)}`} </td>
+                                                        <td>{`${formatCurrency(item?.unitPrice?.net?.currency)}${addCommasToNumber(item?.undiscountedUnitPrice?.net?.amount)}`} </td>
                                                     ) : (
-                                                        <td>{`${formatCurrency(item?.unitPrice?.net?.currency)}${item?.variant?.pricing?.price?.net?.amount}`} </td>
+                                                        <td>{`${formatCurrency(item?.unitPrice?.net?.currency)}${item?.undiscountedUnitPrice?.net?.amount}`} </td>
                                                     )}
                                                     <td>
                                                         <div>× {item?.quantity}</div>
                                                     </td>
                                                     {/* <td>{`${formatCurrency(item?.unitPrice?.gross?.currency)}${addCommasToNumber(item?.unitPrice?.gross?.amount)}`} </td> */}
                                                     <td>
-                                                        <div>
-                                                            {`${formatCurrency(item?.totalPrice?.gross?.currency)}${Number(item?.variant?.pricing?.price?.gross?.amount) * Number(item?.quantity)}`}
-                                                        </div>
+                                                        <div>{`${formatCurrency(item?.totalPrice?.gross?.currency)}${Number(item?.totalPrice?.gross?.amount)}`}</div>
+                                                        {item?.unitDiscount?.amount && item?.unitDiscount?.amount != 0 && (
+                                                            <div className="text-[12px]">{`(${formatCurrency(item?.totalPrice?.gross?.currency)}${Number(item?.unitDiscount?.amount)} Discount)`}</div>
+                                                        )}
                                                     </td>
                                                     {formData?.billing?.state !== '' && formData?.shipping?.state == 'Tamil Nadu' ? (
                                                         <td>
-                                                            <div>{`SGST: ${formatCurrency(item?.unitPrice?.tax?.currency)}${(Number(item?.unitPrice?.tax?.amount) / 2)?.toFixed(2)}`}</div>
+                                                            <div>{`SGST: ${formatCurrency(item?.totalPrice?.tax?.currency)}${Number(item?.totalPrice?.tax?.amount) / 2}`}</div>
                                                             <span className="ml-10">+</span>
-                                                            <div>{`CSGT: ${formatCurrency(item?.unitPrice?.tax?.currency)}${(Number(item?.unitPrice?.tax?.amount) / 2)?.toFixed(2)}`}</div>
+                                                            <div>{`CSGT: ${formatCurrency(item?.totalPrice?.tax?.currency)}${Number(item?.totalPrice?.tax?.amount) / 2}`}</div>
                                                         </td>
                                                     ) : (
                                                         <td>
-                                                            <div>{`IGST: ${formatCurrency(item?.unitPrice?.tax?.currency)}${Number(item?.unitPrice?.tax?.amount)?.toFixed(2)}`}</div>
+                                                            <div>{`IGST: ${formatCurrency(item?.totalPrice?.tax?.currency)}${Number(item?.totalPrice?.tax?.amount)}`}</div>
                                                         </td>
                                                     )}
                                                     {/* <td>
@@ -2312,9 +2313,12 @@ const Editorder = () => {
                                 <div className="sm:w-3/5">
                                     <div className="flex items-center justify-between">
                                         <div>Items Subtotal:</div>
-                                        <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${itemSubTotal}`}</div>
+                                        <div>
+                                            <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${orderData?.subtotal?.net?.amount}`}</div>
+                                            {/* <div className='text-[12px]'>{`(Included Tax)`}</div> */}
+                                        </div>
                                     </div>
-                                    {orderData?.discounts?.length > 0 && (
+                                    {/* {orderData?.discounts?.length > 0 && (
                                         <div className="mt-4 flex items-center justify-between">
                                             <div>Coupon Amount</div>
                                             <div style={{ color: 'green' }}>
@@ -2322,12 +2326,12 @@ const Editorder = () => {
                                                 {orderData?.discounts[0]?.amount?.amount}
                                             </div>
                                         </div>
-                                    )}
+                                    )} */}
                                     {orderDetails?.order?.giftCards?.length > 0 && (
-                                        <div className="mt-4 flex  justify-between">
+                                        <div className="mt-4 flex  justify-between" style={{ color: 'green' }}>
                                             <div>Gift Voucher Amount</div>
                                             <div>
-                                                <div className="ml-[94px] items-end">{`${formatCurrency(coupenAmt?.currency)}${coupenAmt?.amount}`}</div>
+                                                <div className="ml-[94px] items-end">{`-${formatCurrency(coupenAmt?.currency)}${coupenAmt?.amount}`}</div>
                                             </div>
                                         </div>
                                     )}

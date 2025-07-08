@@ -343,7 +343,7 @@ const AbandonedCarts = () => {
 
             const response = {
                 gte: startDate,
-                lte: e,
+                lte: dayjs(e).format('YYYY-MM-DD HH:mm:ss'),
             };
             setInterval(response);
 

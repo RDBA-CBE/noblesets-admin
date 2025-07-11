@@ -69,6 +69,8 @@ import {
     sampleParams,
     showDeleteAlert,
     roundIndianRupee,
+    floatComma,
+    formatAsINRWithDecimal,
 } from '@/utils/functions';
 import Swal from 'sweetalert2';
 import IconPencil from '@/components/Icon/IconPencil';
@@ -1603,6 +1605,36 @@ const Editorder = () => {
         return net;
     };
 
+    const calculateDiscount = () => {
+        return formatAsINRWithDecimal(orderData?.discount?.amount);
+    };
+
+    const subTotal = () => {
+        const subtotal = orderData?.subtotal?.net?.amount || 0;
+        let result = 0;
+        if (!orderData?.voucher) {
+            return subtotal;
+        }
+
+        if (orderData.voucher) {
+            const { discountValue, discountValueType, currency } = orderData.voucher;
+
+            if (discountValueType === 'FIXED') {
+                if (subtotal < discountValue) {
+                    result = orderData?.discount?.amount || 0;
+                } else {
+                    result = Math.max(0, subtotal + discountValue);
+                }
+            } else if (discountValueType === 'PERCENTAGE') {
+                result = Math.max(0, subtotal + orderData?.discount?.amount || 0);
+            }
+        } else {
+            result = subtotal;
+        }
+
+        return formatAsINRWithDecimal(result);
+    };
+
     return (
         <>
             <>
@@ -2237,8 +2269,8 @@ const Editorder = () => {
                                             <th>Item</th>
                                             <th>Cost</th>
                                             <th>Qty</th>
-                                            <th>Total</th>
 
+                                            <th>Total</th>
                                             <th>GST</th>
 
                                             {/* <th>Action</th> */}
@@ -2262,20 +2294,21 @@ const Editorder = () => {
                                                         </div>
                                                     </td>
                                                     {item?.unitPrice?.net?.currency == 'USD' ? (
-                                                        <td>{`${formatCurrency(item?.unitPrice?.net?.currency)}${addCommasToNumber(item?.undiscountedUnitPrice?.net?.amount)}`} </td>
+                                                        <td>{`${formatAsINRWithDecimal(item?.undiscountedUnitPrice?.net?.amount)}`} </td>
                                                     ) : (
-                                                        <td>{`${formatCurrency(item?.unitPrice?.net?.currency)}${item?.undiscountedUnitPrice?.net?.amount}`} </td>
+                                                        <td>{`${formatAsINRWithDecimal(item?.variant?.pricing?.price?.gross?.amount)}`} </td>
                                                     )}
                                                     <td>
                                                         <div>× {item?.quantity}</div>
                                                     </td>
-                                                    {/* <td>{`${formatCurrency(item?.unitPrice?.gross?.currency)}${addCommasToNumber(item?.unitPrice?.gross?.amount)}`} </td> */}
                                                     <td>
-                                                        <div>{`${formatCurrency(item?.totalPrice?.gross?.currency)}${Number(item?.totalPrice?.gross?.amount)}`}</div>
-                                                        {item?.unitDiscount?.amount && item?.unitDiscount?.amount != 0 && (
-                                                            <div className="text-[12px]">{`(${formatCurrency(item?.totalPrice?.gross?.currency)}${Number(item?.unitDiscount?.amount)} Discount)`}</div>
-                                                        )}
+                                                        <div>{`${formatAsINRWithDecimal(Number(item?.variant?.pricing?.price?.gross?.amount) * Number(item?.quantity))}`}</div>
+                                                        {/* {orderData?.discount && (
+                                                            <div className="text-[12px]">{`(${formatCurrency(orderData?.discount?.currency)}${Number(orderData?.discount?.amount)} Discount)`}</div>
+                                                        )} */}
                                                     </td>
+                                                    {/* <td>{`${formatCurrency(item?.unitPrice?.gross?.currency)}${addCommasToNumber(item?.unitPrice?.gross?.amount)}`} </td> */}
+
                                                     {formData?.billing?.state !== '' && formData?.shipping?.state == 'Tamil Nadu' ? (
                                                         <td>
                                                             <div>{`SGST: ${formatCurrency(item?.totalPrice?.tax?.currency)}${Number(item?.totalPrice?.tax?.amount) / 2}`}</div>
@@ -2287,6 +2320,7 @@ const Editorder = () => {
                                                             <div>{`IGST: ${formatCurrency(item?.totalPrice?.tax?.currency)}${Number(item?.totalPrice?.tax?.amount)}`}</div>
                                                         </td>
                                                     )}
+
                                                     {/* <td>
                                                             <button
                                                                 type="button"
@@ -2314,19 +2348,18 @@ const Editorder = () => {
                                     <div className="flex items-center justify-between">
                                         <div>Items Subtotal:</div>
                                         <div>
-                                            <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${orderData?.subtotal?.net?.amount}`}</div>
+                                            <div>{subTotal()}</div>
                                             {/* <div className='text-[12px]'>{`(Included Tax)`}</div> */}
                                         </div>
                                     </div>
-                                    {/* {orderData?.discounts?.length > 0 && (
+                                    {orderData?.voucher && orderData?.voucher?.discountValue != 0 && (
                                         <div className="mt-4 flex items-center justify-between">
-                                            <div>Coupon Amount</div>
+                                            <div>Coupon Amount {`(${orderData?.voucher?.name})`}</div>
                                             <div style={{ color: 'green' }}>
-                                                {orderData?.discounts[0]?.amount?.currency == 'USD' ? '- $' : '- ₹'}
-                                                {orderData?.discounts[0]?.amount?.amount}
+                                                {orderData?.voucher?.discountValueType === 'PERCENTAGE' ? `-${calculateDiscount()}` : `-${formatAsINRWithDecimal(orderData?.discount?.amount)}`}
                                             </div>
                                         </div>
-                                    )} */}
+                                    )}
                                     {orderDetails?.order?.giftCards?.length > 0 && (
                                         <div className="mt-4 flex  justify-between" style={{ color: 'green' }}>
                                             <div>Gift Voucher Amount</div>
@@ -2335,18 +2368,22 @@ const Editorder = () => {
                                             </div>
                                         </div>
                                     )}
-                                    <div className="mt-4 flex  justify-between">
-                                        <div>{orderData?.paymentMethod?.name == 'Cash On Delivery' ? 'COD Fee:' : 'Shipping:'}</div>
-                                        <div>
-                                            {orderData?.paymentMethod?.name == 'Cash On Delivery' ? (
-                                                <div className="ml-[94px] items-end">{`${formatCurrency(orderData?.subtotal?.gross?.currency)}${orderData?.codAmount}`}</div>
-                                            ) : (
-                                                <div className="ml-[94px] items-end">
-                                                    {`${formatCurrency(orderData?.shippingPrice?.gross?.currency)}${addCommasToNumber(orderData?.shippingPrice?.gross?.amount)}`}
-                                                </div>
-                                            )}
+                                    {(orderData?.paymentMethod?.name === 'Cash On Delivery' ? orderData?.codAmount > 0 : orderData?.shippingPrice?.gross?.amount > 0) && (
+                                        <div className="mt-4 flex justify-between">
+                                            <div>{orderData?.paymentMethod?.name === 'Cash On Delivery' ? 'COD Fee:' : 'Shipping:'}</div>
+                                            <div>
+                                                {orderData?.paymentMethod?.name === 'Cash On Delivery' ? (
+                                                    <div className="ml-[94px] items-end">{`${formatCurrency('INR')}${orderData?.codAmount}}`}</div>
+                                                ) : (
+                                                    <div className="ml-[94px] items-end">
+                                                        {/* {`${formatCurrency(orderData?.codAmount)}${orderData?.subtotal?.gross?.currency}`} */}
+
+                                                        {`${formatCurrency(orderData?.shippingPrice?.gross?.currency)}${orderData?.shippingPrice?.gross?.amount}`}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                     {isGiftWrap && (
                                         <div className="mt-4 flex  justify-between">
                                             <div>Gift Wrap:</div>

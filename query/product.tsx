@@ -1067,201 +1067,26 @@ export const CREATE_COUPEN = gql`
 `;
 
 export const ASSIGN_TO_COUPON = gql`
-    mutation VoucherCataloguesAdd(
-        $input: CatalogueInput!
-        $id: ID!
-        $after: String
-        $before: String
-        $first: Int
-        $last: Int
-        $includeProducts: Boolean!
-        $includeCollections: Boolean!
-        $includeCategories: Boolean!
-    ) {
-        voucherCataloguesAdd(id: $id, input: $input) {
+    mutation AddCategoriesToVoucher($voucherId: ID!, $categoryIds: [ID!]!) {
+        voucherCataloguesAdd(id: $voucherId, input: { categories: $categoryIds }) {
             errors {
-                ...DiscountError
-                __typename
+                field
+                message
+                code
             }
             voucher {
-                ...VoucherDetails
-                __typename
-            }
-            __typename
-        }
-    }
-
-    fragment DiscountError on DiscountError {
-        code
-        field
-        channels
-        message
-        __typename
-    }
-
-    fragment VoucherDetails on Voucher {
-        ...Voucher
-        usageLimit
-        used
-        applyOncePerOrder
-        applyOncePerCustomer
-        onlyForStaff
-        singleUse
-        productsCount: products {
-            totalCount
-            __typename
-        }
-        collectionsCount: collections {
-            totalCount
-            __typename
-        }
-        categoriesCount: categories {
-            totalCount
-            __typename
-        }
-        products(after: $after, before: $before, first: $first, last: $last) @include(if: $includeProducts) {
-            edges {
-                node {
-                    id
-                    name
-                    productType {
-                        id
-                        name
-                        __typename
-                    }
-                    thumbnail {
-                        url
-                        __typename
-                    }
-                    channelListings {
-                        ...ChannelListingProductWithoutPricing
-                        __typename
-                    }
-                    __typename
-                }
-                __typename
-            }
-            pageInfo {
-                ...PageInfo
-                __typename
-            }
-            __typename
-        }
-        collections(after: $after, before: $before, first: $first, last: $last) @include(if: $includeCollections) {
-            edges {
-                node {
-                    id
-                    name
-                    products {
-                        totalCount
-                        __typename
-                    }
-                    __typename
-                }
-                __typename
-            }
-            pageInfo {
-                ...PageInfo
-                __typename
-            }
-            __typename
-        }
-        categories(after: $after, before: $before, first: $first, last: $last) @include(if: $includeCategories) {
-            edges {
-                node {
-                    id
-                    name
-                    products {
-                        totalCount
-                        __typename
-                    }
-                    __typename
-                }
-                __typename
-            }
-            pageInfo {
-                ...PageInfo
-                __typename
-            }
-            __typename
-        }
-        __typename
-    }
-
-    fragment Voucher on Voucher {
-        ...Metadata
-        id
-        name
-        startDate
-        endDate
-        usageLimit
-        type
-        discountValueType
-        countries {
-            code
-            country
-            __typename
-        }
-        minCheckoutItemsQuantity
-        channelListings {
-            id
-            channel {
                 id
                 name
-                currencyCode
-                __typename
+                categories(first: 10) {
+                    edges {
+                        node {
+                            id
+                            name
+                        }
+                    }
+                }
             }
-            discountValue
-            currency
-            minSpent {
-                amount
-                currency
-                __typename
-            }
-            __typename
         }
-        __typename
-    }
-
-    fragment Metadata on ObjectWithMetadata {
-        metadata {
-            ...MetadataItem
-            __typename
-        }
-        privateMetadata {
-            ...MetadataItem
-            __typename
-        }
-        __typename
-    }
-
-    fragment MetadataItem on MetadataItem {
-        key
-        value
-        __typename
-    }
-
-    fragment ChannelListingProductWithoutPricing on ProductChannelListing {
-        isPublished
-        publicationDate
-        isAvailableForPurchase
-        availableForPurchase
-        visibleInListings
-        channel {
-            id
-            name
-            currencyCode
-            __typename
-        }
-        __typename
-    }
-
-    fragment PageInfo on PageInfo {
-        endCursor
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        __typename
     }
 `;
 
@@ -8751,7 +8576,9 @@ export const GET_ORDER_DETAILS = gql`
                 currentBalance {
                     amount
                     currency
+                    __typename
                 }
+                __typename
             }
             ...OrderDetailsWithMetadata
             __typename
@@ -8770,7 +8597,9 @@ export const GET_ORDER_DETAILS = gql`
                 gross {
                     amount
                     currency
+                    __typename
                 }
+                __typename
             }
         }
         shop {
@@ -8805,13 +8634,18 @@ export const GET_ORDER_DETAILS = gql`
                         gross {
                             amount
                             currency
+                            __typename
                         }
                         net {
                             amount
                             currency
+                            __typename
                         }
+                        __typename
                     }
+                    __typename
                 }
+                __typename
             }
         }
         __typename
@@ -9035,6 +8869,19 @@ export const GET_ORDER_DETAILS = gql`
         }
         isPaid
         __typename
+        voucher {
+            id
+            name
+            used
+            currency
+            discountValue
+            discountValueType
+        }
+        discount {
+            amount
+            currency
+            ...Money
+        }
     }
 
     fragment Metadata on ObjectWithMetadata {
@@ -9354,19 +9201,25 @@ export const GET_ORDER_DETAILS = gql`
                     gross {
                         amount
                         currency
+                        __typename
                     }
+                    __typename
                 }
                 undiscountedTotalPrice {
                     gross {
                         amount
                         currency
+                        __typename
                     }
+                    __typename
                 }
                 totalPrice {
                     gross {
                         amount
                         currency
+                        __typename
                     }
+                    __typename
                 }
             }
             __typename
@@ -9428,11 +9281,13 @@ export const GET_ORDER_DETAILS = gql`
                 __typename
                 thumbnail {
                     url
+                    __typename
                 }
                 productType {
                     isDigital
                     id
                     kind
+                    __typename
                 }
             }
             __typename
@@ -9562,7 +9417,9 @@ export const GET_ORDER_DETAILS = gql`
             product {
                 category {
                     name
+                    __typename
                 }
+                __typename
             }
         }
         __typename

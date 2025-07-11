@@ -1653,3 +1653,20 @@ export const roundIndianRupee = (value) => {
 
     return rounded;
 };
+
+export const floatComma = (number) => {
+    const formattedNumber = number?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return formattedNumber;
+};
+
+
+export const formatAsINRWithDecimal = (amount) => {
+    const formattedINR = new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(amount);
+    return formattedINR
+  
+};

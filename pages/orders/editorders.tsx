@@ -2294,15 +2294,15 @@ const Editorder = () => {
                                                         </div>
                                                     </td>
                                                     {item?.unitPrice?.net?.currency == 'USD' ? (
-                                                        <td>{`${formatAsINRWithDecimal(item?.undiscountedUnitPrice?.net?.amount)}`} </td>
+                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.gross?.amount)}`} </td>
                                                     ) : (
-                                                        <td>{`${formatAsINRWithDecimal(item?.variant?.pricing?.price?.gross?.amount)}`} </td>
+                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.gross?.amount)}`} </td>
                                                     )}
                                                     <td>
                                                         <div>× {item?.quantity}</div>
                                                     </td>
                                                     <td>
-                                                        <div>{`${formatAsINRWithDecimal(Number(item?.variant?.pricing?.price?.gross?.amount) * Number(item?.quantity))}`}</div>
+                                                        <div>{`${formatAsINRWithDecimal(Number(item?.unitPrice?.gross?.amount) * Number(item?.quantity))}`}</div>
                                                         {/* {orderData?.discount && (
                                                             <div className="text-[12px]">{`(${formatCurrency(orderData?.discount?.currency)}${Number(orderData?.discount?.amount)} Discount)`}</div>
                                                         )} */}

@@ -2236,9 +2236,9 @@ const Editorder = () => {
                                                         </div>
                                                     </td>
                                                     {item?.unitPrice?.net?.currency == 'USD' ? (
-                                                        <td>{`${formatAsINRWithDecimal(item?.variant?.pricing?.price?.gross?.amount)}`} </td>
+                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.gross?.amount)}`} </td>
                                                     ) : (
-                                                        <td>{`${formatAsINRWithDecimal(item?.variant?.pricing?.price?.gross?.amount)}`} </td>
+                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.gross?.amount)}`} </td>
 
                                                         // <td>{`${formatCurrency(item?.unitPrice?.net?.currency)}${floatComma(item?.variant?.pricing?.pricing?.gross?.amount)}`} </td>
                                                     )}
@@ -2255,7 +2255,7 @@ const Editorder = () => {
                                                         )} */}
                                                     {/* </td> */}
                                                     <td>
-                                                        <div>{`${formatAsINRWithDecimal(Number(item?.variant?.pricing?.price?.gross?.amount) * Number(item?.quantity))}`}</div>
+                                                        <div>{`${formatAsINRWithDecimal(Number(item?.unitPrice?.gross?.amount) * Number(item?.quantity))}`}</div>
                                                     </td>
                                                     {formData?.billing?.state !== '' && formData?.shipping?.state == 'Tamil Nadu' ? (
                                                         <td>

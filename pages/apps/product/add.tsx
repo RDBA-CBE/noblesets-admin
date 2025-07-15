@@ -2384,7 +2384,7 @@ const ProductAdd = () => {
                                         ) : (
                                             <>
                                                 <div className="grid grid-cols-12 pt-5">
-                                                    <div className="col-span-9 h-[500px] overflow-y-scroll border-r border-gray-200 pr-5 md:h-[700px] xl:h-[700px]">
+                                                    <div className="col-span-9 h-[500px] overflow-y-scroll border-r border-gray-200 pr-5  md:h-[600px] xl:h-[600px]">
                                                         <div className="flex gap-4">
                                                             <div>
                                                                 <div>Filter by type</div>

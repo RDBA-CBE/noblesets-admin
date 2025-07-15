@@ -624,7 +624,7 @@ const Category = () => {
                                         ) : (
                                             <>
                                                 <div className="grid grid-cols-12 pt-5">
-                                                    <div className="col-span-9 h-[450px] overflow-y-scroll border-r border-gray-200 pr-5">
+                                                    <div className="col-span-9 h-[450px] overflow-y-scroll border-r border-gray-200 pr-5  md:h-[600px] xl:h-[600px]">
                                                         <div>
                                                             <div>Filter by month</div>
                                                             <div className="flex justify-between gap-3 pt-3">

@@ -94,7 +94,7 @@ const Media = () => {
             after: null,
             fileType: state.mediaType == 'all' ? '' : state.mediaType,
             month: state.selectedMonthNumber,
-            year: 2024,
+            year: 2025,
             name: state.search,
         },
         onCompleted: (data) => {
@@ -111,7 +111,7 @@ const Media = () => {
                 before: null,
                 fileType: state.mediaType == 'all' ? '' : state.mediaType,
                 month: state.selectedMonthNumber,
-                year: 2024,
+                year: 2025,
                 name: state.search,
             },
         });
@@ -124,7 +124,7 @@ const Media = () => {
                 before: state.startCursor,
                 fileType: state.mediaType == 'all' ? '' : state.mediaType,
                 month: state.selectedMonthNumber,
-                year: 2024,
+                year: 2025,
                 name: state.search,
             },
         });
@@ -296,7 +296,7 @@ const Media = () => {
                 after,
                 fileType: fileType == 'all' ? '' : fileType,
                 month,
-                year: 2024,
+                year: 2025,
                 name,
             },
         };
@@ -373,7 +373,7 @@ const Media = () => {
                 after: null,
                 fileType: state.mediaType == 'all' ? '' : state.mediaType,
                 month: value == 'all' ? null : res,
-                year: 2024,
+                year: 2025,
                 name: '',
             },
         });
@@ -531,14 +531,14 @@ const Media = () => {
                                             <div className="flex justify-between gap-3 pt-3">
                                                 <div className="flex gap-3">
                                                     {/* <select className="form-select w-40 flex-1"> */}
-                                                    <select className="form-select w-40 xl:w-60  flex-1" value={state.mediaType} onChange={(e) => setState({ mediaType: e.target.value })}>
+                                                    <select className="form-select w-40 flex-1  xl:w-60" value={state.mediaType} onChange={(e) => setState({ mediaType: e.target.value })}>
                                                         <option value="all">All Data</option>
                                                         <option value="Image">Images</option>
                                                         <option value="Video">Videos</option>
                                                         <option value="Doc">Docs</option>
 
-                                                        {/* <option value="July/2024">July 2024</option>
-                                                                            <option value="August/2024">August 2024</option> */}
+                                                        {/* <option value="July/2025">July 2025</option>
+                                                                            <option value="August/2025">August 2025</option> */}
                                                     </select>
                                                 </div>
                                             </div>
@@ -549,7 +549,7 @@ const Media = () => {
                                             <div className="flex justify-between gap-3 pt-3">
                                                 <div className="flex gap-3">
                                                     <select
-                                                        className="form-select w-40 xl:w-60  flex-1"
+                                                        className="form-select w-40 flex-1  xl:w-60"
                                                         value={state.date}
                                                         onChange={(e) => {
                                                             filterMediaByMonth(e.target.value);
@@ -557,11 +557,11 @@ const Media = () => {
                                                     >
                                                         <option value="all">All Data</option>
                                                         {months.map((month, index) => (
-                                                            <option key={month} value={`${month}/2024`}>{`${month} 2024`}</option>
+                                                            <option key={month} value={`${month}/2025`}>{`${month} 2025`}</option>
                                                         ))}
-                                                        {/* <option value="June/2024">June 2024</option>
-                                                        <option value="July/2024">July 2024</option>
-                                                        <option value="August/2024">August 2024</option> */}
+                                                        {/* <option value="June/2025">June 2025</option>
+                                                        <option value="July/2025">July 2025</option>
+                                                        <option value="August/2025">August 2025</option> */}
                                                     </select>
                                                 </div>
                                                 <div>
@@ -588,9 +588,7 @@ const Media = () => {
                                                             <div
                                                                 key={item.node?.fileUrl}
                                                                 className={`col-span-2  overflow-hidden p-2 ${
-                                                                    state.selectedImages.some((selected) => selected.node?.fileUrl === item.node?.fileUrl)
-                                                                        ? 'border-4 border-blue-500'
-                                                                        : ''
+                                                                    state.selectedImages.some((selected) => selected.node?.fileUrl === item.node?.fileUrl) ? 'border-4 border-blue-500' : ''
                                                                 }`}
                                                                 onClick={() => handleSingleClick(item)}
                                                                 onTouchStart={() => handleLongPressStart(item)}

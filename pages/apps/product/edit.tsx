@@ -278,7 +278,6 @@ const ProductEdit = (props: any) => {
     const [productPreview, setPreviewData] = useState(null);
     const [previewSelectedImg, setPreviewSelectedImg] = useState(null);
     const [tableHtml, setTableHtml] = useState(null);
-    console.log('✌️tableHtml --->', tableHtml);
 
     const [imageUrl, setImageUrl] = useState([]);
 
@@ -314,7 +313,7 @@ const ProductEdit = (props: any) => {
     //         after: null,
     //         fileType: mediaType == 'all' ? '' : mediaType,
     //         month: 9,
-    //         year: 2024,
+    //         year: 2025,
     //         name: '',
     //     },
     //     onCompleted: (data) => {
@@ -330,7 +329,7 @@ const ProductEdit = (props: any) => {
                 before: null,
                 fileType: mediaType == 'all' ? '' : mediaType,
                 month: monthNumber,
-                year: 2024,
+                year: 2025,
                 name: mediaSearch,
             },
         });
@@ -343,7 +342,7 @@ const ProductEdit = (props: any) => {
                 before: mediaStartCussor,
                 fileType: mediaType == 'all' ? '' : mediaType,
                 month: monthNumber,
-                year: 2024,
+                year: 2025,
                 name: mediaSearch,
             },
         });
@@ -1751,7 +1750,7 @@ const ProductEdit = (props: any) => {
                 after,
                 fileType: mediaType == 'all' ? '' : mediaType,
                 month: month,
-                year: 2024,
+                year: 2025,
                 name,
             },
         };
@@ -2793,8 +2792,8 @@ const ProductEdit = (props: any) => {
                                                                             <option value="video">Videos</option>
                                                                             <option value="doc">Docs</option>
 
-                                                                            {/* <option value="July/2024">July 2024</option>
-                                                                            <option value="August/2024">August 2024</option> */}
+                                                                            {/* <option value="July/2025">July 2025</option>
+                                                                            <option value="August/2025">August 2025</option> */}
                                                                         </select>
                                                                     </div>
                                                                 </div>
@@ -2807,7 +2806,7 @@ const ProductEdit = (props: any) => {
                                                                             {/* <select className="form-select w-40 flex-1" value={mediaDate} onChange={(e) => filterMediaByMonth(e.target.value)}> */}
                                                                             <option value="all">All Data</option>
                                                                             {months.map((month, index) => (
-                                                                                <option key={month} value={`${month}/2024`}>{`${month} 2024`}</option>
+                                                                                <option key={month} value={`${month}/2025`}>{`${month} 2025`}</option>
                                                                             ))}
                                                                         </select>
                                                                     </div>

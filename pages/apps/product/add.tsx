@@ -309,7 +309,7 @@ const ProductAdd = () => {
                 before: null,
                 fileType: mediaType == 'all' ? '' : mediaType,
                 month: monthNumber,
-                year: 2024,
+                year: 2025,
                 name: mediaSearch,
             },
         });
@@ -322,14 +322,13 @@ const ProductAdd = () => {
                 before: mediaStartCussor,
                 fileType: mediaType == 'all' ? '' : mediaType,
                 month: monthNumber,
-                year: 2024,
+                year: 2025,
                 name: mediaSearch,
             },
         });
     };
 
     const commonPagination = (data) => {
-        console.log('✌️data --->', data);
         setImageList(data.files.edges);
         setMediaStartCussor(data.files.pageInfo.startCursor);
         setMediaEndCursor(data.files.pageInfo.endCursor);
@@ -667,8 +666,8 @@ const ProductAdd = () => {
         let maxPrice = null;
         if (variants.length > 1) {
             const prices = variants.map((product) => product.regularPrice);
-             minPrice = Math.min(...prices); 
-             maxPrice = Math.max(...prices);
+            minPrice = Math.min(...prices);
+            maxPrice = Math.max(...prices);
         }
 
         const data = {
@@ -680,8 +679,8 @@ const ProductAdd = () => {
             description: savedContent,
             category: selectedCat,
             variants,
-            minPrice:minPrice,
-            maxPrice:maxPrice,
+            minPrice: minPrice,
+            maxPrice: maxPrice,
             collection: selectedCollection,
             tags: selectedTag,
             upsell: selectedUpsell,
@@ -1414,7 +1413,11 @@ const ProductAdd = () => {
     };
 
     useEffect(() => {
-        filterByType();
+        if (monthNumber) {
+            filterByType();
+        } else {
+            refresh();
+        }
     }, [monthNumber]);
 
     const filterByType = async () => {
@@ -1440,7 +1443,7 @@ const ProductAdd = () => {
                 after,
                 fileType: mediaType == 'all' ? '' : mediaType,
                 month: month,
-                year: 2024,
+                year: 2025,
                 name,
             },
         };
@@ -1563,7 +1566,7 @@ const ProductAdd = () => {
                 after: null,
                 fileType: '',
                 month: null,
-                year: null,
+                year: 2025,
                 name: '',
             });
 
@@ -1576,8 +1579,27 @@ const ProductAdd = () => {
     useEffect(() => {
         if (mediaType == 'all') {
             refresh();
+        } else {
+            filterByTypes();
         }
     }, [mediaType]);
+
+    const filterByTypes = async () => {
+        try {
+            const res = await mediaRefetch({
+                first: PAGE_SIZE,
+                after: null,
+                fileType: mediaType == 'all' ? '' : mediaType,
+                month: null,
+                year: null,
+                name: '',
+            });
+
+            commonPagination(res.data);
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    };
 
     const handleSelectChange = (attributeId, selectedOptions) => {
         // Ensure slug is used in place of value or label for state
@@ -2390,7 +2412,7 @@ const ProductAdd = () => {
                                                                         <select className="form-select w-40 flex-1 xl:w-60" value={mediaMonth} onChange={(e) => filterMediaByMonth(e.target.value)}>
                                                                             <option value="all">All Data</option>
                                                                             {months.map((month, index) => (
-                                                                                <option key={month} value={`${month}/2024`}>{`${month} 2024`}</option>
+                                                                                <option key={month} value={`${month}/2025`}>{`${month} 2025`}</option>
                                                                             ))}
                                                                         </select>
                                                                     </div>

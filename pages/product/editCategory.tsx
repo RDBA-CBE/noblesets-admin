@@ -131,7 +131,7 @@ const EditCategory = () => {
             after: null,
             fileType: 'Image',
             month: null,
-            year: 2024,
+            year: 2025,
             name: '',
         },
         onCompleted: (data) => {
@@ -152,8 +152,29 @@ const EditCategory = () => {
     }, [categoryDatas, catId]);
 
     useEffect(() => {
-        filterByType();
+        if (monthNumber) {
+            filterByType();
+        } else {
+            refresh();
+        }
     }, [monthNumber]);
+
+    const refresh = async () => {
+        try {
+            const res = await mediaRefetch({
+                first: PAGE_SIZE,
+                after: null,
+                fileType: '',
+                month: null,
+                year: 2025,
+                name: '',
+            });
+
+            commonPagination(res.data);
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    };
 
     useEffect(() => {
         const getparentCategoryList = parentList?.categories?.edges;
@@ -448,7 +469,7 @@ const EditCategory = () => {
                 after,
                 fileType: 'Image',
                 month: month,
-                year: 2024,
+                year: 2025,
                 name,
             },
         };
@@ -463,7 +484,7 @@ const EditCategory = () => {
                 before: null,
                 fileType: 'Image',
                 month: monthNumber,
-                year: 2024,
+                year: 2025,
                 name: mediaSearch,
             },
         });
@@ -476,7 +497,7 @@ const EditCategory = () => {
                 before: mediaStartCussor,
                 fileType: 'Image',
                 month: monthNumber,
-                year: 2024,
+                year: 2025,
                 name: mediaSearch,
             },
         });
@@ -627,7 +648,7 @@ const EditCategory = () => {
                                                     }
                                                 }}
                                             >
-                                                Set Product Image
+                                                Set Category Image
                                             </button>
                                         </div>
 
@@ -670,7 +691,7 @@ const EditCategory = () => {
                                                                 >
                                                                     <option value="all">All Data</option>
                                                                     {months.map((month, index) => (
-                                                                        <option key={month} value={`${month}/2024`}>{`${month} 2024`}</option>
+                                                                        <option key={month} value={`${month}/2025`}>{`${month} 2025`}</option>
                                                                     ))}
                                                                 </select>
                                                             </div>
@@ -690,9 +711,7 @@ const EditCategory = () => {
                                                                 mediaImages?.map((item) => (
                                                                     <div
                                                                         key={item?.node?.fileUrl}
-                                                                        className={`col-span-2  overflow-hidden p-2  ${
-                                                                            selectedImg == item?.node?.fileUrl ? 'border-4 border-blue-500' : ''
-                                                                        }`}
+                                                                        className={`col-span-2  overflow-hidden p-2  ${selectedImg == item?.node?.fileUrl ? 'border-4 border-blue-500' : ''}`}
                                                                         // onMouseDown={() => handleMouseDown(item)}
                                                                         // onMouseUp={handleMouseUp}
                                                                         // onMouseLeave={handleMouseLeave}
@@ -729,7 +748,7 @@ const EditCategory = () => {
                                                                     <p className="mb-2 text-lg font-semibold">ATTACHMENT DETAILS</p>
                                                                 </div>
                                                                 {selectedImg?.endsWith('.mp4') ? (
-                                                                    <video controls src={selectedImg} className="h-full w-full object-cover" >
+                                                                    <video controls src={selectedImg} className="h-full w-full object-cover">
                                                                         Your browser does not support the video tag.
                                                                     </video>
                                                                 ) : (

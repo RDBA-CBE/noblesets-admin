@@ -117,7 +117,7 @@ const Category = () => {
             after: null,
             fileType: 'Image',
             month: null,
-            year: 2024,
+            year: 2025,
             name: '',
         },
         onCompleted: (data) => {
@@ -353,8 +353,29 @@ const Category = () => {
     };
 
     useEffect(() => {
-        filterByType();
+        if (monthNumber) {
+            filterByType();
+        } else {
+            refresh();
+        }
     }, [monthNumber]);
+
+    const refresh = async () => {
+        try {
+            const res = await mediaRefetch({
+                first: PAGE_SIZE,
+                after: null,
+                fileType: '',
+                month: null,
+                year: 2025,
+                name: '',
+            });
+
+            commonPagination(res.data);
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    };
 
     const filterByType = async () => {
         fetchNextPage(commonInput(null, monthNumber, mediaSearch));
@@ -379,7 +400,7 @@ const Category = () => {
                 after,
                 fileType: 'Image',
                 month: month,
-                year: 2024,
+                year: 2025,
                 name,
             },
         };
@@ -394,7 +415,7 @@ const Category = () => {
                 before: null,
                 fileType: 'Image',
                 month: monthNumber,
-                year: 2024,
+                year: 2025,
                 name: mediaSearch,
             },
         });
@@ -407,7 +428,7 @@ const Category = () => {
                 before: mediaStartCussor,
                 fileType: 'Image',
                 month: monthNumber,
-                year: 2024,
+                year: 2025,
                 name: mediaSearch,
             },
         });
@@ -577,7 +598,7 @@ const Category = () => {
                                                     }
                                                 }}
                                             >
-                                                Set Product Image
+                                                Set Category Image
                                             </button>
                                         </div>
 
@@ -619,7 +640,7 @@ const Category = () => {
                                                                     >
                                                                         <option value="all">All Data</option>
                                                                         {months.map((month, index) => (
-                                                                            <option key={month} value={`${month}/2024`}>{`${month} 2024`}</option>
+                                                                            <option key={month} value={`${month}/2025`}>{`${month} 2025`}</option>
                                                                         ))}
                                                                     </select>
                                                                 </div>

@@ -251,7 +251,7 @@ const AbandonedCarts = () => {
                                 {
                                     accessor: 'ID',
                                     title: 'ID',
-                                    
+
                                     width: 300,
                                     render: (row) => (
                                         <div
@@ -267,9 +267,9 @@ const AbandonedCarts = () => {
                                         </div>
                                     ),
                                 },
-                                { accessor: 'firstRunTime',  },
-                                { accessor: 'secondRunTime',  },
-                                { accessor: 'thirdRunTime',  },
+                                { accessor: 'firstRunTime' },
+                                { accessor: 'secondRunTime' },
+                                { accessor: 'thirdRunTime' },
                                 {
                                     accessor: 'actions',
                                     title: 'Actions',
@@ -344,6 +344,7 @@ const AbandonedCarts = () => {
                                 setFirstRunTime(e);
                             }}
                             isSearchable={true}
+                            menuPosition="fixed"
                         />
                         <div className=" mt-3 flex justify-between">
                             <label htmlFor="name">Second RunTime</label>
@@ -356,6 +357,7 @@ const AbandonedCarts = () => {
                                 setSecondRunTime(e);
                             }}
                             isSearchable={true}
+                            menuPosition="fixed"
                         />
                         <div className=" mt-3 flex justify-between">
                             <label htmlFor="name">Third RunTime</label>
@@ -368,6 +370,7 @@ const AbandonedCarts = () => {
                                 setThirdRunTime(e);
                             }}
                             isSearchable={true}
+                            menuPosition="fixed"
                         />
 
                         <div className="mt-8 flex items-center justify-end">

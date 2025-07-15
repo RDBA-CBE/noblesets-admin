@@ -59,6 +59,7 @@ const CustomerList = () => {
     useEffect(() => {
         dispatch(setPageTitle('Products'));
     }, [dispatch]);
+
     useEffect(() => {
         if (search == '' && search == undefined) {
             refresh();
@@ -76,6 +77,7 @@ const CustomerList = () => {
         variables: {
             first: PAGE_SIZE,
             after: null,
+            search: search ? search : '',
             // filter: {
             //     dateJoined: null,
             //     numberOfOrders: null,
@@ -98,6 +100,8 @@ const CustomerList = () => {
         variables: {
             first: PAGE_SIZE,
             after: null,
+            search: search ? search : '',
+
             // filter: {
             //     dateJoined: null,
             //     numberOfOrders: null,
@@ -135,7 +139,7 @@ const CustomerList = () => {
                 ...item.node,
                 image: item?.node.product?.thumbnail?.url,
                 name: `${item.node.product?.name} `,
-                productId:item.node.product?.id,
+                productId: item.node.product?.id,
                 created_at: moment(item.node.createdAt).format('DD-MM-YYYY'),
             }))
         );
@@ -216,6 +220,7 @@ const CustomerList = () => {
             variables: {
                 last: PAGE_SIZE,
                 before: startCursor,
+                search: search,
                 // filter: {
                 //     dateJoined: null,
                 //     numberOfOrders: null,
@@ -287,7 +292,7 @@ const CustomerList = () => {
                     </div>
                     <div className="mt-5 md:mt-0 md:flex  md:ltr:ml-auto md:rtl:mr-auto">
                         <input type="text" className="form-input  mb-3 mr-2 w-full md:mb-0 md:w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                        <div className="dropdown mb-3 mr-0  md:mb-0 md:mr-2">
+                        {/* <div className="dropdown mb-3 mr-0  md:mb-0 md:mr-2">
                             <Dropdown
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
                                 btnClassName="btn btn-outline-primary dropdown-toggle  lg:w-auto w-full"
@@ -311,7 +316,7 @@ const CustomerList = () => {
                         </div>
                         <button type="button" className="btn btn-primary  w-full md:mb-0 md:w-auto" onClick={() => CreateProduct()}>
                             + Create
-                        </button>
+                        </button> */}
                     </div>
                 </div>
 
@@ -325,16 +330,16 @@ const CustomerList = () => {
                             columns={[
                                 {
                                     accessor: 'image',
-                                    
+
                                     render: (row) => <img src={row?.image ? row?.image : '/assets/images/placeholder.png'} alt="Product" className="h-10 w-10 object-cover ltr:mr-2 rtl:ml-2" />,
                                 },
                                 {
                                     accessor: 'name',
-                                    
-                                    title:"Product Name"
+
+                                    title: 'Product Name',
                                 },
 
-                                { accessor: 'created_at',  title: 'Created Date' },
+                                { accessor: 'created_at', title: 'Created Date' },
 
                                 {
                                     accessor: 'actions',
@@ -367,10 +372,10 @@ const CustomerList = () => {
                             withBorder={true}
                             minHeight={200}
                             paginationText={({ from, to, totalRecords }) => ''}
-                            selectedRecords={selectedRecords}
-                            onSelectedRecordsChange={(selectedRecords) => {
-                                setSelectedRecords(selectedRecords);
-                            }}
+                            // selectedRecords={selectedRecords}
+                            // onSelectedRecordsChange={(selectedRecords) => {
+                            //     setSelectedRecords(selectedRecords);
+                            // }}
                         />
                     )}
                 </div>

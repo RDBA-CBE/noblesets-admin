@@ -1,5 +1,5 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useEffect } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import IconTrashLines from '@/components/Icon/IconTrashLines';
@@ -19,6 +19,7 @@ import IconArrowBackward from '@/components/Icon/IconArrowBackward';
 import IconArrowForward from '@/components/Icon/IconArrowForward';
 import CommonLoader from '../elements/commonLoader';
 import { CREATE_PINCODE, DELETE_PINCODE, PINCODE_LIST, UPDATE_PINCODE } from '@/query/pincode';
+import useDebounce from '@/utils/useDebounce';
 
 const Pincode = () => {
     const [addTag, { loading: addLoading }] = useMutation(CREATE_PINCODE);
@@ -43,7 +44,6 @@ const Pincode = () => {
     const [modal1, setModal1] = useState(false);
     const [modalTitle, setModalTitle] = useState(null);
     const [modalContant, setModalContant] = useState<any>(null);
-    console.log('✌️modalContant --->', modalContant);
     const [totalCount, setTotalCount] = useState(0);
 
     const {
@@ -60,7 +60,6 @@ const Pincode = () => {
             },
         },
         onCompleted: (data) => {
-            console.log('✌️data --->', data);
             commonPagination(data);
         },
     });
@@ -102,12 +101,21 @@ const Pincode = () => {
         },
     });
 
+    const debouncedSearchTerm = useDebounce(search, 2000); // Debounce with a 500ms delay
+
+    useEffect(() => {
+        if (debouncedSearchTerm) {
+            handleSearchChange(debouncedSearchTerm);
+        } else {
+            refresh();
+        }
+    }, [debouncedSearchTerm]);
+
     const commonPagination = (data) => {
         const customers = data.pincodes.edges;
         const pageInfo = data.pincodes?.pageInfo;
 
         const newData = customers?.map((item: any) => {
-            console.log('✌️item --->', item);
             return {
                 name: item.node?.name,
                 id: item.node?.id,
@@ -165,25 +173,22 @@ const Pincode = () => {
             console.log('error: ', error);
         }
     };
-    const handleSearchChange = async (e) => {
-        setSearch(e);
-        if (e == '') {
-            refresh();
-        } else {
-            const res = await categoryListRefetch({
-                variables: {
-                    channel: 'india-channel',
 
-                    filter: {
-                        code: [e],
-                    },
-                    last: PAGE_SIZE,
-                    before: startCursor,
+    const handleSearchChange = async (e) => {
+        const res = await categoryListRefetch({
+            variables: {
+                channel: 'india-channel',
+
+                filter: {
+                    code: [e],
                 },
-            });
-            commonPagination(res?.data);
-        }
+                last: PAGE_SIZE,
+                before: startCursor,
+            },
+        });
+        commonPagination(res?.data);
     };
+
     const SubmittedForm = Yup.object().shape({
         name: Yup.string().required('Name is required'),
 
@@ -276,7 +281,6 @@ const Pincode = () => {
 
     // category table edit
     const EditCategory = (record: any) => {
-        console.log('✌️record --->', record);
         setModal1(true);
         setModalTitle(record);
         setModalContant(record);
@@ -369,7 +373,7 @@ const Pincode = () => {
                     <h5 className="text-lg font-semibold dark:text-white-light">Pincodes ({totalCount})</h5>
 
                     <div className="flex ltr:ml-auto rtl:mr-auto">
-                        <input type="text" className="form-input mr-2 w-auto" placeholder="Search..." value={search} onChange={(e) => handleSearchChange(e.target.value)} />
+                        <input type="text" className="form-input mr-2 w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
 
                         <button type="button" className="btn btn-primary" onClick={() => CreateTags()}>
                             + Create
@@ -384,8 +388,8 @@ const Pincode = () => {
                             className="table-hover whitespace-nowrap"
                             records={recordsData}
                             columns={[
-                                { accessor: 'name',  },
-                                { accessor: 'code',  render: (row: any) => <div>{row?.code?.join(', ')}</div> },
+                                { accessor: 'name' },
+                                { accessor: 'code', render: (row: any) => <div>{row?.code?.join(', ')}</div> },
 
                                 {
                                     accessor: 'actions',

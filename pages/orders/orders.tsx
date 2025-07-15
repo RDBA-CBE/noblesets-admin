@@ -458,12 +458,14 @@ const AbandonedCarts = () => {
                 </div>
 
                 {duration == 'custom' && (
-                    <div className="flex space-x-4 pb-4">
+                    <div className="flex space-x-4 pb-2">
                         <div className="col-span-4">
                             {/* <label htmlFor="dateTimeCreated" className="block pr-2 text-sm font-medium text-gray-700">
                                 Start Date:
                             </label> */}
                             <DateTimeField
+                                height="32px"
+                                width="200px"
                                 label=""
                                 placeholder="Select Date"
                                 className="form-select"
@@ -492,6 +494,8 @@ const AbandonedCarts = () => {
                                 End date:
                             </label> */}
                             <DateTimeField
+                                height="32px"
+                                width="200px"
                                 label=""
                                 placeholder="Select Date"
                                 className="form-select"

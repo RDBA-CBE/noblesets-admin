@@ -1635,6 +1635,8 @@ const Editorder = () => {
         return formatAsINRWithDecimal(result);
     };
 
+    console.log('formData', formData);
+
     return (
         <>
             <>
@@ -2308,12 +2310,23 @@ const Editorder = () => {
                                                         )} */}
                                                     </td>
                                                     {/* <td>{`${formatCurrency(item?.unitPrice?.gross?.currency)}${addCommasToNumber(item?.unitPrice?.gross?.amount)}`} </td> */}
-
-                                                    {formData?.billing?.state !== '' && formData?.shipping?.state == 'Tamil Nadu' ? (
+                                                    {formData?.shipping && formData?.shipping?.state === 'Tamil Nadu' ? (
+                                                        formData?.shipping?.state === 'Tamil Nadu' ? (
+                                                            <td>
+                                                                <div>{`SGST: ${formatCurrency(item?.totalPrice?.tax?.currency)}${Number(item?.totalPrice?.tax?.amount) / 2}`}</div>
+                                                                <span className="ml-10">+</span>
+                                                                <div>{`CGST: ${formatCurrency(item?.totalPrice?.tax?.currency)}${Number(item?.totalPrice?.tax?.amount) / 2}`}</div>
+                                                            </td>
+                                                        ) : (
+                                                            <td>
+                                                                <div>{`IGST: ${formatCurrency(item?.totalPrice?.tax?.currency)}${Number(item?.totalPrice?.tax?.amount)}`}</div>
+                                                            </td>
+                                                        )
+                                                    ) : formData?.billing?.state === 'Tamil Nadu' ? (
                                                         <td>
                                                             <div>{`SGST: ${formatCurrency(item?.totalPrice?.tax?.currency)}${Number(item?.totalPrice?.tax?.amount) / 2}`}</div>
                                                             <span className="ml-10">+</span>
-                                                            <div>{`CSGT: ${formatCurrency(item?.totalPrice?.tax?.currency)}${Number(item?.totalPrice?.tax?.amount) / 2}`}</div>
+                                                            <div>{`CGST: ${formatCurrency(item?.totalPrice?.tax?.currency)}${Number(item?.totalPrice?.tax?.amount) / 2}`}</div>
                                                         </td>
                                                     ) : (
                                                         <td>
@@ -2392,33 +2405,60 @@ const Editorder = () => {
                                             </div>
                                         </div>
                                     )}
-                                    {formData?.billing?.state !== '' && formData?.shipping?.state == 'Tamil Nadu' ? (
+                                   
+
+                                    {formData?.shipping && formData?.shipping?.state === 'Tamil Nadu' ? (
+                                        formData?.shipping?.state === 'Tamil Nadu' ? (
+                                            <>
+                                                <div className="mt-4 flex items-center justify-between">
+                                                    <div>SGST: </div>
+
+                                                    <div>
+                                                        <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount) / 2}`}</div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="mt-4 flex items-center justify-between">
+                                                    <div>CGST: </div>
+                                                    <div>
+                                                        <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount) / 2}`}</div>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="mt-4 flex items-center justify-between">
+                                                <div>IGST: </div>
+                                                <div>
+                                                    <div>{`IGST: ${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount)}`}</div>
+                                                </div>
+                                            </div>
+                                        )
+                                    ) : formData?.billing?.state === 'Tamil Nadu' ? (
                                         <>
-                                            <div className="mt-4 flex items-center justify-between">
-                                                <div>SGST:</div>
-                                                <div>
-                                                    <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount / 2)?.toFixed(2)}`}</div>
+                                        <div className="mt-4 flex items-center justify-between">
+                                            <div>SGST: </div>
+                                            <div> <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount) / 2}`}</div></div>
+                                           
+                                            {/* <span className="ml-10">+</span> */}
+                                           
+                                        </div>
 
-                                                    {/* {orderData?.subtotal?.tax?.currency} {orderData?.subtotal?.tax?.amount / 2} */}
-                                                </div>
+                                        <div className="mt-4 flex items-center justify-between">
+                                            <div>CGST: </div>
+                                            <div>
+                                                 <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount) / 2}`}</div>
                                             </div>
-                                            <div className="mt-4 flex items-center justify-between">
-                                                <div>CSGT:</div>
-                                                <div>
-                                                    <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount / 2)?.toFixed(2)}`}</div>
+                                        </div>
 
-                                                    {/* {orderData?.subtotal?.tax?.currency} {orderData?.subtotal?.tax?.amount / 2} */}
-                                                </div>
-                                            </div>
                                         </>
+                                        
                                     ) : (
                                         <div className="mt-4 flex items-center justify-between">
                                             <div>IGST:</div>
                                             <div>
-                                                <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${orderData?.subtotal?.tax?.amount}`}</div>
-
-                                                {/* {orderData?.subtotal?.gross?.currency} {orderData?.subtotal?.gross?.amount} */}
+                                                <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount)}`}</div>
                                             </div>
+                                            
                                         </div>
                                     )}
                                     {/* <div className="mt-4 flex items-center justify-between">

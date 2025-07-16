@@ -2325,7 +2325,7 @@ const Editorder = () => {
                                         {/* <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${itemSubTotal}`}</div> */}
                                         {/* <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${floatComma(orderData?.subtotal?.net?.amount)}`}</div> */}
                                         <div>
-                                            <div>{`${formatAsINRWithDecimal(subTotal())}`}</div>
+                                            <div>{`${(subTotal())}`}</div>
                                             {/* <div className='text-[12px]'>{`(Included Tax)`}</div> */}
                                         </div>
                                         {/* <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${addCommasToNumber(itemSubTotal)}`}</div> */}

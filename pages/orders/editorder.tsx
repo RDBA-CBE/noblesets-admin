@@ -1574,8 +1574,11 @@ const Editorder = () => {
                 result = Math.max(0, subtotal + orderData?.discount?.amount || 0);
             }
         } else {
+            
             result = subtotal;
         }
+        console.log("result",result);
+        
         return formatAsINRWithDecimal(result);
     };
     return (
@@ -2322,7 +2325,7 @@ const Editorder = () => {
                                         {/* <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${itemSubTotal}`}</div> */}
                                         {/* <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${floatComma(orderData?.subtotal?.net?.amount)}`}</div> */}
                                         <div>
-                                            <div>{`${subTotal()}`}</div>
+                                            <div>{`${formatAsINRWithDecimal(subTotal())}`}</div>
                                             {/* <div className='text-[12px]'>{`(Included Tax)`}</div> */}
                                         </div>
                                         {/* <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${addCommasToNumber(itemSubTotal)}`}</div> */}

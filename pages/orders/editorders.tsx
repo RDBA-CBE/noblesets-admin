@@ -2361,7 +2361,7 @@ const Editorder = () => {
                                     <div className="flex items-center justify-between">
                                         <div>Items Subtotal:</div>
                                         <div>
-                                            <div>{subTotal()}</div>
+                                            <div>{`${formatAsINRWithDecimal(subTotal())}`}</div>
                                             {/* <div className='text-[12px]'>{`(Included Tax)`}</div> */}
                                         </div>
                                     </div>

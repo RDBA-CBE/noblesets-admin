@@ -2386,7 +2386,7 @@ const Editorder = () => {
                                             <div>{orderData?.paymentMethod?.name === 'Cash On Delivery' ? 'COD Fee:' : 'Shipping:'}</div>
                                             <div>
                                                 {orderData?.paymentMethod?.name === 'Cash On Delivery' ? (
-                                                    <div className="ml-[94px] items-end">{`${formatCurrency('INR')}${orderData?.codAmount}}`}</div>
+                                                    <div className="ml-[94px] items-end">{`${formatCurrency('INR')}${orderData?.codAmount}`}</div>
                                                 ) : (
                                                     <div className="ml-[94px] items-end">
                                                         {/* {`${formatCurrency(orderData?.codAmount)}${orderData?.subtotal?.gross?.currency}`} */}

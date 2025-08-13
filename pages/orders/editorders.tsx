@@ -2376,12 +2376,12 @@ const Editorder = () => {
                                             </div>
                                         </div>
                                     )}
-                                    <div className="flex items-center justify-between">
+                                    {/* <div className="flex items-center justify-between">
                                         <div>Subtotal:</div>
                                         <div>
                                             <div>{orderData?.subtotal?.net?.amount}</div>
                                         </div>
-                                    </div>
+                                    </div> */}
 
                                     {orderDetails?.order?.giftCards?.length > 0 && (
                                         <div className="mt-4 flex  justify-between" style={{ color: 'green' }}>

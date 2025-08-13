@@ -34,6 +34,7 @@ import {
     UserDropdownData,
     addCommasToNumber,
     billingAddress,
+    formatAsINRWithDecimal,
     // checkChannel,
     formatCurrency,
     getUniqueStates,
@@ -162,7 +163,7 @@ const NewOrder = () => {
 
     const { data: customerAddress, refetch: addressRefetch } = useQuery(CUSTOMER_ADDRESS);
 
-    const { data: searchProduct, refetch: searchProductRefetch,loading:searchLoading } = useQuery(PRODUCT_SEARCH);
+    const { data: searchProduct, refetch: searchProductRefetch, loading: searchLoading } = useQuery(PRODUCT_SEARCH);
 
     const { data: stateData, refetch: stateRefetch } = useQuery(STATES_LIST, {
         variables: { code: state.billingAddress.country },
@@ -1035,6 +1036,56 @@ const NewOrder = () => {
         }
     };
 
+    const subTotal = () => {
+        const subtotal = productDetails?.order?.subtotal?.gross?.amount || 0;
+        console.log('✌️subtotal --->', productDetails);
+        let result = 0;
+        if (productDetails?.order?.discounts?.length > 0 && productDetails?.order?.discounts[0]?.value > 0) {
+            const discountValue = productDetails?.order?.discounts[0]?.value || 0;
+            const discountValueType = productDetails?.order?.discounts[0]?.valueType || 'FIXED';
+
+            if (discountValueType === 'FIXED') {
+                if (subtotal < discountValue) {
+                    result = discountValue;
+                } else {
+                    result = Math.max(0, subtotal + discountValue);
+                }
+            } else {
+                result = Math.max(0, subtotal + discountValue);
+            }
+
+            // if (discountValueType === 'FIXED') {
+            //     if (subtotal < discountValue) {
+            //         result = orderData?.discount?.amount || 0;
+            //     } else {
+            //         result = Math.max(0, subtotal + discountValue);
+            //     }
+            // } else if (discountValueType === 'PERCENTAGE') {
+            //     result = Math.max(0, subtotal + orderData?.discount?.amount || 0);
+            // }
+        } else {
+            result = subtotal;
+        }
+
+        // if (productDetails.voucher) {
+        //     const { discountValue, discountValueType, currency } = productDetails.voucher;
+
+        //     if (productDetails?.discounts[0]?.calculationMode === 'FIXED') {
+        //         if (subtotal < discountValue) {
+        //             result = productDetails?.discount?.amount || 0;
+        //         } else {
+        //             result = Math.max(0, subtotal + discountValue);
+        //         }
+        //     } else if (discountValueType === 'PERCENTAGE') {
+        //         result = Math.max(0, subtotal + productDetails?.discount?.amount || 0);
+        //     }
+        // } else {
+        //     result = subtotal;
+        // }
+        return formatAsINRWithDecimal(result);
+    };
+    console.log('✌️subTotal --->', subTotal());
+
     return (
         <>
             <div className="panel mb-5 flex items-center justify-between gap-3 p-5 ">
@@ -1044,7 +1095,7 @@ const NewOrder = () => {
     </button> */}
             </div>
             <div className="grid grid-cols-12 gap-5 ">
-                <div className="col-span-12 md:col-span-7 mb-5  ">
+                <div className="col-span-12 mb-5 md:col-span-7  ">
                     <div className="panel mb-5 p-5">
                         <div>
                             <h3 className="text-lg font-semibold">Order Details</h3>
@@ -1091,8 +1142,8 @@ const NewOrder = () => {
                     </div>
                     <div className="panel mt-8 grid grid-cols-12 gap-5 p-5">
                         {/* Billing Address */}
-                        <div className="col-span-12 xl:col-span-6 mr-5">
-                            <div className="flex w-100 items-center justify-between">
+                        <div className="col-span-12 mr-5 xl:col-span-6">
+                            <div className="w-100 flex items-center justify-between">
                                 <h5 className="mb-3 text-lg font-semibold">Billing</h5>
                                 <button type="button" onClick={() => setState({ showBillingInputs: !state.showBillingInputs })}>
                                     <IconPencil className="cursor-pointer" />
@@ -1379,8 +1430,8 @@ const NewOrder = () => {
                         </div>
 
                         {/* Shipping Address */}
-                        <div className="col-span-12 xl:col-span-6 mr-5">
-                            <div className="flex w-100 items-center justify-between">
+                        <div className="col-span-12 mr-5 xl:col-span-6">
+                            <div className="w-100 flex items-center justify-between">
                                 <h5 className="mb-3 text-lg font-semibold">Shipping</h5>
                                 <button type="button" onClick={() => setState({ showShippingInputs: !state.showShippingInputs })}>
                                     <IconPencil />
@@ -1646,7 +1697,7 @@ const NewOrder = () => {
                             )}
                         </div>
                         <div className="col-span-12 flex  items-center justify-end gap-5">
-                            <div className="flex cursor-pointer items-center gap-3" onClick={() => setState({ isFreeShipping: !state.isFreeShipping })}>
+                            {/* <div className="flex cursor-pointer items-center gap-3" onClick={() => setState({ isFreeShipping: !state.isFreeShipping })}>
                                 <input
                                     type="checkbox"
                                     checked={state.isFreeShipping}
@@ -1654,7 +1705,7 @@ const NewOrder = () => {
                                     className="form-checkbox border-white-light dark:border-white-dark ltr:mr-0 rtl:ml-0"
                                 />
                                 <h3 className="text-md font-semibold dark:text-white-light">Free Shipping</h3>
-                            </div>
+                            </div> */}
                             <div className="">
                                 <button type="button" className="btn btn-primary" onClick={() => updateAddress()}>
                                     {updateDraftOrderLoading || updateShippingCastLoading ? <IconLoader /> : 'Update Address'}
@@ -1686,20 +1737,22 @@ const NewOrder = () => {
                                                 <img src={profilePic(item?.variant?.product?.thumbnail?.url)} height={80} width={80} />
                                             </td>
                                             <td>{item?.productSku}</td>
-                                            <td>{`${formatCurrency(item?.unitPrice?.gross?.currency)}${addCommasToNumber(item?.unitPrice?.gross?.amount)}`} </td>
+                                            <td>{`${formatCurrency(item?.unitPrice?.gross?.currency)}${addCommasToNumber(item?.variant?.pricing?.price?.gross?.amount)}`} </td>
 
                                             {/* <td>
                                                   
                                                 {item?.unitPrice?.gross?.currency} {item?.unitPrice?.gross?.amount}
                                             </td> */}
                                             <td>{item?.quantity}</td>
-                                            <td>{`${formatCurrency(item?.totalPrice?.gross?.currency)}${addCommasToNumber(item?.totalPrice?.gross?.amount)}`} </td>
+                                            <td>{`${formatAsINRWithDecimal(Number(item?.variant?.pricing?.price?.gross?.amount) * Number(item?.quantity))}`}</td>
+
+                                            {/* <td>{`${formatCurrency(item?.totalPrice?.gross?.currency)}${addCommasToNumber(item?.totalPrice?.gross?.amount)}`} </td> */}
 
                                             {/* <td>
                                                 {item?.totalPrice?.gross?.currency} {item?.totalPrice?.gross?.amount}
                                             </td> */}
 
-                                            <td className='flex'>
+                                            <td className="flex">
                                                 <button
                                                     type="button"
                                                     onClick={() => {
@@ -1826,13 +1879,13 @@ const NewOrder = () => {
                                     Add Product
                                 </button>
                                 <button type="button" className="btn btn-outline-primary" onClick={() => setState({ isOpenCoupen: true })}>
-                                    Apply coupon
+                                    Apply Coupon
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="col-span-12 md:col-span-5 mb-5  ">
+                <div className="col-span-12 mb-5 md:col-span-5  ">
                     <div className="panel mb-5 p-5">
                         <div className="mb-5  ">
                             <h3 className="text-lg font-semibold">Order Actions</h3>
@@ -1970,18 +2023,18 @@ const NewOrder = () => {
                                     <input type="text" className="form-input w-full p-3" placeholder="Search..." value={state.search} onChange={(e) => setState({ search: e.target.value })} />
                                 </div>
 
-                                {productLoadMoreLoading || searchLoading? (
+                                {productLoadMoreLoading || searchLoading ? (
                                     <CommonLoader />
                                 ) : (
                                     <div className="h-[550px] overflow-auto">
                                         {/* Product list */}
                                         {state.productList?.map(({ id: productId, name, variants, thumbnail }) => {
                                             return (
-                                                <div key={productId} className='bg-[#e09a7a1a] px-2 py-4 m-2 rounded-xl'>
+                                                <div key={productId} className="m-2 rounded-xl bg-[#e09a7a1a] px-2 py-4">
                                                     <div className="flex gap-3">
                                                         <input
                                                             type="checkbox"
-                                                            className="form-checkbox w-[15px] h-[15px]"
+                                                            className="form-checkbox h-[15px] w-[15px]"
                                                             checked={state.selectedItems[productId] && Object.values(state.selectedItems[productId])?.every((value) => value)}
                                                             onChange={() => handleHeadingSelect(productId)}
                                                         />
@@ -1990,12 +2043,12 @@ const NewOrder = () => {
                                                     </div>
                                                     <ul>
                                                         {variants?.map(({ id: variantId, name: variantName, sku, pricing }) => (
-                                                            <li key={variantId} className="pt-5 pl-8">
+                                                            <li key={variantId} className="pl-8 pt-5">
                                                                 <div className="flex items-center justify-between">
                                                                     <div className="flex gap-3">
                                                                         <input
                                                                             type="checkbox"
-                                                                            className="form-checkbox w-[15px] h-[15px] mt-1"
+                                                                            className="form-checkbox mt-1 h-[15px] w-[15px]"
                                                                             checked={state.selectedItems[productId]?.[variantId]}
                                                                             onChange={() => handleSubHeadingSelect(productId, variantId)}
                                                                         />
@@ -2044,10 +2097,7 @@ const NewOrder = () => {
                                         >
                                             Cancel
                                         </button>
-                                        <button
-                                            onClick={() => addProducts()}
-                                            className="btn btn-primary"
-                                        >
+                                        <button onClick={() => addProducts()} className="btn btn-primary">
                                             {state.productLoading ? <IconLoader /> : 'Confirm'}
                                         </button>
                                     </div>
@@ -2060,8 +2110,8 @@ const NewOrder = () => {
 
             <Modal
                 edit={state.isOpenCoupen}
-                addHeader={'Discount this Order by:'}
-                updateHeader={'Discount this Order by:'}
+                addHeader={'Coupon this Order by:'}
+                updateHeader={'Coupon this Order by:'}
                 open={state.isOpenCoupen}
                 close={() => setState({ isOpenCoupen: false })}
                 renderComponent={() => (
@@ -2106,10 +2156,7 @@ const NewOrder = () => {
                             {precentageErrMsg && <div className="mt-1 text-red-500">{precentageErrMsg}</div>}
                             {fixedErrMsg && <div className="mt-1 text-red-500">{fixedErrMsg}</div>}{' '}
                             <div className="mt-5 flex justify-end gap-5">
-                                <button
-                                    className="btn btn-outline-primary"
-                                    onClick={() => setState({ isOpenCoupen: false })}
-                                >
+                                <button className="btn btn-outline-primary" onClick={() => setState({ isOpenCoupen: false })}>
                                     Cancel
                                 </button>
                                 <button

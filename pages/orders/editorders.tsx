@@ -1608,9 +1608,11 @@ const Editorder = () => {
     const calculateDiscount = () => {
         return formatAsINRWithDecimal(orderData?.discount?.amount);
     };
-
     const subTotal = () => {
         const subtotal = orderData?.subtotal?.net?.amount || 0;
+        console.log('✌️subtotal --->', subtotal);
+        console.log('✌️orderData.voucher --->', orderData);
+
         let result = 0;
         if (!orderData?.voucher) {
             return subtotal;
@@ -1620,18 +1622,17 @@ const Editorder = () => {
             const { discountValue, discountValueType, currency } = orderData.voucher;
 
             if (discountValueType === 'FIXED') {
-                if (subtotal < discountValue) {
+                if (subtotal < orderData?.discount?.amount) {
                     result = orderData?.discount?.amount || 0;
                 } else {
-                    result = Math.max(0, subtotal + discountValue);
+                    result = Math.max(0, subtotal - orderData?.discount?.amount);
                 }
             } else if (discountValueType === 'PERCENTAGE') {
-                result = Math.max(0, subtotal + orderData?.discount?.amount || 0);
+                result = Math.max(0, subtotal - orderData?.discount?.amount || 0);
             }
         } else {
             result = subtotal;
         }
-
         return formatAsINRWithDecimal(result);
     };
 
@@ -2361,18 +2362,28 @@ const Editorder = () => {
                                     <div className="flex items-center justify-between">
                                         <div>Items Subtotal:</div>
                                         <div>
-                                            <div>{`${formatAsINRWithDecimal(subTotal())}`}</div>
+                                            {/* <div>{`${formatAsINRWithDecimal(subTotal())}`}</div> */}
+                                            <div>{orderData?.subtotal?.net?.amount}</div>
+
                                             {/* <div className='text-[12px]'>{`(Included Tax)`}</div> */}
                                         </div>
                                     </div>
                                     {orderData?.voucher && orderData?.voucher?.discountValue != 0 && (
-                                        <div className="mt-4 flex items-center justify-between">
+                                        <div className="mb-4 flex items-center justify-between">
                                             <div>Coupon Amount {`(${orderData?.voucher?.name})`}</div>
                                             <div style={{ color: 'green' }}>
                                                 {orderData?.voucher?.discountValueType === 'PERCENTAGE' ? `-${calculateDiscount()}` : `-${formatAsINRWithDecimal(orderData?.discount?.amount)}`}
                                             </div>
                                         </div>
                                     )}
+                                    <div className="flex items-center justify-between">
+                                        <div>Items Subtotal:</div>
+                                        <div>
+                                            <div>{orderData?.subtotal?.net?.amount}</div>
+                                            {/* <div className='text-[12px]'>{`(Included Tax)`}</div> */}
+                                        </div>
+                                    </div>
+
                                     {orderDetails?.order?.giftCards?.length > 0 && (
                                         <div className="mt-4 flex  justify-between" style={{ color: 'green' }}>
                                             <div>Gift Voucher Amount</div>
@@ -2386,7 +2397,7 @@ const Editorder = () => {
                                             <div>{orderData?.paymentMethod?.name === 'Cash On Delivery' ? 'COD Fee:' : 'Shipping:'}</div>
                                             <div>
                                                 {orderData?.paymentMethod?.name === 'Cash On Delivery' ? (
-                                                    <div className="ml-[94px] items-end">{`${formatCurrency('INR')}${orderData?.codAmount}}`}</div>
+                                                    <div className="ml-[94px] items-end">{`${formatCurrency('INR')}${orderData?.codAmount}`}</div>
                                                 ) : (
                                                     <div className="ml-[94px] items-end">
                                                         {/* {`${formatCurrency(orderData?.codAmount)}${orderData?.subtotal?.gross?.currency}`} */}

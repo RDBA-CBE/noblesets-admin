@@ -1556,6 +1556,9 @@ const Editorder = () => {
 
     const subTotal = () => {
         const subtotal = orderData?.subtotal?.net?.amount || 0;
+        console.log('✌️subtotal --->', subtotal);
+        console.log('✌️orderData.voucher --->', orderData);
+
         let result = 0;
         if (!orderData?.voucher) {
             return subtotal;
@@ -1565,10 +1568,10 @@ const Editorder = () => {
             const { discountValue, discountValueType, currency } = orderData.voucher;
 
             if (discountValueType === 'FIXED') {
-                if (subtotal < discountValue) {
+                if (subtotal < orderData?.discount?.amount) {
                     result = orderData?.discount?.amount || 0;
                 } else {
-                    result = Math.max(0, subtotal + discountValue);
+                    result = Math.max(0, subtotal + orderData?.discount?.amount);
                 }
             } else if (discountValueType === 'PERCENTAGE') {
                 result = Math.max(0, subtotal + orderData?.discount?.amount || 0);
@@ -1579,6 +1582,34 @@ const Editorder = () => {
         }
         console.log("result",result);
         
+        return formatAsINRWithDecimal(result);
+    };
+
+    const withoutDiscount = () => {
+        const subtotal = orderData?.subtotal?.net?.amount || 0;
+        console.log('✌️subtotal --->', subtotal);
+        console.log('✌️orderData.voucher --->', orderData);
+
+        let result = 0;
+        if (!orderData?.voucher) {
+            return subtotal;
+        }
+
+        if (orderData.voucher) {
+            const { discountValue, discountValueType, currency } = orderData.voucher;
+
+            if (discountValueType === 'FIXED') {
+                if (subtotal < orderData?.discount?.amount) {
+                    result = orderData?.discount?.amount || 0;
+                } else {
+                    result = Math.max(0, subtotal - orderData?.discount?.amount);
+                }
+            } else if (discountValueType === 'PERCENTAGE') {
+                result = Math.max(0, subtotal - orderData?.discount?.amount || 0);
+            }
+        } else {
+            result = subtotal;
+        }
         return formatAsINRWithDecimal(result);
     };
     return (
@@ -2321,14 +2352,12 @@ const Editorder = () => {
                                 <div className="sm:w-3/5">
                                     <div className="flex items-center justify-between">
                                         <div>Items Subtotal:</div>
-                                        {/* <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${addCommasToNumber(orderData?.subtotal?.net?.amount)}`}</div> */}
-                                        {/* <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${itemSubTotal}`}</div> */}
-                                        {/* <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${floatComma(orderData?.subtotal?.net?.amount)}`}</div> */}
+
                                         <div>
-                                            <div>{`${formatAsINRWithDecimal(subTotal())}`}</div>
-                                            {/* <div className='text-[12px]'>{`(Included Tax)`}</div> */}
+                                            {/* <div>{subTotal()}</div> */}
+                                            <div>{orderData?.subtotal?.net?.amount}</div>
+
                                         </div>
-                                        {/* <div>{`${formatCurrency(orderData?.subtotal?.net?.currency)}${addCommasToNumber(itemSubTotal)}`}</div> */}
                                     </div>
                                     {orderData?.voucher && orderData?.voucher?.discountValue > 0 && (
                                         <div className="mt-4 flex items-center justify-between">
@@ -2338,6 +2367,14 @@ const Editorder = () => {
                                             </div>
                                         </div>
                                     )}
+                                    <div className=" mt-4 flex items-center justify-between">
+                                        <div>Subtotal:</div>
+
+                                        <div>
+                                            <div>{orderData?.subtotal?.net?.amount}</div>
+                                        </div>
+                                    </div>
+
                                     {orderData?.order?.giftCards?.length > 0 && (
                                         <div className="mt-4 flex  justify-between" style={{ color: 'green' }}>
                                             <div>Gift Voucher Amount</div>

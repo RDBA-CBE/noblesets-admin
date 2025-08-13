@@ -2369,7 +2369,7 @@ const Editorder = () => {
                                         </div>
                                     </div>
                                     {orderData?.voucher && orderData?.voucher?.discountValue != 0 && (
-                                        <div className="mb-4 flex items-center justify-between">
+                                        <div className="mt-4 mb-4 flex items-center justify-between">
                                             <div>Coupon Amount {`(${orderData?.voucher?.name})`}</div>
                                             <div style={{ color: 'green' }}>
                                                 {orderData?.voucher?.discountValueType === 'PERCENTAGE' ? `-${calculateDiscount()}` : `-${formatAsINRWithDecimal(orderData?.discount?.amount)}`}
@@ -2377,10 +2377,9 @@ const Editorder = () => {
                                         </div>
                                     )}
                                     <div className="flex items-center justify-between">
-                                        <div>Items Subtotal:</div>
+                                        <div>Subtotal:</div>
                                         <div>
                                             <div>{orderData?.subtotal?.net?.amount}</div>
-                                            {/* <div className='text-[12px]'>{`(Included Tax)`}</div> */}
                                         </div>
                                     </div>
 

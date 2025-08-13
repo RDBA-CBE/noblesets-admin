@@ -2357,6 +2357,7 @@ const Editorder = () => {
                                             {/* <div>{subTotal()}</div> */}
                                             <div>{orderData?.subtotal?.net?.amount}</div>
 
+
                                         </div>
                                     </div>
                                     {orderData?.voucher && orderData?.voucher?.discountValue > 0 && (

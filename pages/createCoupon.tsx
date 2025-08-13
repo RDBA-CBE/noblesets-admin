@@ -34,7 +34,7 @@ const CreateCoupon = () => {
         autoCode: false,
         autoCodeNumber: '',
         autoCodeNumberErr: '',
-        generatedCodes: [],
+        generatedCodes: '',
         codeOption: [],
         minimumReqOption: [],
         usageOption: [],
@@ -138,11 +138,12 @@ const CreateCoupon = () => {
             if (!couponName) {
                 errors.nameError = 'Coupon name is required';
             }
-            if (generatedCodes.length === 0) {
+            if (generatedCodes == '') {
                 errors.generatedCodesError = 'At least one coupon code is required';
             }
             if (codeType.value !== 'Free Shipping') {
-                if (!couponValue && couponValue !== 0) {  // Checks for null/undefined/empty string
+                if (!couponValue && couponValue !== 0) {
+                    // Checks for null/undefined/empty string
                     errors.couponValueError = 'Coupon value is required';
                 } else if (couponValue <= 0) {
                     errors.couponValueError = 'Coupon value must be greater than 0';
@@ -171,12 +172,12 @@ const CreateCoupon = () => {
                 applyOncePerCustomer: usageLimit.value === 'Limit to one use per customer',
                 applyOncePerOrder: false,
                 onlyForStaff: usageLimit.value === 'Limit to staff only',
-                addCodes: generatedCodes,
+                addCodes: [generatedCodes],
                 discountValueType: codeType.value === 'Fixed Amount' ? 'FIXED' : 'PERCENTAGE',
                 endDate: isEndDate ? dayjs(endDate).toISOString() : null,
                 minCheckoutItemsQuantity: minimumReq.value === 'Minimum quantity of items' ? minimumReqValue : 0,
                 startDate: dayjs(startDate).toISOString(),
-                type: codeType.value === 'Free Shipping' ? 'SHIPPING' : 'ENTIRE_ORDER',
+                type: 'ENTIRE_ORDER',
                 usageLimit: usageLimit.value === 'Limit number of times this discount can be used in total' ? (usageValue ? usageValue : null) : null,
                 singleUse: usageLimit.value === 'Limit to voucher code use once',
                 autoApply: state.autoApply,
@@ -270,7 +271,7 @@ const CreateCoupon = () => {
     };
 
     const codeType = () => {
-        const arr = ['Fixed Amount', 'Percentage', 'Free Shipping'];
+        const arr = ['Fixed Amount', 'Percentage'];
         const arr1 = ['None', 'Minimal order value', 'Minimum quantity of items'];
         const arr3 = ['None', 'Maximum order value'];
         const arr2 = ['Limit number of times this discount can be used in total', 'Limit to one use per customer', 'Limit to staff only', 'Limit to voucher code use once'];
@@ -320,21 +321,31 @@ const CreateCoupon = () => {
             <div className="panel   ">
                 <div className=" w-full   ">
                     <label htmlFor="name" className="block text-lg font-medium text-gray-700">
-                        Coupon Codes
+                        Coupon Code
                     </label>
-                    <div className="flex w-full ">
+                    <div className=" w-full  md:w-6/12">
                         <div className="">
-                            <Dropdown overlay={menu} trigger={['click']} onVisibleChange={(flag) => setState({ visible: flag })} visible={state.visible}>
+                            {/* <Dropdown overlay={menu} trigger={['click']} onVisibleChange={(flag) => setState({ visible: flag })} visible={state.visible}>
                                 <Button className="btn btn-primary h-[42px]  w-full md:mb-0 md:w-auto" onClick={(e) => e.preventDefault()}>
                                     Create Code <DownOutlined />
                                 </Button>
-                            </Dropdown>
+                            </Dropdown> */}
+
+                            <input
+                                type="text"
+                                value={state.generatedCodes}
+                                onChange={(e) => setState({ generatedCodes: e.target.value, errors: { generatedCodesError: '' } })}
+                                placeholder="Enter Coupon Code"
+                                name="name"
+                                className="form-input"
+                                required
+                            />
                             {state.errors?.generatedCodesError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.generatedCodesError}</p>}
                         </div>
                     </div>
                 </div>
 
-                {state.generatedCodes?.length > 0 ? (
+                {/* {state.generatedCodes?.length > 0 ? (
                     <div className=" mt-5">
                         <DataTable
                             className="table-hover whitespace-nowrap"
@@ -398,7 +409,7 @@ const CreateCoupon = () => {
                             No coupon codes found
                         </label>
                     </div>
-                )}
+                )} */}
             </div>
 
             <div className="panel mt-5">
@@ -578,14 +589,7 @@ const CreateCoupon = () => {
                         {/* <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                            
                         </label> */}
-                        <DateTimeField
-                            label=" Active Dates"
-                            placeholder="Select Date"
-                            className="form-input"
-                            value={state.startDate}
-                            onChange={(e) => setState({ startDate: e, endDate: '' })}
-                            fromDate={new Date()}
-                        />
+                        <DateTimeField label=" Active Dates" placeholder="Select Date" className="form-input" value={state.startDate} onChange={(e) => setState({ startDate: e, endDate: '' })} />
                         {/* <input
                             value={state.startDate}
                             onChange={handleStartDateChange}
@@ -658,6 +662,7 @@ const CreateCoupon = () => {
                     </button>
                 </div>
             </div>
+            
             <Modal
                 addHeader={'Enter Coupon Code'}
                 open={state.isOpen}

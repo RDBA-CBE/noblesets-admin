@@ -124,6 +124,7 @@ const EditCoupon = () => {
                 includeProducts: true,
             });
             const data = res?.data?.voucher;
+console.log('✌️data --->', data);
             const endDate = data?.endDate;
             if (endDate) {
                 setState({ isEndDate: true, endDate: dayjs(endDate).toISOString() });
@@ -149,6 +150,7 @@ const EditCoupon = () => {
                 setState({ description: data?.metadata[0]?.value });
             }
             setState({
+                couponOrginName: data?.name,
                 couponName: data?.name,
                 autoApply: data?.autoApply,
                 invidual: data?.invidualUseOnly,
@@ -206,7 +208,7 @@ const EditCoupon = () => {
             });
 
             const data = res?.data?.voucher?.codes?.edges?.map((item: any) => item?.node)?.map((item: any) => item.code);
-            setState({ generatedCodes: data?.length > 0 ? data[0] : '', oldCodes: data });
+            setState({ generatedCodes: data?.length > 0 ? data[0] : '', oldCodes: data,generatedOldCodes: data?.length > 0 ? data[0] : '' });
         } catch (error) {
             console.log('error: ', error);
         }
@@ -288,6 +290,7 @@ const EditCoupon = () => {
             endDate: e.target.value,
         });
     };
+    console.log('✌️state.couponOrginName --->', state.couponOrginName,state.generatedCodes);
 
     const updateCoupon = async () => {
         try {
@@ -324,14 +327,14 @@ const EditCoupon = () => {
             }
             // const set1 = new Set(state.oldCodes);
             // const pendingList = state.generatedCodes.filter((item) => !set1.has(item));
-            const body = {
+            const body:any = {
                 name: state.couponName,
                 applyOncePerCustomer: state.usageLimit?.value == 'Limit to one use per customer' ? true : false,
                 // applyOncePerOrder: state.usageLimit?.value == 'Limit to one use per customer' ? true : false,
                 applyOncePerOrder: false,
                 onlyForStaff: state.usageLimit?.value == 'Limit to staff only' ? true : false,
                 // addCodes: pendingList,
-                addCodes: [generatedCodes],
+                // addCodes: [generatedCodes],
                 discountValueType: state.codeType?.value == 'Fixed Amount' ? 'FIXED' : 'PERCENTAGE',
                 endDate: state.isEndDate ? dayjs(state.endDate).toISOString() : null,
                 minCheckoutItemsQuantity: state.minimumReq?.value == 'Minimum quantity of items' ? state.minimumReqValue : 0,
@@ -344,6 +347,10 @@ const EditCoupon = () => {
                 autoApply: state?.autoApply,
                 invidualUseOnly: state.invidual,
             };
+
+            if(state.generatedOldCodes != generatedCodes) {
+                body.addCodes = [generatedCodes];
+            }
 
             const res = await updateCoupons({
                 variables: {

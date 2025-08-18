@@ -7,8 +7,8 @@ import Modal from '@/components/Modal';
 import { DataTable, DataTableProps } from 'mantine-datatable';
 import IconTrashLines from '@/components/Icon/IconTrashLines';
 import Select from 'react-select';
-import { useMutation } from '@apollo/client';
-import { COUPON_CHANNEL_UPDATE, COUPON_META_DATA, CREATE_COUPEN } from '@/query/product';
+import { useMutation, useQuery } from '@apollo/client';
+import { ASSIGN_TO_COUPON, COUPON_CHANNEL_UPDATE, COUPON_META_DATA, CREATE_COUPEN, GET_CAT } from '@/query/product';
 import { Description } from '@headlessui/react/dist/components/description/description';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import IconLoader from '@/components/Icon/IconLoader';
@@ -21,6 +21,11 @@ const CreateCoupon = () => {
 
     const [createCoupons, { loading: createLoading }] = useMutation(CREATE_COUPEN);
     const [channelUpdate, { loading: chennelLoading }] = useMutation(COUPON_CHANNEL_UPDATE);
+    const [assignDataRefetch, { loading: assignLoading }] = useMutation(ASSIGN_TO_COUPON);
+
+    const { refetch: categortRefetch } = useQuery(GET_CAT, {
+        variables: {},
+    });
 
     const [metaData, { loading: metaLoading }] = useMutation(COUPON_META_DATA);
 
@@ -61,6 +66,7 @@ const CreateCoupon = () => {
 
     useEffect(() => {
         codeType();
+        categoryList();
     }, []);
 
     const handleMenuClick = (e) => {
@@ -177,7 +183,7 @@ const CreateCoupon = () => {
                 endDate: isEndDate ? dayjs(endDate).toISOString() : null,
                 minCheckoutItemsQuantity: minimumReq.value === 'Minimum quantity of items' ? minimumReqValue : 0,
                 startDate: dayjs(startDate).toISOString(),
-                type: 'ENTIRE_ORDER',
+                type: 'SPECIFIC_PRODUCT',
                 usageLimit: usageLimit.value === 'Limit number of times this discount can be used in total' ? (usageValue ? usageValue : null) : null,
                 singleUse: usageLimit.value === 'Limit to voucher code use once',
                 autoApply: state.autoApply,
@@ -236,6 +242,8 @@ const CreateCoupon = () => {
             if (res?.data?.voucherChannelListingUpdate?.errors?.length > 0) {
                 Failure(res?.data?.voucherChannelListingUpdate?.errors[0]?.message);
             } else {
+            await assignData(id);
+
                 if (state.description !== '') {
                     updateMetaData(id);
                 } else {
@@ -262,9 +270,39 @@ const CreateCoupon = () => {
                     keysToDelete: [],
                 },
             });
-
+            await assignData(id);
             router.push(`/editCoupon?id=${id}`);
             Success('Coupon Created Successfully');
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    };
+
+    const assignData = async (id: any) => {
+console.log('✌️assignData --->', id);
+        try {
+            const res = await assignDataRefetch({
+                variables: {
+                    voucherId: id,
+                    categoryIds: state.categoryIds,
+                },
+            });
+
+       
+            setState({ selectedExcludeCategory: [], selectedCategory: [], selectedProduct: [] });
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    };
+
+    const categoryList = async () => {
+        try {
+            const { data } = await categortRefetch({});
+
+            const categoryIds = data?.categories?.edges.filter((category) => category.node.name !== 'Gift Card').map((category) => category.node.id);
+
+            setState({categoryIds: categoryIds});
+            console.log('✌️data --->', data);
         } catch (error) {
             console.log('error: ', error);
         }
@@ -662,7 +700,7 @@ const CreateCoupon = () => {
                     </button>
                 </div>
             </div>
-            
+
             <Modal
                 addHeader={'Enter Coupon Code'}
                 open={state.isOpen}

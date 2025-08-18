@@ -11,6 +11,7 @@ export default function CategorySelect({
     isMulti = true, 
     clearable = true,
     title = '',
+    disabled = false,
 }) {
     const [state, setState] = useSetState({
         catOption: [],
@@ -64,6 +65,7 @@ export default function CategorySelect({
                 </label>
             )}
                 <Select
+                    isDisabled={disabled}
                     placeholder={placeholder}
                     options={state.catOption}
                     value={selectedCategory}

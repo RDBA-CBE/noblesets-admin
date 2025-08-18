@@ -19997,3 +19997,20 @@ export const GET_SIZEGUIDE = gql`
         }
     }
 `;
+
+export const GET_CAT= gql`
+  query MyQuery {
+    categories(first: 200) {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+
+

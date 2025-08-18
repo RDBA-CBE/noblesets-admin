@@ -31,6 +31,8 @@ import CategorySelect from '@/components/CategorySelect';
 import ProductSelect from '@/components/ProductSelect';
 import dayjs from 'dayjs';
 import DateTimeField from '@/components/DateTimePicker';
+import CouponCategorySelect from '@/components/CouponCategorySelect';
+import CouponProductSelect from '@/components/CouponProductSelect';
 
 const EditCoupon = () => {
     const router = useRouter();
@@ -124,7 +126,6 @@ const EditCoupon = () => {
                 includeProducts: true,
             });
             const data = res?.data?.voucher;
-console.log('✌️data --->', data);
             const endDate = data?.endDate;
             if (endDate) {
                 setState({ isEndDate: true, endDate: dayjs(endDate).toISOString() });
@@ -208,7 +209,7 @@ console.log('✌️data --->', data);
             });
 
             const data = res?.data?.voucher?.codes?.edges?.map((item: any) => item?.node)?.map((item: any) => item.code);
-            setState({ generatedCodes: data?.length > 0 ? data[0] : '', oldCodes: data,generatedOldCodes: data?.length > 0 ? data[0] : '' });
+            setState({ generatedCodes: data?.length > 0 ? data[0] : '', oldCodes: data, generatedOldCodes: data?.length > 0 ? data[0] : '' });
         } catch (error) {
             console.log('error: ', error);
         }
@@ -290,7 +291,6 @@ console.log('✌️data --->', data);
             endDate: e.target.value,
         });
     };
-    console.log('✌️state.couponOrginName --->', state.couponOrginName,state.generatedCodes);
 
     const updateCoupon = async () => {
         try {
@@ -321,13 +321,17 @@ console.log('✌️data --->', data);
                 errors.endDateError = 'End date is required';
             }
 
+            if (state.selectedCategory?.length === 0) {
+                errors.categoryError = 'At least one category is required';
+            }
+
             if (Object.keys(errors).length > 0) {
                 setState({ errors });
                 return;
             }
             // const set1 = new Set(state.oldCodes);
             // const pendingList = state.generatedCodes.filter((item) => !set1.has(item));
-            const body:any = {
+            const body: any = {
                 name: state.couponName,
                 applyOncePerCustomer: state.usageLimit?.value == 'Limit to one use per customer' ? true : false,
                 // applyOncePerOrder: state.usageLimit?.value == 'Limit to one use per customer' ? true : false,
@@ -341,13 +345,12 @@ console.log('✌️data --->', data);
                 startDate: state.startDate ? dayjs(state.startDate).toISOString() : null,
                 // type: state.codeType?.value == 'Free Shipping' ? 'SHIPPING' : 'SPECIFIC_PRODUCT',
                 // type: state.codeType?.value == 'Specific Products' ? 'SPECIFIC_PRODUCT' : 'ENTIRE_ORDER',
-                type: 'ENTIRE_ORDER',
+                type: 'SPECIFIC_PRODUCT',
                 usageLimit: state.usageLimit?.value == 'Limit number of times this discount can be used in total' ? (state.usageValue ? state.usageValue : null) : null,
                 singleUse: state.usageLimit?.value == 'Limit to voucher code use once' ? true : false,
                 autoApply: state?.autoApply,
                 invidualUseOnly: state.invidual,
             };
-
 
             const res = await updateCoupons({
                 variables: {
@@ -430,8 +433,8 @@ console.log('✌️data --->', data);
         const oldProduct = state.oldProduct?.map((val) => val.value) || [];
         const selectedProduct = state.selectedProduct?.map((val) => val.value) || [];
 
-        const oldExcludeCat = state.oldExcludeCat?.map((val) => val.value) || [];
-        const selectedExcludeCategory = state.selectedExcludeCategory?.map((val) => val.value) || [];
+        // const oldExcludeCat = state.oldExcludeCat?.map((val) => val.value) || [];
+        // const selectedExcludeCategory = state.selectedExcludeCategory?.map((val) => val.value) || [];
 
         const newlyAddedCat = selectedCategory.filter((item) => !oldCat.includes(item));
         const removedCat = oldCat.filter((item) => !selectedCategory.includes(item));
@@ -439,17 +442,17 @@ console.log('✌️data --->', data);
         const newlyAddedProduct = selectedProduct.filter((item) => !oldProduct.includes(item));
         const removedProduct = oldProduct.filter((item) => !selectedProduct.includes(item));
 
-        const newlyAddedExCat = selectedExcludeCategory.filter((item) => !oldExcludeCat.includes(item));
-        const removedExCat = oldExcludeCat.filter((item) => !selectedExcludeCategory.includes(item));
+        // const newlyAddedExCat = selectedExcludeCategory.filter((item) => !oldExcludeCat.includes(item));
+        // const removedExCat = oldExcludeCat.filter((item) => !selectedExcludeCategory.includes(item));
 
-        if (newlyAddedCat?.length > 0 || newlyAddedProduct?.length > 0 || newlyAddedExCat?.length > 0) {
-            assignData(id, newlyAddedCat, newlyAddedProduct, newlyAddedExCat);
+        if (newlyAddedCat?.length > 0 || newlyAddedProduct?.length > 0) {
+            assignData(id, newlyAddedCat, newlyAddedProduct);
         }
-        if (removedCat?.length > 0 || removedProduct?.length > 0 || removedExCat?.length > 0) {
-            removeData(id, removedCat, removedProduct, removedExCat);
+        if (removedCat?.length > 0 || removedProduct?.length > 0) {
+            removeData(id, removedCat, removedProduct);
         }
-        router.push(`/coupon`);
-        Success('Coupon updated Successfully');
+        // router.push(`/coupon`);
+        // Success('Coupon updated Successfully');
     };
 
     const updateMetaData = async (id: any) => {
@@ -474,7 +477,7 @@ console.log('✌️data --->', data);
         }
     };
 
-    const assignData = async (id: any, categories: any, products: any, exclude_categories: any) => {
+    const assignData = async (id: any, categories: any, products: any) => {
         try {
             const res = await assignDataRefetch({
                 variables: {
@@ -482,6 +485,7 @@ console.log('✌️data --->', data);
                     // includeCategories: true,
                     // includeCollections: false,
                     // includeProducts: false,
+                    products,
                     voucherId: id,
                     categoryIds: categories,
                 },
@@ -495,7 +499,7 @@ console.log('✌️data --->', data);
         }
     };
 
-    const removeData = async (id: any, categories: any, products: any, exclude_categories: any) => {
+    const removeData = async (id: any, categories: any, products: any) => {
         try {
             const res = await removeDataFromCoupon({
                 variables: {
@@ -507,7 +511,7 @@ console.log('✌️data --->', data);
                     input: {
                         categories,
                         products,
-                        exclude_categories,
+                        // exclude_categories,
                     },
                 },
             });
@@ -781,19 +785,28 @@ console.log('✌️data --->', data);
                 <>
                     <div className="mt-5 flex w-full gap-5">
                         <div className="col-6 md:w-6/12">
-                            {/* <ProductSelect
-                                        queryFunc={fetchProducts}
-                                        selectedCategory={state.selectedProduct}
-                                        onCategoryChange={(data) => setState({ selectedProduct: data })}
-                                        loading={productLoading}
-                                    /> */}
+                        <CouponCategorySelect
+                                queryFunc={fetchCategories} // Pass the function to fetch categories
+                                selectedCategory={state.selectedCategory} // Use 'selectedCategory' instead of 'value'
+                                onCategoryChange={(data) => setState({ selectedCategory: data })} // Use 'onCategoryChange' instead of 'onChange'
+                                placeholder="Select categories"
+                                title="Categories"
+                            />
+                            {state.errors?.categoryError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.categoryError}</p>}
 
-                            <ProductSelect
+                            {/* <CouponProductSelect
+                                queryFunc={fetchProducts}
+                                selectedCategory={state.selectedProduct}
+                                onCategoryChange={(data) => setState({ selectedProduct: data })}
+                                loading={productLoading}
+                            /> */}
+
+                            {/* <ProductSelect
                                 loading={productLoading}
                                 queryFunc={fetchProducts}
                                 selectedCategory={state.selectedProduct}
                                 onCategoryChange={(data) => setState({ selectedProduct: data })}
-                            />
+                            /> */}
 
                             {/* 
                                     <label htmlFor="name" className="block text-lg font-medium text-gray-700">
@@ -811,6 +824,23 @@ console.log('✌️data --->', data);
                                     /> */}
                         </div>
                         <div className="col-6 md:w-6/12">
+                        <CategorySelect
+                            queryFunc={fetchCategories} // Pass the function to fetch categories
+                            selectedCategory={[{ label: 'Gift Card', value: 1 }]} // Use 'selectedCategory' instead of 'value'
+                            onCategoryChange={(data) => {}} // Use 'onCategoryChange' instead of 'onChange'
+                            placeholder="Select categories"
+                            title="Exclude Categories"
+                            disabled
+                        />
+                            {/* <CouponCategorySelect
+                                queryFunc={fetchCategories} // Pass the function to fetch categories
+                                selectedCategory={state.selectedCategory} // Use 'selectedCategory' instead of 'value'
+                                onCategoryChange={(data) => setState({ selectedCategory: data })} // Use 'onCategoryChange' instead of 'onChange'
+                                placeholder="Select categories"
+                                title="Categories"
+                            />
+                            {state.errors?.categoryError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.categoryError}</p>} */}
+
                             {/* <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                                         Categories
                                     </label>
@@ -823,12 +853,14 @@ console.log('✌️data --->', data);
                                         isMulti={true}
                                     /> */}
 
-                            <CategorySelect
+                            {/* <CategorySelect
                                 queryFunc={fetchCategories} // Pass the function to fetch categories
                                 selectedCategory={state.selectedCategory} // Use 'selectedCategory' instead of 'value'
                                 onCategoryChange={(data) => setState({ selectedCategory: data })} // Use 'onCategoryChange' instead of 'onChange'
                                 placeholder="Select categories"
-                            />
+                                disabled={true}
+                                
+                            /> */}
                             {/* <CategorySelect
                                         queryFunc={fetchCategories} // Pass the function to fetch categories
                                         value={state.selectedCategory} // Selected categories
@@ -839,13 +871,22 @@ console.log('✌️data --->', data);
                         </div>
                     </div>
                     <div className="col-6 mt-5 md:w-6/12">
-                        <CategorySelect
+                        {/* <CategorySelect
                             queryFunc={fetchCategories} // Pass the function to fetch categories
-                            selectedCategory={state.selectedExcludeCategory} // Use 'selectedCategory' instead of 'value'
-                            onCategoryChange={(data) => setState({ selectedExcludeCategory: data })} // Use 'onCategoryChange' instead of 'onChange'
+                            selectedCategory={[{ label: 'Gift Card', value: 1 }]} // Use 'selectedCategory' instead of 'value'
+                            onCategoryChange={(data) => {}} // Use 'onCategoryChange' instead of 'onChange'
                             placeholder="Select categories"
                             title="Exclude Categories"
-                        />
+                            disabled
+                        /> */}
+                        {/* <CategorySelect
+                            queryFunc={fetchCategories} // Pass the function to fetch categories
+                            selectedCategory={[{label:"Gift Card",value:1}]} // Use 'selectedCategory' instead of 'value'
+                            onCategoryChange={(data) => {}} // Use 'onCategoryChange' instead of 'onChange'
+                            placeholder="Select categories"
+                            title="Exclude Categories"
+                            disabled
+                        /> */}
                         {/* <label htmlFor="name" className="block text-lg font-medium text-gray-700">
                                     Exclude Categories
                                 </label>

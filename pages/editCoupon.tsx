@@ -348,9 +348,6 @@ console.log('✌️data --->', data);
                 invidualUseOnly: state.invidual,
             };
 
-            if(state.generatedOldCodes != generatedCodes) {
-                body.addCodes = [generatedCodes];
-            }
 
             const res = await updateCoupons({
                 variables: {
@@ -606,6 +603,7 @@ console.log('✌️data --->', data);
                                 name="name"
                                 className="form-input"
                                 required
+                                disabled
                             />
                             {state.errors?.generatedCodesError && <p className="mt-[4px] text-[14px] text-red-600">{state.errors?.generatedCodesError}</p>}
                         </div>

@@ -1608,35 +1608,7 @@ const Editorder = () => {
     const calculateDiscount = () => {
         return formatAsINRWithDecimal(orderData?.discount?.amount);
     };
-    const subTotal = () => {
-        const subtotal = orderData?.subtotal?.net?.amount || 0;
-        console.log('✌️subtotal --->', subtotal);
-        console.log('✌️orderData.voucher --->', orderData);
-
-        let result = 0;
-        if (!orderData?.voucher) {
-            return subtotal;
-        }
-
-        if (orderData.voucher) {
-            const { discountValue, discountValueType, currency } = orderData.voucher;
-
-            if (discountValueType === 'FIXED') {
-                if (subtotal < orderData?.discount?.amount) {
-                    result = orderData?.discount?.amount || 0;
-                } else {
-                    result = Math.max(0, subtotal - orderData?.discount?.amount);
-                }
-            } else if (discountValueType === 'PERCENTAGE') {
-                result = Math.max(0, subtotal - orderData?.discount?.amount || 0);
-            }
-        } else {
-            result = subtotal;
-        }
-        return formatAsINRWithDecimal(result);
-    };
-
-    console.log('formData', formData);
+  
 
     return (
         <>
@@ -2297,15 +2269,15 @@ const Editorder = () => {
                                                         </div>
                                                     </td>
                                                     {item?.unitPrice?.net?.currency == 'USD' ? (
-                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.gross?.amount)}`} </td>
+                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.net?.amount)}`} </td>
                                                     ) : (
-                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.gross?.amount)}`} </td>
+                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.net?.amount)}`} </td>
                                                     )}
                                                     <td>
                                                         <div>× {item?.quantity}</div>
                                                     </td>
                                                     <td>
-                                                        <div>{`${formatAsINRWithDecimal(Number(item?.unitPrice?.gross?.amount) * Number(item?.quantity))}`}</div>
+                                                        <div>{`${formatAsINRWithDecimal(Number(item?.unitPrice?.net?.amount) * Number(item?.quantity))}`}</div>
                                                         {/* {orderData?.discount && (
                                                             <div className="text-[12px]">{`(${formatCurrency(orderData?.discount?.currency)}${Number(orderData?.discount?.amount)} Discount)`}</div>
                                                         )} */}

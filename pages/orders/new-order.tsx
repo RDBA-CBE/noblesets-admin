@@ -1036,56 +1036,6 @@ const NewOrder = () => {
         }
     };
 
-    const subTotal = () => {
-        const subtotal = productDetails?.order?.subtotal?.gross?.amount || 0;
-        console.log('✌️subtotal --->', productDetails);
-        let result = 0;
-        if (productDetails?.order?.discounts?.length > 0 && productDetails?.order?.discounts[0]?.value > 0) {
-            const discountValue = productDetails?.order?.discounts[0]?.value || 0;
-            const discountValueType = productDetails?.order?.discounts[0]?.valueType || 'FIXED';
-
-            if (discountValueType === 'FIXED') {
-                if (subtotal < discountValue) {
-                    result = discountValue;
-                } else {
-                    result = Math.max(0, subtotal + discountValue);
-                }
-            } else {
-                result = Math.max(0, subtotal + discountValue);
-            }
-
-            // if (discountValueType === 'FIXED') {
-            //     if (subtotal < discountValue) {
-            //         result = orderData?.discount?.amount || 0;
-            //     } else {
-            //         result = Math.max(0, subtotal + discountValue);
-            //     }
-            // } else if (discountValueType === 'PERCENTAGE') {
-            //     result = Math.max(0, subtotal + orderData?.discount?.amount || 0);
-            // }
-        } else {
-            result = subtotal;
-        }
-
-        // if (productDetails.voucher) {
-        //     const { discountValue, discountValueType, currency } = productDetails.voucher;
-
-        //     if (productDetails?.discounts[0]?.calculationMode === 'FIXED') {
-        //         if (subtotal < discountValue) {
-        //             result = productDetails?.discount?.amount || 0;
-        //         } else {
-        //             result = Math.max(0, subtotal + discountValue);
-        //         }
-        //     } else if (discountValueType === 'PERCENTAGE') {
-        //         result = Math.max(0, subtotal + productDetails?.discount?.amount || 0);
-        //     }
-        // } else {
-        //     result = subtotal;
-        // }
-        return formatAsINRWithDecimal(result);
-    };
-    console.log('✌️subTotal --->', subTotal());
-
     return (
         <>
             <div className="panel mb-5 flex items-center justify-between gap-3 p-5 ">
@@ -1781,6 +1731,40 @@ const NewOrder = () => {
                                         {/* {productDetails?.order?.subtotal?.gross?.currency} {productDetails?.order?.subtotal?.gross?.amount} */}
                                     </div>
                                 </div>
+                                {productDetails?.order?.discounts?.length > 0 && (
+                                    <div className="mt-4 flex items-center justify-between">
+                                        <div className="flex">
+                                            <div>Discount</div>
+                                            <div className=" cursor-pointer" onClick={() => removeTotalDiscounts()}>
+                                                <IconTrashLines className="text-red-500" />
+                                            </div>
+                                        </div>
+
+                                        <div className="">
+                                            {productDetails?.order?.discounts[0]?.calculationMode == 'PERCENTAGE' ? (
+                                                <div style={{ color: 'green' }}>
+                                                    {`${`- (${productDetails?.order?.discounts[0]?.value}%)`} ${formatCurrency(productDetails?.order?.discounts[0]?.amount?.currency)}${addCommasToNumber(
+                                                        productDetails?.order?.discounts[0]?.amount?.amount
+                                                    )}`}
+                                                </div>
+                                            ) : (
+                                                <div style={{ color: 'green' }}>{`- ${formatCurrency(productDetails?.order?.discounts[0]?.amount?.currency)}${addCommasToNumber(
+                                                    productDetails?.order?.discounts[0]?.amount?.amount
+                                                )}`}</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                                {productDetails?.order?.shippingPrice?.gross?.amount != 0 && (
+                                    <div className="mt-4 flex items-center justify-between">
+                                        <div>Shipping Rate</div>
+                                        <div>
+                                            {`${formatCurrency(productDetails?.order?.shippingPrice?.gross?.currency)}${addCommasToNumber(productDetails?.order?.shippingPrice?.gross?.amount)}`}
+
+                                            {/* {productDetails?.order?.shippingMethods[0]?.price?.currency} {productDetails?.order?.shippingMethods[0]?.price?.amount} */}
+                                        </div>
+                                    </div>
+                                )}
                                 {state.shippingAddress?.state !== '' &&
                                     (state.shippingAddress?.state == 'Tamil Nadu' ? (
                                         <>
@@ -1814,41 +1798,8 @@ const NewOrder = () => {
                                         </div>
                                     ))}
 
-                                {productDetails?.order?.shippingPrice?.gross?.amount != 0 && (
-                                    <div className="mt-4 flex items-center justify-between">
-                                        <div>Shipping Rate</div>
-                                        <div>
-                                            {`${formatCurrency(productDetails?.order?.shippingPrice?.gross?.currency)}${addCommasToNumber(productDetails?.order?.shippingPrice?.gross?.amount)}`}
-
-                                            {/* {productDetails?.order?.shippingMethods[0]?.price?.currency} {productDetails?.order?.shippingMethods[0]?.price?.amount} */}
-                                        </div>
-                                    </div>
-                                )}
-                                {state.line?.length}
-                                {productDetails?.order?.discounts?.length > 0 && (
-                                    <div className="mt-4 flex items-center justify-between">
-                                        <div className="flex">
-                                            <div>Discount</div>
-                                            <div className=" cursor-pointer" onClick={() => removeTotalDiscounts()}>
-                                                <IconTrashLines className="text-red-500" />
-                                            </div>
-                                        </div>
-
-                                        <div className="">
-                                            {productDetails?.order?.discounts[0]?.calculationMode == 'PERCENTAGE' ? (
-                                                <div>
-                                                    {`${`(${productDetails?.order?.discounts[0]?.value}%)`} ${formatCurrency(productDetails?.order?.discounts[0]?.amount?.currency)}${addCommasToNumber(
-                                                        productDetails?.order?.discounts[0]?.amount?.amount
-                                                    )}`}
-                                                </div>
-                                            ) : (
-                                                <div>{`${formatCurrency(productDetails?.order?.discounts[0]?.amount?.currency)}${addCommasToNumber(
-                                                    productDetails?.order?.discounts[0]?.amount?.amount
-                                                )}`}</div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
+                                {/* {state.line?.length} */}
+                                
                                 <div className="mt-4 flex items-center justify-between font-semibold">
                                     <div>Total</div>
 

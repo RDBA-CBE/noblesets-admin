@@ -1130,43 +1130,6 @@ const Editorder = () => {
         }
     };
 
-    // const updateInvoice = async (country?: any) => {
-    //     try {
-    //         setUpdateInvoideLoading(true);
-    //         const res = await updatesInvoice({
-    //             variables: {
-    //                 invoiceid: orderData?.invoices[0]?.id,
-    //                 input: {
-    //                     number: 'PR2425' + invoiceNumber,
-    //                     createdAt: invoiceDate,
-    //                 },
-    //             },
-    //         });
-
-    //         if (res.data?.invoiceUpdate?.errors?.length > 0) {
-    //             setOpenInvoice(false);
-    //             setUpdateInvoideLoading(false);
-    //             getOrderDetails();
-    //             Failure('Invoice not updated');
-    //         } else {
-    //             const res = await updateInvoicePdf({
-    //                 variables: {
-    //                     invoiceId: orderData?.invoices[0]?.id,
-    //                 },
-    //             });
-    //             setUpdateInvoideLoading(false);
-
-    //             setOpenInvoice(false);
-    //             getOrderDetails();
-
-    //             Success('Invoice Updated Successfully');
-    //         }
-    //     } catch (error) {
-    //         setUpdateInvoideLoading(false);
-
-    //         console.log('error: ', error);
-    //     }
-    // };
 
     const updateInvoice = async (country?: any) => {
         try {
@@ -1348,7 +1311,6 @@ const Editorder = () => {
 
     const setTotalAmountCalc = (item) => {
         let isDisable = false;
-        const orderLineId = item?.orderLine?.id || item?.id;
         if (item?.orderLine?.quantity === 0 || item?.quantity === 0) {
             isDisable = true;
         }
@@ -1554,64 +1516,7 @@ const Editorder = () => {
         return formatAsINRWithDecimal(orderData?.discount?.amount);
     };
 
-    const subTotal = () => {
-        const subtotal = orderData?.subtotal?.net?.amount || 0;
-        console.log('✌️subtotal --->', subtotal);
-        console.log('✌️orderData.voucher --->', orderData);
 
-        let result = 0;
-        if (!orderData?.voucher) {
-            return subtotal;
-        }
-
-        if (orderData.voucher) {
-            const { discountValue, discountValueType, currency } = orderData.voucher;
-
-            if (discountValueType === 'FIXED') {
-                if (subtotal < orderData?.discount?.amount) {
-                    result = orderData?.discount?.amount || 0;
-                } else {
-                    result = Math.max(0, subtotal + orderData?.discount?.amount);
-                }
-            } else if (discountValueType === 'PERCENTAGE') {
-                result = Math.max(0, subtotal + orderData?.discount?.amount || 0);
-            }
-        } else {
-            
-            result = subtotal;
-        }
-        console.log("result",result);
-        
-        return formatAsINRWithDecimal(result);
-    };
-
-    const withoutDiscount = () => {
-        const subtotal = orderData?.subtotal?.net?.amount || 0;
-        console.log('✌️subtotal --->', subtotal);
-        console.log('✌️orderData.voucher --->', orderData);
-
-        let result = 0;
-        if (!orderData?.voucher) {
-            return subtotal;
-        }
-
-        if (orderData.voucher) {
-            const { discountValue, discountValueType, currency } = orderData.voucher;
-
-            if (discountValueType === 'FIXED') {
-                if (subtotal < orderData?.discount?.amount) {
-                    result = orderData?.discount?.amount || 0;
-                } else {
-                    result = Math.max(0, subtotal - orderData?.discount?.amount);
-                }
-            } else if (discountValueType === 'PERCENTAGE') {
-                result = Math.max(0, subtotal - orderData?.discount?.amount || 0);
-            }
-        } else {
-            result = subtotal;
-        }
-        return formatAsINRWithDecimal(result);
-    };
     return (
         <>
             <>
@@ -2270,9 +2175,9 @@ const Editorder = () => {
                                                         </div>
                                                     </td>
                                                     {item?.unitPrice?.net?.currency == 'USD' ? (
-                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.gross?.amount)}`} </td>
+                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.net?.amount)}`} </td>
                                                     ) : (
-                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.gross?.amount)}`} </td>
+                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.net?.amount)}`} </td>
 
                                                         // <td>{`${formatCurrency(item?.unitPrice?.net?.currency)}${floatComma(item?.variant?.pricing?.pricing?.gross?.amount)}`} </td>
                                                     )}
@@ -2289,7 +2194,7 @@ const Editorder = () => {
                                                         )} */}
                                                     {/* </td> */}
                                                     <td>
-                                                        <div>{`${formatAsINRWithDecimal(Number(item?.unitPrice?.gross?.amount) * Number(item?.quantity))}`}</div>
+                                                        <div>{`${formatAsINRWithDecimal(Number(item?.unitPrice?.net?.amount) * Number(item?.quantity))}`}</div>
                                                     </td>
                                                     {/* {formData?.billing?.state !== '' && formData?.shipping?.state == 'Tamil Nadu' ? (
                                                         <td>

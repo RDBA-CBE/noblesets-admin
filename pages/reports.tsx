@@ -1712,8 +1712,9 @@ const Reports = () => {
                                             className="form-input"
                                             value={state.orderStartDate}
                                             onChange={(e) => {
-                                                setState({ orderStartDate: dayjs(e).format('DD/MM/YYYY HH:mm:ss'), orderEndDate: '' });
+                                                setState({ orderStartDate: dayjs(e).format('YYYY-MM-DD HH:mm:ss'), orderEndDate: '' });
                                             }}
+
                                             // onChange={(e) => setState({ endDate: e })}
                                         />
 
@@ -1741,7 +1742,7 @@ const Reports = () => {
                                             className="form-input"
                                             value={state.orderEndDate}
                                             onChange={(e) => {
-                                                setState({ orderEndDate: dayjs(e).format('DD/MM/YYYY HH:mm:ss') });
+                                                setState({ orderEndDate: dayjs(e).format('YYYY-MM-DD HH:mm:ss') });
                                             }}
 
                                             // onChange={(e) => setState({ endDate: e })}
@@ -2008,7 +2009,7 @@ const Reports = () => {
                                             className="form-input"
                                             value={state.customerStartDate}
                                             onChange={(e) => {
-                                                setState({ customerStartDate: dayjs(e).format('DD/MM/YYYY HH:mm:ss'), customerEndDate: '' });
+                                                setState({ customerStartDate: dayjs(e).format('YYYY-MM-DD HH:mm:ss'), customerEndDate: '' });
                                             }}
                                         />
                                     </div>
@@ -2035,7 +2036,7 @@ const Reports = () => {
                                             className="form-input"
                                             value={state.customerEndDate}
                                             onChange={(e) => {
-                                                setState({ customerEndDate: dayjs(e).format('DD/MM/YYYY HH:mm:ss') });
+                                                setState({ customerEndDate: dayjs(e).format('YYYY-MM-DD HH:mm:ss') });
                                             }}
 
                                             // onChange={(e) => setState({ endDate: e })}
@@ -2134,7 +2135,7 @@ const Reports = () => {
                                             className="form-input"
                                             value={state.analysisStartDate}
                                             onChange={(e) => {
-                                                setState({ analysisStartDate: dayjs(e).format('DD/MM/YYYY HH:mm:ss'), analysisEndDate: '' });
+                                                setState({ analysisStartDate: dayjs(e).format('YYYY-MM-DD HH:mm:ss'), analysisEndDate: '' });
                                             }}
                                         />
                                     </div>
@@ -2149,7 +2150,7 @@ const Reports = () => {
                                             className="form-input"
                                             value={state.analysisEndDate}
                                             onChange={(e) => {
-                                                setState({ analysisEndDate: dayjs(e).format('DD/MM/YYYY HH:mm:ss') });
+                                                setState({ analysisEndDate: dayjs(e).format('YYYY-MM-DD HH:mm:ss') });
                                             }}
 
                                             // onChange={(e) => setState({ endDate: e })}

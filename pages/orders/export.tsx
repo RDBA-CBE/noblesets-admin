@@ -249,19 +249,19 @@ const Orders = () => {
 
     const excelDownload = async () => {
         try {
-            if (exportBy == '') {           
+            if (exportBy == '') {
                 Failure('Please select duration');
                 return;
             }
-            if(!endDate ) {
+            if (exportBy == 'custom' && !endDate) {
                 Failure('Please select end date');
                 return;
             }
-           
-            if (exportBy == 'custom' && (startDate == '' || endDate == '')) {       
+
+            if (exportBy == 'custom' && (startDate == '' || endDate == '')) {
                 Failure('Please select start date and end date');
                 return;
-            }   
+            }
 
             setState({ loading: true });
             let hasNextPage = true;

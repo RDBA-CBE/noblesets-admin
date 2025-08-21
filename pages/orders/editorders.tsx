@@ -2335,7 +2335,7 @@ const Editorder = () => {
                                         <div>Items Subtotal:</div>
                                         <div>
                                             {/* <div>{`${formatAsINRWithDecimal(subTotal())}`}</div> */}
-                                            <div>{orderData?.subtotal?.net?.amount}</div>
+                                            <div>{formatAsINRWithDecimal(orderData?.subtotal?.net?.amount)}</div>
 
                                             {/* <div className='text-[12px]'>{`(Included Tax)`}</div> */}
                                         </div>

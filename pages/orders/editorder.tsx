@@ -197,6 +197,7 @@ const Editorder = () => {
     });
 
     const [orderData, setOrderData] = useState<any>({});
+console.log('✌️orderData --->', orderData);
     const [discountOpen, setDiscountOpen] = useState(false);
     const [openInvoice, setOpenInvoice] = useState(false);
     const [updateInvoideLoading, setUpdateInvoideLoading] = useState(false);
@@ -2288,7 +2289,7 @@ const Editorder = () => {
                                         </div>
                                     </div> */}
 
-                                    {orderData?.order?.giftCards?.length > 0 && (
+                                    {orderData?.giftCards?.length > 0 && (
                                         <div className="mt-4 flex  justify-between" style={{ color: 'green' }}>
                                             <div>Gift Voucher Amount</div>
                                             <div>

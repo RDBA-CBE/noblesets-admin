@@ -806,7 +806,7 @@ export const generatePresignedPost = async (file) => {
             ['starts-with', '$Content-Type', ''], // Allow any content type
             ['eq', '$key', file.name],
         ],
-        Expires: 60, // 1 minute expiration
+        // Expires: 60, // 1 minute expiration
     };
 
     return new Promise((resolve, reject) => {
@@ -842,7 +842,7 @@ export const generatePresignedVideoPost = async (file) => {
             ['starts-with', '$Content-Type', ''], // Ensure only MP4 files are allowed
             ['eq', '$key', file.name],
         ],
-        Expires: 60, // 1 minute expiration
+        // Expires: 60, // 1 minute expiration
     };
 
     return new Promise((resolve, reject) => {

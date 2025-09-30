@@ -1608,8 +1608,6 @@ const Editorder = () => {
     const calculateDiscount = () => {
         return formatAsINRWithDecimal(orderData?.discount?.amount);
     };
-  
-
     return (
         <>
             <>
@@ -2269,9 +2267,20 @@ const Editorder = () => {
                                                         </div>
                                                     </td>
                                                     {item?.unitPrice?.net?.currency == 'USD' ? (
-                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.net?.amount)}`} </td>
+                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.net?.amount)}`}</td>
                                                     ) : (
-                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.net?.amount)}`} </td>
+                                                        <td>
+                                                            {`${formatAsINRWithDecimal(item?.unitPrice?.net?.amount)}`}
+                                                            {item?.unitDiscountValue && item?.unitDiscountValue != 0 && (
+                                                                <>
+                                                                    <br />
+                                                                    <div className="flex items-center">
+                                                                        <h4 className=" text-[11px]">Discount:</h4>
+                                                                        <div className="pl-1 text-[11px] text-gray-500"> {`${formatAsINRWithDecimal(item?.unitDiscountValue)}`} </div>
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                        </td>
                                                     )}
                                                     <td>
                                                         <div>× {item?.quantity}</div>
@@ -2335,16 +2344,16 @@ const Editorder = () => {
                                         <div>Items Subtotal:</div>
                                         <div>
                                             {/* <div>{`${formatAsINRWithDecimal(subTotal())}`}</div> */}
-                                            <div>{orderData?.subtotal?.net?.amount}</div>
+                                            <div>{formatAsINRWithDecimal(orderData?.subtotal?.net?.amount)}</div>
 
                                             {/* <div className='text-[12px]'>{`(Included Tax)`}</div> */}
                                         </div>
                                     </div>
                                     {orderData?.voucher && orderData?.voucher?.discountValue != 0 && (
-                                        <div className="mt-4 mb-4 flex items-center justify-between">
+                                        <div className="mb-4 mt-4 flex items-center justify-between">
                                             <div>Coupon Amount {`(${orderData?.voucher?.name})`}</div>
-                                            <div style={{ color: 'green' }}>
-                                                {orderData?.voucher?.discountValueType === 'PERCENTAGE' ? `-${calculateDiscount()}` : `-${formatAsINRWithDecimal(orderData?.discount?.amount)}`}
+                                            <div >
+                                                {orderData?.voucher?.discountValueType === 'PERCENTAGE' ? `${calculateDiscount()}` : `${formatAsINRWithDecimal(orderData?.discount?.amount)}`}
                                             </div>
                                         </div>
                                     )}
@@ -2387,7 +2396,6 @@ const Editorder = () => {
                                             </div>
                                         </div>
                                     )}
-                                   
 
                                     {formData?.shipping && formData?.shipping?.state === 'Tamil Nadu' ? (
                                         formData?.shipping?.state === 'Tamil Nadu' ? (
@@ -2417,30 +2425,29 @@ const Editorder = () => {
                                         )
                                     ) : formData?.billing?.state === 'Tamil Nadu' ? (
                                         <>
-                                        <div className="mt-4 flex items-center justify-between">
-                                            <div>SGST: </div>
-                                            <div> <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount) / 2}`}</div></div>
-                                           
-                                            {/* <span className="ml-10">+</span> */}
-                                           
-                                        </div>
+                                            <div className="mt-4 flex items-center justify-between">
+                                                <div>SGST: </div>
+                                                <div>
+                                                    {' '}
+                                                    <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount) / 2}`}</div>
+                                                </div>
 
-                                        <div className="mt-4 flex items-center justify-between">
-                                            <div>CGST: </div>
-                                            <div>
-                                                 <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount) / 2}`}</div>
+                                                {/* <span className="ml-10">+</span> */}
                                             </div>
-                                        </div>
 
+                                            <div className="mt-4 flex items-center justify-between">
+                                                <div>CGST: </div>
+                                                <div>
+                                                    <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount) / 2}`}</div>
+                                                </div>
+                                            </div>
                                         </>
-                                        
                                     ) : (
                                         <div className="mt-4 flex items-center justify-between">
                                             <div>IGST:</div>
                                             <div>
                                                 <div>{`${formatCurrency(orderData?.subtotal?.tax?.currency)}${Number(orderData?.subtotal?.tax?.amount)}`}</div>
                                             </div>
-                                            
                                         </div>
                                     )}
                                     {/* <div className="mt-4 flex items-center justify-between">

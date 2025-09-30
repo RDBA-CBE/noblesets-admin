@@ -197,6 +197,7 @@ const Editorder = () => {
     });
 
     const [orderData, setOrderData] = useState<any>({});
+console.log('✌️orderData --->', orderData);
     const [discountOpen, setDiscountOpen] = useState(false);
     const [openInvoice, setOpenInvoice] = useState(false);
     const [updateInvoideLoading, setUpdateInvoideLoading] = useState(false);
@@ -1130,7 +1131,6 @@ const Editorder = () => {
         }
     };
 
-
     const updateInvoice = async (country?: any) => {
         try {
             if (invoiceNumber == '') {
@@ -1515,7 +1515,6 @@ const Editorder = () => {
     const calculateDiscount = () => {
         return formatAsINRWithDecimal(orderData?.discount?.amount);
     };
-
 
     return (
         <>
@@ -2177,7 +2176,18 @@ const Editorder = () => {
                                                     {item?.unitPrice?.net?.currency == 'USD' ? (
                                                         <td>{`${formatAsINRWithDecimal(item?.unitPrice?.net?.amount)}`} </td>
                                                     ) : (
-                                                        <td>{`${formatAsINRWithDecimal(item?.unitPrice?.net?.amount)}`} </td>
+                                                        <td>
+                                                            {`${formatAsINRWithDecimal(item?.unitPrice?.net?.amount)}`}
+                                                            {item?.unitDiscountValue && item?.unitDiscountValue != 0 && (
+                                                                <>
+                                                                    <br />
+                                                                    <div className="flex items-center">
+                                                                        <h4 className=" text-[12px]">Discount:</h4>
+                                                                        <div className="pl-1 text-[12px] text-gray-500"> {`${formatAsINRWithDecimal(item?.unitDiscountValue)}`} </div>
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                        </td>
 
                                                         // <td>{`${formatCurrency(item?.unitPrice?.net?.currency)}${floatComma(item?.variant?.pricing?.pricing?.gross?.amount)}`} </td>
                                                     )}
@@ -2260,16 +2270,14 @@ const Editorder = () => {
 
                                         <div>
                                             {/* <div>{subTotal()}</div> */}
-                                            <div>{orderData?.subtotal?.net?.amount}</div>
-
-
+                                            <div>{formatAsINRWithDecimal(orderData?.subtotal?.net?.amount)}</div>
                                         </div>
                                     </div>
                                     {orderData?.voucher && orderData?.voucher?.discountValue > 0 && (
                                         <div className="mt-4 flex items-center justify-between">
                                             <div>Coupon Amount {`(${orderData?.voucher?.name})`}</div>
-                                            <div style={{ color: 'green' }}>
-                                                {orderData?.voucher?.discountValueType === 'PERCENTAGE' ? `-${calculateDiscount()}` : `-${formatAsINRWithDecimal(orderData?.discount?.amount)}`}
+                                            <div>
+                                                {orderData?.voucher?.discountValueType === 'PERCENTAGE' ? `${calculateDiscount()}` : `${formatAsINRWithDecimal(orderData?.discount?.amount)}`}
                                             </div>
                                         </div>
                                     )}
@@ -2281,7 +2289,7 @@ const Editorder = () => {
                                         </div>
                                     </div> */}
 
-                                    {orderData?.order?.giftCards?.length > 0 && (
+                                    {orderData?.giftCards?.length > 0 && (
                                         <div className="mt-4 flex  justify-between" style={{ color: 'green' }}>
                                             <div>Gift Voucher Amount</div>
                                             <div>

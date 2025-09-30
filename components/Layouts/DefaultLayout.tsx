@@ -106,8 +106,8 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
                     alignItems: 'center',
                 }}
             >
-                <div style={{ width: '25%', height: '25%', position: 'relative' }}>
-                    <Image src="/assets/images/Prade-Logo-Giff.gif" alt="Loading..." layout="fill" objectFit="contain" />
+                <div style={{ width: '6%', height: '6%', position: 'relative' }}>
+                    <Image src="/assets/images/nobelset-gif-1.gif" alt="Loading..." layout="fill" objectFit="contain" />
                 </div>
             </div>
         );

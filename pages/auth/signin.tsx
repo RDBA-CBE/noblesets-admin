@@ -134,7 +134,7 @@ const LoginBoxed = () => {
                 </div>
             </div>
 
-            <div className="relative flex min-h-screen items-center justify-center  bg-[#e09a7a1a] sm:px-16">
+            <div className="relative flex min-h-screen items-center justify-center  bg-[#9b604d1a] sm:px-16">
                 {/* <img src="/assets/images/auth/coming-soon-object1.png" alt="image" className="absolute left-0 top-1/2 h-full max-h-[893px] -translate-y-1/2" />
                 <img src="/assets/images/auth/coming-soon-object2.png" alt="image" className="absolute left-24 top-0 h-40 md:left-[30%]" />
                 <img src="/assets/images/auth/coming-soon-object3.png" alt="image" className="absolute right-0 top-0 h-[300px]" />

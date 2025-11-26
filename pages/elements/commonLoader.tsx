@@ -12,7 +12,7 @@ export default function CommonLoader() {
             }}
         >
             <div style={{ width: '6%', height: '6%', position: 'relative' }}>
-                <Image src="/assets/images/nobelset-gif-1.gif" alt="Loading..." layout="fill" objectFit="contain" />
+                <Image src="/assets/images/nobelset-gif-2.gif" alt="Loading..." layout="fill" objectFit="contain" />
             </div>
         </div>
     );

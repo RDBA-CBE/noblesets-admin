@@ -91,7 +91,7 @@
     }
     .sidebar .nav-item > button.active,
     .sidebar .nav-item > a.active {
-        @apply bg-[#e09a7a] text-white dark:bg-[#181f32] dark:text-white-dark;
+        @apply bg-[#9b604d] text-white dark:bg-[#181f32] dark:text-white-dark;
     }
 
     .sidebar .nav-item > button.active > div > span,
@@ -719,6 +719,6 @@ pre.hljs {
 }
 
 .swal2-popup .swal2-styled.swal2-confirm{
-    background-color: #e09a7a;
+    background-color: #9b604d;
 }
 

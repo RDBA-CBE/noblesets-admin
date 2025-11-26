@@ -358,7 +358,7 @@ const Address = () => {
                                     {state.index === index && (
                                         <div
                                             style={{
-                                                backgroundColor: '#e09a7a',
+                                                backgroundColor: '#9b604d',
                                                 padding: '10px',
                                                 borderRadius: '5px',
                                                 color: 'white',

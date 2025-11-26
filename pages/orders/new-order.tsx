@@ -1981,7 +1981,7 @@ const NewOrder = () => {
                                         {/* Product list */}
                                         {state.productList?.map(({ id: productId, name, variants, thumbnail }) => {
                                             return (
-                                                <div key={productId} className="m-2 rounded-xl bg-[#e09a7a1a] px-2 py-4">
+                                                <div key={productId} className="m-2 rounded-xl bg-[#9b604d1a] px-2 py-4">
                                                     <div className="flex gap-3">
                                                         <input
                                                             type="checkbox"

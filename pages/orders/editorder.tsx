@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, {  useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useQuery } from '@apollo/client';
 import {

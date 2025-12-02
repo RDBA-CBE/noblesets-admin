@@ -2125,10 +2125,15 @@ const Editorder = () => {
                                 )}
                             </div>
 
+                            {(orderData?.shippingAddress?.metadata?.length > 0 ||  orderData?.billingAddress?.metadata?.length > 0)? 
                             <div className="mt-3">
-                                <div className="text-md"> User Email :</div>
-                                <div className="text-primary underline">{orderData?.shippingAddress?.metadata[0]?.value ?? orderData?.billingAddress?.metadata[0]?.value ?? orderData?.userEmail}</div>
-                            </div>
+                                <div className="text-md">User Email :</div>
+                                <div className="text-primary underline">{orderData?.shippingAddress?.metadata?.[0]?.value || orderData?.billingAddress?.metadata[0]?.value }</div>
+                            </div> : 
+                            <div className="mt-3">
+                                <div className="text-md">User Email :</div>
+                                <div className="text-primary underline">{ orderData?.userEmail}</div>
+                            </div>}
 
                             <div className="mt-5">
                                 {showRefundText() && (

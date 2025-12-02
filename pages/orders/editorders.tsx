@@ -2216,10 +2216,16 @@ const Editorder = () => {
                                     </div>
                                 )}
                             </div>
+                             {(orderData?.shippingAddress?.metadata?.length > 0 ||  orderData?.billingAddress?.metadata?.length > 0)? 
                             <div className="mt-3">
                                 <div className="text-md">User Email :</div>
-                                <div className="text-primary underline">{orderData?.userEmail}</div>
-                            </div>
+                                <div className="text-primary underline">{orderData?.shippingAddress?.metadata?.[0]?.value || orderData?.billingAddress?.metadata[0]?.value }</div>
+                            </div> : 
+                            <div className="mt-3">
+                                <div className="text-md">User Email :</div>
+                                <div className="text-primary underline">{ orderData?.userEmail}</div>
+                            </div>}
+                            
 
                             <div className="mt-5">
                                 {showRefundText() && (
@@ -2352,9 +2358,7 @@ const Editorder = () => {
                                     {orderData?.voucher && orderData?.voucher?.discountValue != 0 && (
                                         <div className="mb-4 mt-4 flex items-center justify-between">
                                             <div>Coupon Amount {`(${orderData?.voucher?.name})`}</div>
-                                            <div >
-                                                {orderData?.voucher?.discountValueType === 'PERCENTAGE' ? `${calculateDiscount()}` : `${formatAsINRWithDecimal(orderData?.discount?.amount)}`}
-                                            </div>
+                                            <div>{orderData?.voucher?.discountValueType === 'PERCENTAGE' ? `${calculateDiscount()}` : `${formatAsINRWithDecimal(orderData?.discount?.amount)}`}</div>
                                         </div>
                                     )}
                                     {/* <div className="flex items-center justify-between">

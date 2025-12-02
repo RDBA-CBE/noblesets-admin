@@ -1,4 +1,4 @@
-import React, {  useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useQuery } from '@apollo/client';
 import {
@@ -197,7 +197,7 @@ const Editorder = () => {
     });
 
     const [orderData, setOrderData] = useState<any>({});
-console.log('✌️orderData --->', orderData);
+    console.log('✌️orderData --->', orderData);
     const [discountOpen, setDiscountOpen] = useState(false);
     const [openInvoice, setOpenInvoice] = useState(false);
     const [updateInvoideLoading, setUpdateInvoideLoading] = useState(false);
@@ -2124,9 +2124,10 @@ console.log('✌️orderData --->', orderData);
                                     </div>
                                 )}
                             </div>
+
                             <div className="mt-3">
-                                <div className="text-md">User Email :</div>
-                                <div className="text-primary underline">{orderData?.userEmail}</div>
+                                <div className="text-md"> User Email :</div>
+                                <div className="text-primary underline">{orderData?.shippingAddress?.metadata[0]?.value ?? orderData?.billingAddress?.metadata[0]?.value ?? orderData?.userEmail}</div>
                             </div>
 
                             <div className="mt-5">
@@ -2276,9 +2277,7 @@ console.log('✌️orderData --->', orderData);
                                     {orderData?.voucher && orderData?.voucher?.discountValue > 0 && (
                                         <div className="mt-4 flex items-center justify-between">
                                             <div>Coupon Amount {`(${orderData?.voucher?.name})`}</div>
-                                            <div>
-                                                {orderData?.voucher?.discountValueType === 'PERCENTAGE' ? `${calculateDiscount()}` : `${formatAsINRWithDecimal(orderData?.discount?.amount)}`}
-                                            </div>
+                                            <div>{orderData?.voucher?.discountValueType === 'PERCENTAGE' ? `${calculateDiscount()}` : `${formatAsINRWithDecimal(orderData?.discount?.amount)}`}</div>
                                         </div>
                                     )}
                                     {/* <div className=" mt-4 flex items-center justify-between">

@@ -8919,6 +8919,11 @@ export const GET_ORDER_DETAILS = gql`
         postalCode
         streetAddress1
         streetAddress2
+         metadata {
+        key
+        value
+        __typename
+    }
         __typename
     }
 

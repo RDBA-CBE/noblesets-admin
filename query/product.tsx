@@ -2821,6 +2821,17 @@ export const UPDATE_SHIPPING_PROVIDER = gql`
     }
 `;
 
+export const UPDATE_ORDER_CANCEL_NOTE = gql`
+    mutation UpdateOrderCancelNote($id: ID!, $note: String!) {
+        updateMetadata(id: $id, input: [{ key: "cancel_reason", value: $note }]) {
+            errors {
+                field
+                message
+            }
+        }
+    }
+`;
+
 export const DRAFT_ORDER_CANCEL = gql`
     mutation OrderCancel($id: ID!) {
         orderCancel(id: $id) {
@@ -8919,11 +8930,11 @@ export const GET_ORDER_DETAILS = gql`
         postalCode
         streetAddress1
         streetAddress2
-         metadata {
-        key
-        value
-        __typename
-    }
+        metadata {
+            key
+            value
+            __typename
+        }
         __typename
     }
 
@@ -9436,7 +9447,6 @@ export const GET_ORDER_DETAILS = gql`
         __typename
     }
 `;
-
 
 export const CREATE_NOTES = gql`
     mutation OrderNoteAdd($input: OrderNoteInput!, $orderId: ID!, $private_note: Boolean!) {
@@ -20004,19 +20014,16 @@ export const GET_SIZEGUIDE = gql`
     }
 `;
 
-export const GET_CAT= gql`
-  query MyQuery {
-    categories(first: 200) {
-      edges {
-        node {
-          id
-          name
+export const GET_CAT = gql`
+    query MyQuery {
+        categories(first: 200) {
+            edges {
+                node {
+                    id
+                    name
+                }
+            }
+            totalCount
         }
-      }
-      totalCount
     }
-  }
 `;
-
-
-

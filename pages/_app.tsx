@@ -32,7 +32,10 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
 
     const client = useMemo(() => {
         const httpLink = createHttpLink({
-            uri: 'https://noble.irepute.in/graphql/',
+            uri: 'https://nobledemo.irepute.co.in/graphql/',
+            // uri: 'https://noble.irepute.in/graphql/',
+
+
         });
 
         const authLink = new ApolloLink((operation, forward) => {
@@ -55,7 +58,7 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
                         err.message === 'Invalid token. User does not exist or is inactive.'
                     ) {
                         localStorage.removeItem('adminToken'); // optional
-                        router.push('/login'); // Redirect to login
+                        router.push('/'); // Redirect to login
                     }
                 }
             }

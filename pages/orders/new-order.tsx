@@ -59,6 +59,8 @@ import Select from 'react-select';
 import CommonLoader from '../elements/commonLoader';
 import useDebounce from '@/utils/useDebounce';
 import CustomerSelect from '@/components/CustomerSelect';
+import axios from 'axios';
+import { BLUE_DART_LIVE } from '@/utils/constant';
 
 const NewOrder = () => {
     const router = useRouter();
@@ -121,6 +123,7 @@ const NewOrder = () => {
 
     const [customerErrMsg, setCustomerErrMsg] = useState('');
     const [billingErrMsg, setBillingErrMsg] = useState<any>({});
+    console.log('✌️billingErrMsg --->', billingErrMsg);
     const [shippingErrMsg, setShippingErrMsg] = useState<any>({});
     const [precentageErrMsg, setPercentageErrMsg] = useState<any>('');
     const [fixedErrMsg, setFixedErrMsg] = useState<any>('');
@@ -394,7 +397,19 @@ const NewOrder = () => {
     };
 
     //Onchange for billing address
-    const handleChange = (e: any) => {
+    // const handleChange = (e: any) => {
+    //     const { name, value } = e.target;
+    //     const [section, field] = name.split('.');
+
+    //     setState({
+    //         billingAddress: {
+    //             ...state.billingAddress,
+    //             [field]: value,
+    //         },
+    //     });
+    // };
+
+    const handleChange = async (e: any) => {
         const { name, value } = e.target;
         const [section, field] = name.split('.');
 
@@ -404,10 +419,22 @@ const NewOrder = () => {
                 [field]: value,
             },
         });
+
+        // 👉 Only for PINCODE
+        if (field === 'pincode' && value.length === 6) {
+            const isValid = await handlePincodeCheck(value);
+
+            setBillingErrMsg((prev) => ({
+                ...prev,
+                pincode: isValid ? '' : 'Delivery not available for this pincode',
+            }));
+        } else {
+            setBillingErrMsg((prev) => ({ ...prev, pincode: '' }));
+        }
     };
 
     //Onchange for shipping address
-    const handleShippingChange = (e: any) => {
+    const handleShippingChange = async(e: any) => {
         const { name, value } = e.target;
         const [section, field] = name.split('.');
 
@@ -417,6 +444,16 @@ const NewOrder = () => {
                 [field]: value,
             },
         });
+        if (field === 'pincode' && value.length === 6) {
+            const isValid = await handlePincodeCheck(value);
+
+            setShippingErrMsg((prev) => ({
+                ...prev,
+                pincode: isValid ? '' : 'Delivery not available for this pincode',
+            }));
+        } else {
+            setShippingErrMsg((prev) => ({ ...prev, pincode: '' }));
+        }
     };
 
     const setBillingAddress = async () => {
@@ -938,6 +975,51 @@ const NewOrder = () => {
         }
     };
 
+    const handlePincodeCheck = async (pincode,loading=false) => {
+        console.log('✌️pincode --->', pincode);
+        try {
+            if(loading){
+            setState({pincodeLoading:true})
+        }
+            const jwtToken = await axios.get(BLUE_DART_LIVE.TokenUrl);
+            console.log('first', jwtToken);
+            const res = await axios.post(
+                `${BLUE_DART_LIVE.BaseUrl}/finder/v1/GetServicesforPincode`,
+                {
+                    pinCode: pincode,
+                    profile: {
+                        Api_type: 'S',
+                        LicenceKey: BLUE_DART_LIVE.LicenceKey,
+                        LoginID: BLUE_DART_LIVE.LoginID,
+                    },
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        accept: 'application/json',
+                        JWTToken: jwtToken?.data?.JWTToken,
+                    },
+                }
+            );
+            setState({pincodeLoading:false})
+
+            console.log('✌️res --->', res);
+            if (res?.data) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (error) {
+            setState({pincodeLoading:false})
+
+            return false;
+
+
+            console.log('✌️error --->', error);
+        }
+    };
+
     const updateAddress = async () => {
         if (state.selectedCustomerId == '') {
             Failure('Please select customer');
@@ -946,6 +1028,23 @@ const NewOrder = () => {
         setBillingErrMsg({});
         setShippingErrMsg({});
         const address = AddressValidation(state);
+
+        if (state?.billingAddress?.pincode) {
+            const isBillingValid = await handlePincodeCheck(state.billingAddress.pincode,true);
+
+            if (!isBillingValid) {
+                address.billingAddress.pincode = 'Delivery not available for this pincode';
+            }
+        }
+
+        // --- SHIPPING PINCODE CHECK ---
+        if (state?.shippingAddress?.pincode) {
+            const isShippingValid = await handlePincodeCheck(state.shippingAddress.pincode,true);
+
+            if (!isShippingValid) {
+                address.shippingAddress.pincode = 'Delivery not available for this pincode';
+            }
+        }
         setShippingErrMsg(address.shippingAddress);
         setBillingErrMsg(address.billingAddress);
         if (Object.keys(address.shippingAddress).length > 0 || Object.keys(address.billingAddress).length > 0) {
@@ -1156,13 +1255,13 @@ const NewOrder = () => {
 
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.billingAddress['billing.firstName'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${billingErrMsg?.firstName && 'border border-danger focus:border-danger'}`}
                                                 name="billing.firstName"
                                                 value={state.billingAddress?.firstName}
                                                 onChange={handleChange}
                                             />
                                             {/* {billingErrMsg?.firstName && <div className="mt-1 text-danger">{billingErrMsg.firstName}</div>} */}
-                                            {state.billingAddress['billing.firstName'] && <div className="mt-1 text-danger">{state.billingAddress['billing.firstName']}</div>}
+                                            {billingErrMsg?.firstName && <div className="mt-1 text-danger">{billingErrMsg?.firstName}</div>}
                                         </div>
                                         <div className="col-span-6">
                                             <label htmlFor="Lastname" className=" text-sm font-medium text-gray-700">
@@ -1170,13 +1269,13 @@ const NewOrder = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.billingAddress['billing.lastName'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${billingErrMsg?.lastName && 'border border-danger focus:border-danger'}`}
                                                 name="billing.lastName"
                                                 value={state.billingAddress?.lastName}
                                                 onChange={handleChange}
                                             />
                                             {/* {billingErrMsg.lastName && <div className="mt-1 text-danger">{billingErrMsg.lastName}</div>} */}
-                                            {state.billingAddress['billing.lastName'] && <div className="mt-1 text-danger">{state.billingAddress['billing.lastName']}</div>}
+                                            {billingErrMsg?.lastName && <div className="mt-1 text-danger">{billingErrMsg?.lastName}</div>}
                                         </div>
                                     </div>
 
@@ -1187,13 +1286,13 @@ const NewOrder = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.billingAddress['billing.company'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${billingErrMsg?.company && 'border border-danger focus:border-danger'}`}
                                                 name="billing.company"
                                                 value={state.billingAddress?.company}
                                                 onChange={handleChange}
                                             />
                                             {/* {billingErrMsg?.company && <div className="mt-1 text-danger">{billingErrMsg.company}</div>} */}
-                                            {state.billingAddress['billing.company'] && <div className="mt-1 text-danger">{state.billingAddress['billing.company']}</div>}
+                                            {billingErrMsg?.company && <div className="mt-1 text-danger">{billingErrMsg?.company}</div>}
                                         </div>
                                     </div>
 
@@ -1204,13 +1303,13 @@ const NewOrder = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.billingAddress['billing.address_1'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${billingErrMsg?.address_1 && 'border border-danger focus:border-danger'}`}
                                                 name="billing.address_1"
                                                 value={state.billingAddress?.address_1}
                                                 onChange={handleChange}
                                             />
                                             {/* {billingErrMsg.address_1 && <div className="mt-1 text-danger">{billingErrMsg.address_1}</div>} */}
-                                            {state.billingAddress['billing.address_1'] && <div className="mt-1 text-danger">{state.billingAddress['billing.address_1']}</div>}
+                                            {billingErrMsg?.address_1 && <div className="mt-1 text-danger">{billingErrMsg?.address_1}</div>}
                                         </div>
                                         {/* <div className="col-span-6">
                                             <label htmlFor="addressline2" className=" text-sm font-medium text-gray-700">
@@ -1234,7 +1333,7 @@ const NewOrder = () => {
                                                 Country / Region
                                             </label>
                                             <select
-                                                className={`form-select mr-3 ${state.billingAddress['billing.country'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-select mr-3 ${billingErrMsg?.country && 'border border-danger focus:border-danger'}`}
                                                 id="billingcountry"
                                                 name="billing.country"
                                                 value={state.billingAddress?.country}
@@ -1251,7 +1350,7 @@ const NewOrder = () => {
                                                 ))}
                                             </select>
                                             {/* {billingErrMsg.country && <div className="mt-1 text-danger">{billingErrMsg.country}</div>} */}
-                                            {state.billingAddress['billing.country'] && <div className="mt-1 text-danger">{state.billingAddress['billing.country']}</div>}
+                                            {billingErrMsg?.country && <div className="mt-1 text-danger">{billingErrMsg?.country}</div>}
                                         </div>
                                         <div className="col-span-6">
                                             <label htmlFor="state" className=" text-sm font-medium text-gray-700">
@@ -1259,7 +1358,7 @@ const NewOrder = () => {
                                             </label>
                                             {state.stateList?.length > 0 ? (
                                                 <select
-                                                    className={`form-select mr-3 ${state.billingAddress['billing.state'] && 'border border-danger focus:border-danger'}`}
+                                                    className={`form-select mr-3 ${billingErrMsg?.state && 'border border-danger focus:border-danger'}`}
                                                     id="billingstate"
                                                     name="billing.state"
                                                     value={state.billingAddress?.state}
@@ -1277,7 +1376,7 @@ const NewOrder = () => {
                                             ) : (
                                                 <input
                                                     type="text"
-                                                    className={`form-select mr-3 ${state.billingAddress['billing.state'] && 'border border-danger focus:border-danger'}`}
+                                                    className={`form-select mr-3 ${billingErrMsg?.state && 'border border-danger focus:border-danger'}`}
                                                     id="billingstate"
                                                     name="billing.state"
                                                     value={state.billingAddress?.state}
@@ -1286,7 +1385,7 @@ const NewOrder = () => {
                                                     }}
                                                 />
                                             )}
-                                            {billingErrMsg.state && <div className="mt-1 text-danger">{billingErrMsg.state}</div>}
+                                            {billingErrMsg?.state && <div className="mt-1 text-danger">{billingErrMsg?.state}</div>}
                                             {/* {state.billingAddress['billing.state'] && <div className="mt-1 text-danger">{state.billingAddress['billing.state']}</div>} */}
                                         </div>
                                     </div>
@@ -1298,13 +1397,13 @@ const NewOrder = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.billingAddress['billing.city'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${billingErrMsg?.city && 'border border-danger focus:border-danger'}`}
                                                 name="billing.city"
                                                 value={state.billingAddress?.city}
                                                 onChange={handleChange}
                                             />
                                             {/* {billingErrMsg.city && <div className="mt-1 text-danger">{billingErrMsg.city}</div>} */}
-                                            {state.billingAddress['billing.city'] && <div className="mt-1 text-danger">{state.billingAddress['billing.city']}</div>}
+                                            {billingErrMsg?.city && <div className="mt-1 text-danger">{billingErrMsg?.city}</div>}
                                         </div>
                                         <div className="col-span-6">
                                             <label htmlFor="pincode" className=" text-sm font-medium text-gray-700">
@@ -1312,13 +1411,13 @@ const NewOrder = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.billingAddress['billing.pincode'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${billingErrMsg?.pincode && 'border border-danger focus:border-danger'}`}
                                                 name="billing.pincode"
                                                 value={state.billingAddress?.pincode}
                                                 onChange={handleChange}
                                             />
                                             {/* {billingErrMsg.pincode && <div className="mt-1 text-danger">{billingErrMsg.pincode}</div>} */}
-                                            {state.billingAddress['billing.pincode'] && <div className="mt-1 text-danger">{state.billingAddress['billing.pincode']}</div>}
+                                            {billingErrMsg?.pincode && <div className="mt-1 text-danger">{billingErrMsg?.pincode}</div>}
                                         </div>
                                     </div>
 
@@ -1345,13 +1444,13 @@ const NewOrder = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.billingAddress['billing.phone'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${billingErrMsg?.phone && 'border border-danger focus:border-danger'}`}
                                                 name="billing.phone"
                                                 value={state.billingAddress?.phone}
                                                 onChange={handleChange}
                                             />
                                             {/* {billingErrMsg.phone && <div className="mt-1 text-danger">{billingErrMsg.phone}</div>} */}
-                                            {state.billingAddress['billing.phone'] && <div className="mt-1 text-danger">{state.billingAddress['billing.phone']}</div>}
+                                            {billingErrMsg?.phone && <div className="mt-1 text-danger">{billingErrMsg?.phone}</div>}
                                         </div>
                                     </div>
 
@@ -1447,13 +1546,13 @@ const NewOrder = () => {
 
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.shippingAddress['shipping.firstName'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${shippingErrMsg?.firstName && 'border border-danger focus:border-danger'}`}
                                                 name="shipping.firstName"
                                                 value={state.shippingAddress.firstName}
                                                 onChange={handleShippingChange}
                                             />
                                             {/* {shippingErrMsg.firstName && <div className="mt-1 text-danger">{shippingErrMsg.firstName}</div>} */}
-                                            {state.shippingAddress['shipping.firstName'] && <div className="mt-1 text-danger">{state.shippingAddress['shipping.firstName']}</div>}
+                                            {shippingErrMsg?.firstName && <div className="mt-1 text-danger">{shippingErrMsg?.firstName}</div>}
                                         </div>
                                         <div className="col-span-6">
                                             <label htmlFor="Lastname" className=" text-sm font-medium text-gray-700">
@@ -1461,13 +1560,13 @@ const NewOrder = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.shippingAddress['shipping.lastName'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${shippingErrMsg?.lastName && 'border border-danger focus:border-danger'}`}
                                                 name="shipping.lastName"
                                                 value={state.shippingAddress.lastName}
                                                 onChange={handleShippingChange}
                                             />
                                             {/* {shippingErrMsg.lastName && <div className="mt-1 text-danger">{shippingErrMsg.lastName}</div>} */}
-                                            {state.shippingAddress['shipping.lastName'] && <div className="mt-1 text-danger">{state.shippingAddress['shipping.lastName']}</div>}
+                                            {shippingErrMsg?.lastName && <div className="mt-1 text-danger">{shippingErrMsg?.lastName}</div>}
                                         </div>
                                     </div>
 
@@ -1478,13 +1577,13 @@ const NewOrder = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.shippingAddress['shipping.company'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${shippingErrMsg?.company && 'border border-danger focus:border-danger'}`}
                                                 name="shipping.company"
                                                 value={state.shippingAddress.company}
                                                 onChange={handleShippingChange}
                                             />
                                             {/* {shippingErrMsg.company && <div className="mt-1 text-danger">{shippingErrMsg.company}</div>} */}
-                                            {state.shippingAddress['shipping.company'] && <div className="mt-1 text-danger">{state.shippingAddress['shipping.company']}</div>}
+                                            {shippingErrMsg?.company && <div className="mt-1 text-danger">{shippingErrMsg?.company}</div>}
                                         </div>
                                     </div>
 
@@ -1495,13 +1594,13 @@ const NewOrder = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.shippingAddress['shipping.address_1'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${shippingErrMsg?.address_1 && 'border border-danger focus:border-danger'}`}
                                                 name="shipping.address_1"
                                                 value={state.shippingAddress.address_1}
                                                 onChange={handleShippingChange}
                                             />
                                             {/* {shippingErrMsg.address_1 && <div className="mt-1 text-danger">{shippingErrMsg.address_1}</div>} */}
-                                            {state.shippingAddress['shipping.address_1'] && <div className="mt-1 text-danger">{state.shippingAddress['shipping.address_1']}</div>}
+                                            {shippingErrMsg?.address_1 && <div className="mt-1 text-danger">{shippingErrMsg?.address_1}</div>}
                                         </div>
                                         {/* <div className="col-span-6">
                                             <label htmlFor="addressline2" className=" text-sm font-medium text-gray-700">
@@ -1525,7 +1624,7 @@ const NewOrder = () => {
                                                 Country / Region
                                             </label>
                                             <select
-                                                className={`form-select mr-3 ${state.shippingAddress['shipping.country'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-select mr-3 ${shippingErrMsg?.country && 'border border-danger focus:border-danger'}`}
                                                 id="shippingcountry"
                                                 name="shipping.country"
                                                 value={state.shippingAddress.country}
@@ -1544,7 +1643,7 @@ const NewOrder = () => {
                                                 ))}
                                             </select>
                                             {/* {shippingErrMsg.country && <div className="mt-1 text-danger">{shippingErrMsg.country}</div>} */}
-                                            {state.shippingAddress['shipping.country'] && <div className="mt-1 text-danger">{state.shippingAddress['shipping.country']}</div>}
+                                            {shippingErrMsg?.country && <div className="mt-1 text-danger">{shippingErrMsg?.country}</div>}
                                         </div>
                                         <div className="col-span-6">
                                             <label htmlFor="state" className=" text-sm font-medium text-gray-700">
@@ -1568,7 +1667,7 @@ const NewOrder = () => {
                                                 </select>
                                             ) : (
                                                 <input
-                                                    className={`form-select mr-3 ${state.shippingAddress['shipping.state'] && 'border border-danger focus:border-danger'}`}
+                                                    className={`form-select mr-3 ${shippingErrMsg?.state && 'border border-danger focus:border-danger'}`}
                                                     id="shippingstate"
                                                     name="shipping.state"
                                                     value={state.shippingAddress.state}
@@ -1576,7 +1675,7 @@ const NewOrder = () => {
                                                     type="text"
                                                 />
                                             )}
-                                            {shippingErrMsg.state && <div className="mt-1 text-danger">{shippingErrMsg.state}</div>}
+                                            {shippingErrMsg?.state && <div className="mt-1 text-danger">{shippingErrMsg?.state}</div>}
                                             {/* {state.shippingAddress['shipping.state'] && <div className="mt-1 text-danger">{state.shippingAddress['shipping.state']}</div>} */}
                                         </div>
                                     </div>
@@ -1588,13 +1687,13 @@ const NewOrder = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.shippingAddress['shipping.city'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${shippingErrMsg?.city && 'border border-danger focus:border-danger'}`}
                                                 name="shipping.city"
                                                 value={state.shippingAddress.city}
                                                 onChange={handleShippingChange}
                                             />
                                             {/* {shippingErrMsg.city && <div className="mt-1 text-danger">{shippingErrMsg.city}</div>} */}
-                                            {state.shippingAddress['shipping.city'] && <div className="mt-1 text-danger">{state.shippingAddress['shipping.city']}</div>}
+                                            {shippingErrMsg?.city && <div className="mt-1 text-danger">{shippingErrMsg?.city}</div>}
                                         </div>
                                         <div className="col-span-6">
                                             <label htmlFor="pincode" className=" text-sm font-medium text-gray-700">
@@ -1602,13 +1701,13 @@ const NewOrder = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.shippingAddress['shipping.pincode'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${shippingErrMsg?.pincode && 'border border-danger focus:border-danger'}`}
                                                 name="shipping.pincode"
                                                 value={state.shippingAddress.pincode}
                                                 onChange={handleShippingChange}
                                             />
                                             {/* {shippingErrMsg.pincode && <div className="mt-1 text-danger">{shippingErrMsg.pincode}</div>} */}
-                                            {state.shippingAddress['shipping.pincode'] && <div className="mt-1 text-danger">{state.shippingAddress['shipping.pincode']}</div>}
+                                            {shippingErrMsg?.pincode && <div className="mt-1 text-danger">{shippingErrMsg?.pincode}</div>}
                                         </div>
                                     </div>
 
@@ -1634,13 +1733,12 @@ const NewOrder = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                className={`form-input ${state.shippingAddress['shipping.phone'] && 'border border-danger focus:border-danger'}`}
+                                                className={`form-input ${shippingErrMsg?.phone && 'border border-danger focus:border-danger'}`}
                                                 name="shipping.phone"
                                                 value={state.shippingAddress.phone}
                                                 onChange={handleShippingChange}
                                             />
-                                            {shippingErrMsg.phone && <div className="mt-1 text-danger">{shippingErrMsg.phone}</div>}
-                                            {state.shippingAddress['shipping.phone'] && <div className="mt-1 text-danger">{state.shippingAddress['shipping.phone']}</div>}
+                                            {shippingErrMsg?.phone && <div className="mt-1 text-danger">{shippingErrMsg?.phone}</div>}
                                         </div>
                                     </div>
                                 </>
@@ -1658,7 +1756,7 @@ const NewOrder = () => {
                             </div> */}
                             <div className="">
                                 <button type="button" className="btn btn-primary" onClick={() => updateAddress()}>
-                                    {updateDraftOrderLoading || updateShippingCastLoading ? <IconLoader /> : 'Update Address'}
+                                    {updateDraftOrderLoading || updateShippingCastLoading || state.pincodeLoading ? <IconLoader /> : 'Update Address'}
                                 </button>
                             </div>
                         </div>
@@ -1743,9 +1841,9 @@ const NewOrder = () => {
                                         <div className="">
                                             {productDetails?.order?.discounts[0]?.calculationMode == 'PERCENTAGE' ? (
                                                 <div style={{ color: 'green' }}>
-                                                    {`${`- (${productDetails?.order?.discounts[0]?.value}%)`} ${formatCurrency(productDetails?.order?.discounts[0]?.amount?.currency)}${addCommasToNumber(
-                                                        productDetails?.order?.discounts[0]?.amount?.amount
-                                                    )}`}
+                                                    {`${`- (${productDetails?.order?.discounts[0]?.value}%)`} ${formatCurrency(
+                                                        productDetails?.order?.discounts[0]?.amount?.currency
+                                                    )}${addCommasToNumber(productDetails?.order?.discounts[0]?.amount?.amount)}`}
                                                 </div>
                                             ) : (
                                                 <div style={{ color: 'green' }}>{`- ${formatCurrency(productDetails?.order?.discounts[0]?.amount?.currency)}${addCommasToNumber(
@@ -1799,7 +1897,7 @@ const NewOrder = () => {
                                     ))}
 
                                 {/* {state.line?.length} */}
-                                
+
                                 <div className="mt-4 flex items-center justify-between font-semibold">
                                     <div>Total</div>
 

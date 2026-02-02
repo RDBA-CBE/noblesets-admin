@@ -20,6 +20,7 @@ import { CREATE_SHIPPING, DELETE_SHIPPING, SHIPPING_LIST, UPDATE_SHIPPING } from
 import { useMutation, useQuery } from '@apollo/client';
 import { showDeleteAlert } from '@/utils/functions';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
+import SkeltonLoader from '@/components/SkeltonLoader';
 
 const ShippingProvider = () => {
     const isRtl = useSelector((state: any) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -29,7 +30,11 @@ const ShippingProvider = () => {
         dispatch(setPageTitle('Shipping Provider'));
     });
 
-    const { error, data: shippingData } = useQuery(SHIPPING_LIST, {
+    const {
+        error,
+        data: shippingData,
+        loading: getLoading,
+    } = useQuery(SHIPPING_LIST, {
         variables: { channel: 'india-channel', first: 20 },
     });
 
@@ -47,7 +52,7 @@ const ShippingProvider = () => {
         setLoading(true);
         if (shippingData) {
             if (shippingData && shippingData.shippingCarriers && shippingData.shippingCarriers.edges?.length > 0) {
-                const newData = shippingData.shippingCarriers.edges.map((item:any) => ({
+                const newData = shippingData.shippingCarriers.edges.map((item: any) => ({
                     ...item.node,
                     name: item?.node?.name,
                 }));
@@ -135,7 +140,7 @@ const ShippingProvider = () => {
         setUpdateShippingLoader(true);
         try {
             setCreateShippingLoader(true);
-        setUpdateShippingLoader(true);
+            setUpdateShippingLoader(true);
             const variables = {
                 input: {
                     name: record.name,
@@ -223,7 +228,7 @@ const ShippingProvider = () => {
                 Swal.fire('Deleted!', 'Your files have been deleted.', 'success');
             },
             () => {
-                Swal.fire('Cancelled', 'Your Product List is safe :)', 'error');
+                Swal.fire('Cancelled', 'Your Record is safe :)', 'error');
             }
         );
     };
@@ -256,7 +261,7 @@ const ShippingProvider = () => {
 
                     <div className="mt-5 md:mt-0 md:flex  md:ltr:ml-auto md:rtl:mr-auto">
                         <input type="text" className="form-input  mb-3 mr-2 w-full md:mb-0 md:w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                        <div className="dropdown mb-3 mr-0  md:mb-0 md:mr-2">
+                        {/* <div className="dropdown mb-3 mr-0  md:mb-0 md:mr-2">
                             <Dropdown
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
                                 btnClassName="btn btn-outline-primary dropdown-toggle  lg:w-auto w-full"
@@ -277,14 +282,14 @@ const ShippingProvider = () => {
                                     </li>
                                 </ul>
                             </Dropdown>
-                        </div>
-                        <button type="button" className="btn btn-primary  w-full md:mb-0 md:w-auto" onClick={() => CreateShipping()}>
+                        </div> */}
+                        {/* <button type="button" className="btn btn-primary  w-full md:mb-0 md:w-auto" onClick={() => CreateShipping()}>
                             + Create
-                        </button>
+                        </button> */}
                     </div>
                 </div>
-                {loading ? (
-                    <Loader />
+                {getLoading ? (
+                    <SkeltonLoader />
                 ) : (
                     <div className="datatables">
                         <DataTable
@@ -293,33 +298,31 @@ const ShippingProvider = () => {
                             columns={[
                                 // { accessor: 'id',  },
                                 // { accessor: 'image',  render: (row) => <img src={row.image} alt="Product" className="h-10 w-10 object-cover ltr:mr-2 rtl:ml-2" /> },
-                                { accessor: 'name',  },
+                                { accessor: 'name' },
 
-                                {
-                                    // Custom column for actions
-                                    accessor: 'actions', // You can use any accessor name you want
-                                    title: 'Actions',
-                                    // Render method for custom column
-                                    render: (row: any) => (
-                                        <>
-                                            {/* <Tippy content="View">
-                                            <button type="button" onClick={() => ViewCategory(row)}>
-                                                <IconEye className="ltr:mr-2 rtl:ml-2" />
-                                            </button>
-                                        </Tippy> */}
-                                            <Tippy content="Edit">
-                                                <button type="button" onClick={() => EditShipping(row)}>
-                                                    <IconPencil className="ltr:mr-2 rtl:ml-2" />
-                                                </button>
-                                            </Tippy>
-                                            <Tippy content="Delete">
-                                                <button type="button" onClick={() => DeleteShipping(row)}>
-                                                    <IconTrashLines />
-                                                </button>
-                                            </Tippy>
-                                        </>
-                                    ),
-                                },
+                                // {
+                                //     accessor: 'actions',
+                                //     title: 'Actions',
+                                //     render: (row: any) => (
+                                //         <>
+                                //             {/* <Tippy content="View">
+                                //             <button type="button" onClick={() => ViewCategory(row)}>
+                                //                 <IconEye className="ltr:mr-2 rtl:ml-2" />
+                                //             </button>
+                                //         </Tippy> */}
+                                //             <Tippy content="Edit">
+                                //                 <button type="button" onClick={() => EditShipping(row)}>
+                                //                     <IconPencil className="ltr:mr-2 rtl:ml-2" />
+                                //                 </button>
+                                //             </Tippy>
+                                //             <Tippy content="Delete">
+                                //                 <button type="button" onClick={() => DeleteShipping(row)}>
+                                //                     <IconTrashLines />
+                                //                 </button>
+                                //             </Tippy>
+                                //         </>
+                                //     ),
+                                // },
                             ]}
                             highlightOnHover
                             totalRecords={initialRecords.length}
@@ -475,10 +478,13 @@ const ShippingProvider = () => {
                                                     </div> */}
 
                                                     <button type="submit" className="btn btn-primary !mt-6">
-                                                        {
-                                                        createShippingLoader || updateShippingLoader ? <Loader  className="me-3 h-4 w-4 shrink-0 animate-spin" /> :
-                                                        
-                                                        modalTitle === null ? 'Submit' : 'Update'}
+                                                        {createShippingLoader || updateShippingLoader ? (
+                                                            <Loader className="me-3 h-4 w-4 shrink-0 animate-spin" />
+                                                        ) : modalTitle === null ? (
+                                                            'Submit'
+                                                        ) : (
+                                                            'Update'
+                                                        )}
                                                     </button>
                                                 </Form>
                                             )}
@@ -526,4 +532,4 @@ const ShippingProvider = () => {
     );
 };
 
-export default PrivateRouter(ShippingProvider) ;
+export default PrivateRouter(ShippingProvider);

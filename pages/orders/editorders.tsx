@@ -39,6 +39,7 @@ import {
     DELETE_INVOICE,
     DELETE_INVOICE_REQUEST,
     NEW_INVOICE_REQUEST,
+    UPDATE_ORDER_CANCEL_NOTE,
 } from '@/query/product';
 import { Loader } from '@mantine/core';
 import moment from 'moment';
@@ -71,6 +72,8 @@ import {
     roundIndianRupee,
     floatComma,
     formatAsINRWithDecimal,
+    toValidJSON,
+    useSetState,
 } from '@/utils/functions';
 import Swal from 'sweetalert2';
 import IconPencil from '@/components/Icon/IconPencil';
@@ -87,6 +90,9 @@ import PrivateRouter from '@/components/Layouts/PrivateRouter';
 import ErrorMessage from '@/components/Layouts/ErrorMessage';
 import DateTimeField from '@/components/DateTimePicker';
 import dayjs from 'dayjs';
+import Steps from '@/components/steps';
+import { BLUE_DART, BLUE_DART_LIVE, BLUEDART_STATUS_TO_ORDER_STATUS, CANCEL_STEPS, ORDER_TRACKING_STATUS, STATUS_MAP, STEPS } from '@/utils/constant';
+import axios from 'axios';
 
 const Editorder = () => {
     const router = useRouter();
@@ -149,7 +155,8 @@ const Editorder = () => {
     const [shippingProviderUpdate] = useMutation(UPDATE_SHIPPING_PROVIDER);
     const [editTrackingNumber] = useMutation(UPDATE_TRACKING_NUMBER);
     const [confirmNewOrder] = useMutation(CONFIRM_ORDER);
-    const [draftOrderCancel] = useMutation(DRAFT_ORDER_CANCEL);
+    const [draftOrderCancel, { loading: orderCancelLoading }] = useMutation(DRAFT_ORDER_CANCEL);
+    const [UpdateOrderCancelNote, { loading: orderUpdateLoading }] = useMutation(UPDATE_ORDER_CANCEL_NOTE);
     const [createInvoice] = useMutation(CREATE_INVOICE);
     const [updatesInvoice] = useMutation(UPDATE_INVOICE);
     const [deleteInvoice, { loading: deleteLoading }] = useMutation(DELETE_INVOICE);
@@ -168,7 +175,11 @@ const Editorder = () => {
     const [manuaOrderRefund, { loading: manuaOrderRefundLoading }] = useMutation(CREATE_MANUAL_ORDER_REFUND);
 
     const [orderDrandRefund, { loading: orderDrandRefundLoading }] = useMutation(ORDER_GRAND_REFUND_ORDER);
-
+    const [state, setState] = useSetState({
+        trackingData: null,
+        shippingStatus: 'placed',
+        currentStep: 0,
+    });
     // updateFullfillStatus
 
     const {
@@ -297,6 +308,12 @@ const Editorder = () => {
     const [shippingError, setShippingError] = useState(false);
     const [isGiftCart, setIsGiftCart] = useState(false);
     const [totalAmount, setTotalAmount] = useState(null);
+    const [expectedDate, setExpectedDate] = useState(null);
+    const [awbData, setAwbData] = useState(null);
+
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [cancelReason, setCancelReason] = useState('');
+    const [viewCancelReason, setViewCancelReason] = useState(null);
 
     useEffect(() => {
         getOrderData();
@@ -325,6 +342,28 @@ const Editorder = () => {
         if (orderDetails) {
             console.log('✌️orderDetails --->', orderDetails);
             if (orderDetails && orderDetails?.order) {
+                // Blue dart shipping provider
+                if (orderDetails?.order?.metadata?.length > 0) {
+                    const waybillItem = orderDetails?.order?.metadata?.find((item) => item.key === 'waybill_response');
+                    console.log('✌️waybillItem --->', waybillItem);
+                    if (waybillItem) {
+                        setAwbData(waybillItem);
+
+                        const waybillData = JSON.parse(toValidJSON(waybillItem.value));
+                        console.log('✌️waybillData --->', waybillData);
+                        trackShipment(waybillData?.GenerateWayBillResult);
+                    }
+
+                    // Cancel Order Reason
+
+                    const cancelReason = orderDetails?.order?.metadata?.find((item) => item.key === 'cancel_reason');
+                    console.log('cancelReason --->', cancelReason);
+
+                    if (cancelReason) {
+                        setViewCancelReason(cancelReason?.value);
+                    }
+                }
+
                 //Invoice
                 getRefundData();
 
@@ -433,7 +472,6 @@ const Editorder = () => {
                 setLines(orderDetails?.order?.lines);
                 setIsGiftWrap(orderDetails?.order?.isGiftWrap);
                 setLoading(false);
-                console.log('✌️orderDetails?.order?.status --->', orderDetails?.order?.status);
 
                 if (orderDetails?.order?.status == 'PARTIALLY_FULFILLED') {
                     setOrderStatus('FULFILLED');
@@ -450,7 +488,12 @@ const Editorder = () => {
                     setRefundStatus('Partially Refunded');
                 }
                 const billing = orderDetails?.order?.billingAddress;
+
                 const shipping = orderDetails?.order?.shippingAddress;
+
+                if (shipping) {
+                    getDomesticTransitTime(shipping?.postalCode);
+                }
                 if (orderDetails?.order?.discounts?.length > 0) {
                     setDiscount(orderDetails?.order?.discounts[0]?.amount?.amount);
                 } else {
@@ -596,6 +639,104 @@ const Editorder = () => {
 
         setTotalAmount(newTotalAmount);
     }, [quantities, refundProduct]);
+
+    const trackShipment = async (waybillData) => {
+        console.log('✌️waybillData --->', waybillData);
+        try {
+            setLoading(true);
+
+            const AWB_NO = waybillData?.AWBNo; // Waybill response la vandhadhu
+            const jwtToken = await axios.get(BLUE_DART_LIVE.TokenUrl);
+
+            const res = await axios.get(`${BLUE_DART_LIVE.BaseUrl}/tracking/v1/shipment`, {
+                params: {
+                    handler: 'tnt',
+                    loginid: BLUE_DART_LIVE.LoginID,
+                    lickey: BLUE_DART_LIVE.TrackingLicKey,
+                    numbers: AWB_NO,
+                    format: 'json',
+                    scan: 1,
+                    action: 'custawbquery',
+                    verno: 1,
+                    awb: 'awb',
+                },
+                headers: {
+                    'Content-Type': 'application/json',
+                    accept: 'application/json',
+                    JWTToken: jwtToken?.data?.JWTToken,
+                },
+            });
+
+            const shipment = res?.data?.ShipmentData?.Shipment?.[0];
+            // const shipment = ORDER_TRACKING_STATUS?.Shipment;
+
+            console.log('✌️shipment --->', shipment);
+
+            if (!shipment) return;
+
+            const statusType = shipment.StatusType;
+            console.log('✌️statusType --->', statusType);
+
+            const shippingStatus = BLUEDART_STATUS_TO_ORDER_STATUS[statusType] || 'placed';
+            console.log('✌️shippingStatus --->', shippingStatus);
+
+            const currentStep = STATUS_MAP[shippingStatus];
+            console.log('✌️currentStep --->', currentStep);
+
+            setState({
+                trackingData: shipment,
+                shippingStatus,
+                currentStep,
+            });
+
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            console.error('Tracking Error ❌', error);
+        }
+    };
+
+    const getDomesticTransitTime = async (shipping_pincode) => {
+        try {
+            setLoading(true);
+            const jwtToken = await axios.get(BLUE_DART_LIVE.TokenUrl);
+
+            const res = await axios.post(
+                `${BLUE_DART_LIVE.BaseUrl}/transit/v1/GetDomesticTransitTimeForPinCodeandProduct`,
+                {
+                    pPinCodeFrom: '400012',
+                    pPinCodeTo: shipping_pincode,
+                    // pPinCodeTo: Data?.shippingAddress?.postalCode,
+
+                    pProductCode: 'A',
+                    pSubProductCode: 'P',
+                    pPudate: `/Date(${Date.now()})/`, // Blue Dart format
+                    pPickupTime: '16:00',
+                    profile: {
+                        Api_type: BLUE_DART.Api_type,
+                        LicenceKey: BLUE_DART_LIVE.LicenceKey,
+                        LoginID: BLUE_DART_LIVE.LoginID,
+                    },
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        accept: 'application/json',
+                        JWTToken: jwtToken?.data?.JWTToken,
+                    },
+                }
+            );
+
+            setExpectedDate(res.data?.GetDomesticTransitTimeForPinCodeandProductResult);
+
+            setLoading(false);
+            return res.data;
+        } catch (error) {
+            console.error('❌ Transit Time Error:', error);
+            setLoading(false);
+            return null;
+        }
+    };
 
     const sumOldCurrentBalance = (giftCards) => {
         const balanceMap = giftCards
@@ -1025,27 +1166,34 @@ const Editorder = () => {
     };
 
     const orderCancelDraft = async () => {
+        setIsCancelModalOpen(true);
+    };
+
+    const handleCancelSubmit = async () => {
         try {
-            showDeleteAlert(
-                async () => {
-                    const res = await draftOrderCancel({
-                        variables: {
-                            id,
-                        },
-                    });
-                    if (res?.data?.orderCancel?.errors?.length > 0) {
-                        Failure(res?.data?.orderCancel?.errors[0]?.message);
-                    } else {
-                        getOrderDetails();
-
-                        Swal.fire('Cancelled!', 'Are you sure to cancelled the order.', 'success');
-                    }
+            const response = await UpdateOrderCancelNote({
+                variables: {
+                    id,
+                    note: cancelReason,
                 },
-
-                () => {
-                    Swal.fire('Cancelled', 'Your order is safe :)', 'error');
+            });
+            if (response?.data?.updateMetadata?.errors?.length > 0) {
+                Failure(response?.data?.updateMetadata?.errors[0]?.message);
+            } else {
+                const res = await draftOrderCancel({
+                    variables: {
+                        id,
+                    },
+                });
+                if (res?.data?.orderCancel?.errors?.length > 0) {
+                    Failure(res?.data?.orderCancel?.errors[0]?.message);
+                } else {
+                    getOrderDetails();
+                    Success('Order has been cancelled successfully.');
                 }
-            );
+                setIsCancelModalOpen(false);
+                setCancelReason('');
+            }
         } catch (error) {
             console.log('error: ', error);
         }
@@ -1608,6 +1756,9 @@ const Editorder = () => {
     const calculateDiscount = () => {
         return formatAsINRWithDecimal(orderData?.discount?.amount);
     };
+
+    const isTerminal = state.shippingStatus === 'returned' || state.shippingStatus === 'cancelled';
+
     return (
         <>
             <>
@@ -1625,13 +1776,29 @@ const Editorder = () => {
                                     <h3 className="text-lg font-semibold">{`Order #${orderData?.number} Details`}</h3>
                                     {freeShipping?.includes(orderData?.shippingMethod?.id) && <h3 className="rounded-2xl bg-green-100 p-2 text-sm font-semibold text-green-700">Free Shipping</h3>}
                                 </div>
+
                                 {orderStatus == 'UNCONFIRMED' && (
                                     <button type="submit" className="btn btn-outline-primary" onClick={() => confirmOrder()}>
                                         {confirmLoading ? <IconLoader /> : ' Order Confirm'}
                                     </button>
                                 )}
+
                                 {/* <p className=" pt-1 text-gray-500">Payment via Cash on delivery. Customer IP: 122.178.161.16</p> */}
                             </div>
+                            {awbData && expectedDate?.ExpectedDateDelivery && (
+                                <span>
+                                    <strong>Expected Delivery Date : </strong>
+                                    <span
+                                        style={{
+                                            // marginLeft: '10px',
+                                            color: '#7d4432',
+                                            // fontWeight: 'bold'
+                                        }}
+                                    >
+                                        {expectedDate?.ExpectedDateDelivery}
+                                    </span>
+                                </span>
+                            )}
                             <div className="mt-8">
                                 <h5 className="mb-3 text-lg font-semibold">General</h5>
                                 <div className="grid grid-cols-12 gap-5">
@@ -1649,6 +1816,7 @@ const Editorder = () => {
                                             disabled
                                         />
                                     </div>
+
                                     {/* {orderStatus != 'UNCONFIRMED' && ( */}
                                     <>
                                         {/* {paymentStatus == 'FULLY_CHARGED' && ( */}
@@ -1697,6 +1865,14 @@ const Editorder = () => {
                                                     Payment Method:
                                                 </label>
                                                 <input type="text" value={orderData?.paymentMethod?.name} name="paymentMenthod" className="form-input" disabled />
+                                            </div>
+                                        )}
+                                        {viewCancelReason && (
+                                            <div className="col-span-12">
+                                                <label htmlFor="cancelReason" className="block pr-2 text-sm font-bold text-gray-700">
+                                                    Cancellation Reason:
+                                                </label>
+                                                <div className="rounded border bg-red-50 p-3 text-sm text-red-800">{viewCancelReason}</div>
                                             </div>
                                         )}
                                     </>
@@ -2216,16 +2392,17 @@ const Editorder = () => {
                                     </div>
                                 )}
                             </div>
-                             {(orderData?.shippingAddress?.metadata?.length > 0 ||  orderData?.billingAddress?.metadata?.length > 0)? 
-                            <div className="mt-3">
-                                <div className="text-md">User Email :</div>
-                                <div className="text-primary underline">{orderData?.shippingAddress?.metadata?.[0]?.value || orderData?.billingAddress?.metadata[0]?.value }</div>
-                            </div> : 
-                            <div className="mt-3">
-                                <div className="text-md">User Email :</div>
-                                <div className="text-primary underline">{ orderData?.userEmail}</div>
-                            </div>}
-                            
+                            {orderData?.shippingAddress?.metadata?.length > 0 || orderData?.billingAddress?.metadata?.length > 0 ? (
+                                <div className="mt-3">
+                                    <div className="text-md">User Email :</div>
+                                    <div className="text-primary underline">{orderData?.shippingAddress?.metadata?.[0]?.value || orderData?.billingAddress?.metadata[0]?.value}</div>
+                                </div>
+                            ) : (
+                                <div className="mt-3">
+                                    <div className="text-md">User Email :</div>
+                                    <div className="text-primary underline">{orderData?.userEmail}</div>
+                                </div>
+                            )}
 
                             <div className="mt-5">
                                 {showRefundText() && (
@@ -2632,6 +2809,32 @@ const Editorder = () => {
                                     </div>
                                 </div>
                             </>
+                        )}
+                        {awbData && (
+                            <div className="panel p-5">
+                                <h3 className="border-b pb-2 text-lg font-semibold">Order Tracking</h3>
+
+                                {loading && <p className="mt-4">Loading tracking...</p>}
+
+                                {/* NORMAL FLOW */}
+                                <Steps
+                                    current={state.currentStep}
+                                    items={(() => {
+                                        console.log('✌️state.trackingData?.Scans --->', state.trackingData?.Scans);
+
+                                        const hasCancelledOrReturned = state.trackingData?.Scans?.some((scan) => scan.ScanType === 'CN');
+                                        console.log('✌️hasCancelledOrReturned --->', hasCancelledOrReturned);
+                                        return hasCancelledOrReturned ? CANCEL_STEPS?.map((title) => ({ title })) : STEPS?.slice(0, 4)?.map((title) => ({ title }));
+                                    })()}
+                                    trackingData={state.trackingData}
+                                    onTrackClick={() => {
+                                        if (awbData) {
+                                            const waybillData = JSON.parse(toValidJSON(awbData.value));
+                                            trackShipment(waybillData?.GenerateWayBillResult);
+                                        }
+                                    }}
+                                />
+                            </div>
                         )}
                         <div className="panel mb-5 max-h-[810px]  overflow-y-auto p-5">
                             <div className="mb-5 border-b border-gray-200 pb-2 ">
@@ -3337,6 +3540,44 @@ const Editorder = () => {
                             </button>
                             <button type="submit" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => handleRefund()}>
                                 {orderDrandRefundLoading || manuaOrderRefundLoading ? <IconLoader /> : 'Confirm'}
+                            </button>
+                        </div>
+                    </div>
+                )}
+            />
+
+            <Modal
+                addHeader={'Order Cancellation'}
+                open={isCancelModalOpen}
+                close={() => {
+                    setIsCancelModalOpen(false);
+                    setCancelReason('');
+                }}
+                renderComponent={() => (
+                    <div className="p-5">
+                        <div className="mb-3 text-lg font-semibold text-gray-800">Why do you want to cancel this order?</div>
+                        <div className="mb-3 text-sm text-gray-600">Please provide a detailed reason for cancelling this order. This information will help us improve our service.</div>
+                        <textarea
+                            className="form-textarea"
+                            placeholder="Please describe the reason for cancellation (minimum 40 characters required)"
+                            value={cancelReason}
+                            onChange={(e) => setCancelReason(e.target.value)}
+                            rows={4}
+                        />
+                        {cancelReason.length < 40 && cancelReason.length > 0 && <div className="mt-1 text-sm text-red-400">Please enter at least 40 characters</div>}
+                        <div className="mt-8 flex items-center justify-end">
+                            <button
+                                type="button"
+                                className="btn btn-outline-danger gap-2"
+                                onClick={() => {
+                                    setIsCancelModalOpen(false);
+                                    setCancelReason('');
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" disabled={cancelReason.length < 40} onClick={handleCancelSubmit}>
+                                {orderCancelLoading || orderUpdateLoading ? <IconLoader /> : 'Confirm Cancellation'}
                             </button>
                         </div>
                     </div>

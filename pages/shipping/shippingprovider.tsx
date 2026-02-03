@@ -20,7 +20,7 @@ import { CREATE_SHIPPING, DELETE_SHIPPING, SHIPPING_LIST, UPDATE_SHIPPING } from
 import { useMutation, useQuery } from '@apollo/client';
 import { showDeleteAlert } from '@/utils/functions';
 import PrivateRouter from '@/components/Layouts/PrivateRouter';
-import SkeltonLoader from '@/components/SkeltonLoader';
+import IconLoader from '@/components/Icon/IconLoader';
 
 const ShippingProvider = () => {
     const isRtl = useSelector((state: any) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -289,7 +289,7 @@ const ShippingProvider = () => {
                     </div>
                 </div>
                 {getLoading ? (
-                    <SkeltonLoader />
+                    <IconLoader />
                 ) : (
                     <div className="datatables">
                         <DataTable

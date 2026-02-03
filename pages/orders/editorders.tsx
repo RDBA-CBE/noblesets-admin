@@ -1857,7 +1857,7 @@ const Editorder = () => {
                             </div>
                             {awbData && expectedDate?.ExpectedDateDelivery && (
                                 <span>
-                                    {state.orderCancel ? <strong>Order Cancel Date:</strong> : <strong>Expected Delivery Date : </strong>}
+                                    {state.orderCancel ? <strong>Order Cancellation Date :</strong> : <strong>Expected Delivery Date : </strong>}
 
                                     <span
                                         style={{

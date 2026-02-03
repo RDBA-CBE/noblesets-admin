@@ -434,7 +434,7 @@ const NewOrder = () => {
     };
 
     //Onchange for shipping address
-    const handleShippingChange = async(e: any) => {
+    const handleShippingChange = async (e: any) => {
         const { name, value } = e.target;
         const [section, field] = name.split('.');
 
@@ -975,12 +975,12 @@ const NewOrder = () => {
         }
     };
 
-    const handlePincodeCheck = async (pincode,loading=false) => {
+    const handlePincodeCheck = async (pincode, loading = false) => {
         console.log('✌️pincode --->', pincode);
         try {
-            if(loading){
-            setState({pincodeLoading:true})
-        }
+            if (loading) {
+                setState({ pincodeLoading: true });
+            }
             const jwtToken = await axios.get(BLUE_DART_LIVE.TokenUrl);
             console.log('first', jwtToken);
             const res = await axios.post(
@@ -1001,20 +1001,18 @@ const NewOrder = () => {
                     },
                 }
             );
-            setState({pincodeLoading:false})
+            setState({ pincodeLoading: false });
 
             console.log('✌️res --->', res);
-            if (res?.data) {
+            if (res?.data?.GetServicesforPincodeResult?.eTailPrePaidAirInbound == 'Yes') {
                 return true;
             } else {
                 return false;
             }
-
         } catch (error) {
-            setState({pincodeLoading:false})
+            setState({ pincodeLoading: false });
 
             return false;
-
 
             console.log('✌️error --->', error);
         }
@@ -1030,7 +1028,7 @@ const NewOrder = () => {
         const address = AddressValidation(state);
 
         if (state?.billingAddress?.pincode) {
-            const isBillingValid = await handlePincodeCheck(state.billingAddress.pincode,true);
+            const isBillingValid = await handlePincodeCheck(state.billingAddress.pincode, true);
 
             if (!isBillingValid) {
                 address.billingAddress.pincode = 'Delivery not available for this pincode';
@@ -1039,7 +1037,7 @@ const NewOrder = () => {
 
         // --- SHIPPING PINCODE CHECK ---
         if (state?.shippingAddress?.pincode) {
-            const isShippingValid = await handlePincodeCheck(state.shippingAddress.pincode,true);
+            const isShippingValid = await handlePincodeCheck(state.shippingAddress.pincode, true);
 
             if (!isShippingValid) {
                 address.shippingAddress.pincode = 'Delivery not available for this pincode';

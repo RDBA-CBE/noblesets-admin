@@ -650,8 +650,7 @@ const Editorder = () => {
                     scan: 1,
                     action: 'custawbquery',
                     verno: 1,
-                    awb:"awb"
-
+                    awb: 'awb',
                 },
                 headers: {
                     'Content-Type': 'application/json',
@@ -661,24 +660,67 @@ const Editorder = () => {
             });
 
             const shipment = res?.data?.ShipmentData?.Shipment?.[0];
+            // const shipment = ORDER_TRACKING_STATUS?.Shipment;
+
             console.log('✌️shipment --->', shipment);
 
             if (!shipment) return;
 
-            const statusType = shipment.StatusType;
+            const scans = shipment.Scans || [];
+            let currentStep = 0;
+            let steps = [];
 
-            const shippingStatus = BLUEDART_STATUS_TO_ORDER_STATUS[statusType] || 'placed';
-            console.log('✌️shippingStatus --->', shippingStatus);
+            // Check scan codes to determine status
+            const hasScanCode030 = scans.some((scan) => scan.ScanDetail?.ScanCode === '030');
+            const hasScanCode015 = scans.some((scan) => scan.ScanDetail?.ScanCode === '015');
 
-            const currentStep = STATUS_MAP[shippingStatus];
-            console.log('✌️currentStep --->', currentStep);
+            const hasScanCode000 = scans.some((scan) => scan.ScanDetail?.ScanCode === '000');
+            const hasCancelledScan = scans.some((scan) => scan.ScanDetail?.ScanCode == '503');
+
+            if (hasCancelledScan) {
+                if (hasScanCode015) {
+                    steps = ['Order Placed', 'Confirmed', 'Shipped', 'Cancelled'];
+                    currentStep = 3;
+                } else {
+                    steps = ['Order Placed', 'Confirmed', 'Cancelled'];
+                    currentStep = 2;
+                }
+            } else if (hasScanCode000) {
+                steps = ['Order Placed', 'Confirmed', 'Shipped', 'Delivered'];
+                currentStep = 3;
+            } else if (hasScanCode015) {
+                steps = ['Order Placed', 'Confirmed', 'Shipped', 'Delivered'];
+                currentStep = 2;
+            } else if (hasScanCode030) {
+                steps = ['Order Placed', 'Confirmed', 'Shipped', 'Delivered'];
+                currentStep = 1;
+            } else {
+                steps = ['Order Placed'];
+                currentStep = 0;
+            }
 
             setState({
                 trackingData: shipment,
-                shippingStatus,
                 currentStep,
+                steps,
             });
-            console.log('Tracking Response 👉', res);
+
+            // if (!shipment) return;
+
+            // const statusType = shipment.StatusType;
+            // console.log('✌️statusType --->', statusType);
+
+            // const shippingStatus = BLUEDART_STATUS_TO_ORDER_STATUS[statusType] || 'placed';
+            // console.log('✌️shippingStatus --->', shippingStatus);
+
+            // const currentStep = STATUS_MAP[shippingStatus];
+            // console.log('✌️currentStep --->', currentStep);
+
+            // setState({
+            //     trackingData: shipment,
+            //     shippingStatus,
+            //     currentStep,
+            // });
 
             setLoading(false);
         } catch (error) {
@@ -2758,23 +2800,17 @@ const Editorder = () => {
                                 {loading && <p className="mt-4">Loading tracking...</p>}
 
                                 {/* NORMAL FLOW */}
-                                {!isTerminal && <Steps current={state.currentStep} items={STEPS?.map((title) => ({ title }))} />}
-
-                                {/* RETURNED */}
-                                {state.shippingStatus === 'returned' && (
-                                    <div className="mt-6 rounded border border-red-300 bg-red-50 p-4 text-center">
-                                        <h4 className="font-semibold text-red-700">Shipment Returned</h4>
-                                        <p className="mt-1 text-sm text-red-600">The shipment was returned to the sender.</p>
-                                    </div>
-                                )}
-
-                                {/* CANCELLED */}
-                                {state.shippingStatus === 'cancelled' && (
-                                    <div className="mt-6 rounded border border-gray-300 bg-gray-50 p-4 text-center">
-                                        <h4 className="font-semibold text-gray-700">Shipment Cancelled</h4>
-                                        <p className="mt-1 text-sm text-gray-600">This shipment was cancelled.</p>
-                                    </div>
-                                )}
+                                <Steps
+                                    current={state.currentStep}
+                                    items={state.steps?.map((title) => ({ title })) || ['Order Placed', 'Confirmed', 'Shipped', 'Delivered'].map((title) => ({ title }))}
+                                    trackingData={state.trackingData}
+                                    onTrackClick={() => {
+                                        if (awbData) {
+                                            const waybillData = JSON.parse(toValidJSON(awbData.value));
+                                            trackShipment(waybillData?.GenerateWayBillResult);
+                                        }
+                                    }}
+                                />
                             </div>
                         )}
                         <div className="panel mb-5 max-h-[810px]  overflow-y-auto p-5">

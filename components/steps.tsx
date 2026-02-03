@@ -38,9 +38,7 @@ const Steps = ({ current, items, trackingData, onTrackClick }) => {
                         <div>
                             <span className="font-medium">Expected Delivery:</span> {trackingData.ExpectedDeliveryDate}
                         </div>
-                        <div>
-                            <span className="font-medium">Received By:</span> {trackingData.ReceivedBy || 'N/A'}
-                        </div>
+                        
                     </div>
                 </div>
 
@@ -48,13 +46,13 @@ const Steps = ({ current, items, trackingData, onTrackClick }) => {
                     <h4 className="text-md mb-3 font-semibold">Tracking History</h4>
                     <div className="space-y-3">
                         {trackingData.Scans?.map((scan, index) => {
-                            const isCurrentStatus = scan?.ScanDetail?.Scan === trackingData?.Status && trackingData?.StatusDate === moment(scan?.ScanDetail?.ScanDate).format('DD MMMM YYYY');
+                            const isCurrentStatus = scan?.ScanDetail?.ScanType === trackingData?.StatusType && trackingData?.StatusDate === moment(scan?.ScanDetail?.ScanDate).format('DD MMMM YYYY') && scan?.ScanDetail?.ScanTime === trackingData?.StatusTime  ;
 
                             return (
                                 <div
                                     key={index}
                                     ref={isCurrentStatus ? (el) => el?.scrollIntoView({ behavior: 'smooth', block: 'center' }) : null}
-                                    className={`border-l-2 pb-3 pl-4 ${isCurrentStatus ? 'border-[#7d4432] bg-[#7d4432]/10' : 'border-[#7d4432]'}`}
+                                    className={`border-l-2 p-3 ${isCurrentStatus ? 'border-[#7d4432] bg-[#7d4432]/10' : 'border-[#7d4432]'}`}
                                 >
                                     <div className="flex items-start justify-between">
                                         <div className="flex-1">

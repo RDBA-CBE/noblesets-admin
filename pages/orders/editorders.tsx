@@ -179,6 +179,7 @@ const Editorder = () => {
         trackingData: null,
         shippingStatus: 'placed',
         currentStep: 0,
+        orderCancel: false,
     });
     // updateFullfillStatus
 
@@ -309,6 +310,7 @@ const Editorder = () => {
     const [isGiftCart, setIsGiftCart] = useState(false);
     const [totalAmount, setTotalAmount] = useState(null);
     const [expectedDate, setExpectedDate] = useState(null);
+    console.log('✌️expectedDate --->', expectedDate);
     const [awbData, setAwbData] = useState(null);
 
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -353,7 +355,7 @@ const Editorder = () => {
                         console.log('✌️waybillData --->', waybillData);
                         setState({ waybillData: waybillData?.GenerateWayBillResult });
 
-                        trackShipment(waybillData?.GenerateWayBillResult);
+                        trackShipment(waybillData?.GenerateWayBillResult, orderDetails?.order?.shippingAddress);
                     }
 
                     // Cancel Order Reason
@@ -493,9 +495,6 @@ const Editorder = () => {
 
                 const shipping = orderDetails?.order?.shippingAddress;
 
-                if (shipping) {
-                    getDomesticTransitTime(shipping?.postalCode);
-                }
                 if (orderDetails?.order?.discounts?.length > 0) {
                     setDiscount(orderDetails?.order?.discounts[0]?.amount?.amount);
                 } else {
@@ -642,8 +641,8 @@ const Editorder = () => {
         setTotalAmount(newTotalAmount);
     }, [quantities, refundProduct]);
 
-    const trackShipment = async (waybillData) => {
-        console.log('✌️waybillData --->', waybillData);
+    const trackShipment = async (waybillData, address = null) => {
+
         try {
             setLoading(true);
 
@@ -686,6 +685,18 @@ const Editorder = () => {
 
             const hasScanCode000 = scans.some((scan) => scan.ScanDetail?.ScanCode === '000');
             const hasCancelledScan = scans.some((scan) => scan.ScanDetail?.ScanCode == '503');
+
+            if (hasCancelledScan) {
+                setState({ orderCancel: true });
+                const hasCancelledScanData = scans.find((scan) => scan.ScanDetail?.ScanCode == '503');
+                console.log('✌️hasCancelledScanData --->', hasCancelledScanData);
+
+                getDomesticTransitTime(hasCancelledScanData, address);
+            } else {
+                setState({ orderCancel: false });
+
+                getDomesticTransitTime(false, address);
+            }
 
             if (hasCancelledScan) {
                 if (hasScanCode015) {
@@ -739,41 +750,45 @@ const Editorder = () => {
         }
     };
 
-    const getDomesticTransitTime = async (shipping_pincode) => {
+    const getDomesticTransitTime = async (hasCancelledScan, shipping_pincode) => {
         try {
             setLoading(true);
-            const jwtToken = await axios.get(BLUE_DART_LIVE.TokenUrl);
+            if (hasCancelledScan) {
+                setExpectedDate({
+                    ExpectedDateDelivery: hasCancelledScan?.ScanDetail?.ScanDate,
+                });
+            } else {
+                const jwtToken = await axios.get(BLUE_DART_LIVE.TokenUrl);
 
-            const res = await axios.post(
-                `${BLUE_DART_LIVE.BaseUrl}/transit/v1/GetDomesticTransitTimeForPinCodeandProduct`,
-                {
-                    pPinCodeFrom: '400012',
-                    pPinCodeTo: shipping_pincode,
-                    // pPinCodeTo: Data?.shippingAddress?.postalCode,
+                const res = await axios.post(
+                    `${BLUE_DART_LIVE.BaseUrl}/transit/v1/GetDomesticTransitTimeForPinCodeandProduct`,
+                    {
+                        pPinCodeFrom: '400012',
+                        pPinCodeTo: shipping_pincode?.postalCode,
+                        // pPinCodeTo: Data?.shippingAddress?.postalCode,
 
-                    pProductCode: 'A',
-                    pSubProductCode: 'P',
-                    pPudate: `/Date(${Date.now()})/`, // Blue Dart format
-                    pPickupTime: '16:00',
-                    profile: {
-                        Api_type: BLUE_DART.Api_type,
-                        LicenceKey: BLUE_DART_LIVE.LicenceKey,
-                        LoginID: BLUE_DART_LIVE.LoginID,
+                        pProductCode: 'A',
+                        pSubProductCode: 'P',
+                        pPudate: `/Date(${Date.now()})/`, // Blue Dart format
+                        pPickupTime: '16:00',
+                        profile: {
+                            Api_type: BLUE_DART.Api_type,
+                            LicenceKey: BLUE_DART_LIVE.LicenceKey,
+                            LoginID: BLUE_DART_LIVE.LoginID,
+                        },
                     },
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        accept: 'application/json',
-                        JWTToken: jwtToken?.data?.JWTToken,
-                    },
-                }
-            );
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            accept: 'application/json',
+                            JWTToken: jwtToken?.data?.JWTToken,
+                        },
+                    }
+                );
 
-            setExpectedDate(res.data?.GetDomesticTransitTimeForPinCodeandProductResult);
-
+                setExpectedDate(res.data?.GetDomesticTransitTimeForPinCodeandProductResult);
+            }
             setLoading(false);
-            return res.data;
         } catch (error) {
             console.error('❌ Transit Time Error:', error);
             setLoading(false);
@@ -1039,8 +1054,7 @@ const Editorder = () => {
                     Failure(res?.data?.orderMarkAsPaid?.errors[0]?.message);
                     setIsPaymentOpen(false);
                     setTransactionLoading(false);
-                    trackShipment(state.waybillData)
-
+                    trackShipment(state.waybillData);
                 } else {
                     getOrderDetails();
                     setIsPaymentOpen(false);
@@ -1209,7 +1223,6 @@ const Editorder = () => {
             }
         }
         trackShipment(state.waybillData);
-
     };
 
     const orderCancelDraft = async () => {
@@ -1834,7 +1847,8 @@ const Editorder = () => {
                             </div>
                             {awbData && expectedDate?.ExpectedDateDelivery && (
                                 <span>
-                                    <strong>Expected Delivery Date : </strong>
+                                    {state.orderCancel ? <strong>Order Cancel Date:</strong> : <strong>Expected Delivery Date : </strong>}
+
                                     <span
                                         style={{
                                             // marginLeft: '10px',

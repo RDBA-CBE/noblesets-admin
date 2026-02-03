@@ -174,6 +174,8 @@ const Editorder = () => {
         trackingData: null,
         shippingStatus: 'placed',
         currentStep: 0,
+        orderCancel: false,
+
     });
 
     // updateFullfillStatus
@@ -344,7 +346,8 @@ const Editorder = () => {
                         const waybillData = JSON.parse(toValidJSON(waybillItem.value));
                         console.log('✌️waybillData --->', waybillData);
                         setState({ waybillData: waybillData?.GenerateWayBillResult });
-                        trackShipment(waybillData?.GenerateWayBillResult);
+                        trackShipment(waybillData?.GenerateWayBillResult, orderDetails?.order?.shippingAddress);
+
                     }
 
                     const cancelReason = orderDetails?.order?.metadata?.find((item) => item.key === 'cancel_reason');
@@ -488,9 +491,7 @@ const Editorder = () => {
                 }
                 const billing = orderDetails?.order?.billingAddress;
                 const shipping = orderDetails?.order?.shippingAddress;
-                if (shipping) {
-                    getDomesticTransitTime(shipping?.postalCode);
-                }
+               
                 if (orderDetails?.order?.discounts?.length > 0) {
                     setDiscount(orderDetails?.order?.discounts[0]?.amount?.amount);
                 } else {
@@ -633,7 +634,7 @@ const Editorder = () => {
         setTotalAmount(newTotalAmount);
     }, [quantities, refundProduct]);
 
-    const trackShipment = async (waybillData) => {
+    const trackShipment = async (waybillData, address = null) => {
         console.log('✌️waybillData --->', waybillData);
         try {
             setLoading(true);
@@ -677,6 +678,18 @@ const Editorder = () => {
 
             const hasScanCode000 = scans.some((scan) => scan.ScanDetail?.ScanCode === '000');
             const hasCancelledScan = scans.some((scan) => scan.ScanDetail?.ScanCode == '503');
+
+            if (hasCancelledScan) {
+                setState({ orderCancel: true });
+                const hasCancelledScanData = scans.find((scan) => scan.ScanDetail?.ScanCode == '503');
+                console.log('✌️hasCancelledScanData --->', hasCancelledScanData);
+
+                getDomesticTransitTime(hasCancelledScanData, address);
+            } else {
+                setState({ orderCancel: false });
+
+                getDomesticTransitTime(false, address);
+            }
 
             if (hasCancelledScan) {
                 if (hasScanCode015) {
@@ -730,16 +743,22 @@ const Editorder = () => {
         }
     };
 
-    const getDomesticTransitTime = async (shipping_pincode) => {
+    const getDomesticTransitTime = async (hasCancelledScan, shipping_pincode) => {
         try {
             setLoading(true);
+            if (hasCancelledScan) {
+                setExpectedDate({
+                    ExpectedDateDelivery: hasCancelledScan?.ScanDetail?.ScanDate,
+                });
+            } else {
             const jwtToken = await axios.get(BLUE_DART_LIVE.TokenUrl);
 
             const res = await axios.post(
                 `${BLUE_DART_LIVE.BaseUrl}/transit/v1/GetDomesticTransitTimeForPinCodeandProduct`,
                 {
                     pPinCodeFrom: '400012',
-                    pPinCodeTo: shipping_pincode,
+                    pPinCodeTo: shipping_pincode?.postalCode,
+
 
                     // pPinCodeTo: Data?.shippingAddress?.postalCode,
 
@@ -763,9 +782,8 @@ const Editorder = () => {
             );
 
             setExpectedDate(res.data?.GetDomesticTransitTimeForPinCodeandProductResult);
-
+        }
             setLoading(false);
-            return res.data;
         } catch (error) {
             console.error('❌ Transit Time Error:', error);
             setLoading(false);
@@ -1758,7 +1776,8 @@ const Editorder = () => {
                             </div>
                             {awbData && expectedDate?.ExpectedDateDelivery && (
                                 <span>
-                                    <strong>Expected Delivery Date : </strong>
+                                    {state.orderCancel ? <strong>Order Cancel Date:</strong> : <strong>Expected Delivery Date : </strong>}
+
                                     <span
                                         style={{
                                             color: '#7d4432',

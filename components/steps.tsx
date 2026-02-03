@@ -24,21 +24,17 @@ const Steps = ({ current, items, trackingData, onTrackClick }) => {
                     <h3 className="mb-2 text-lg font-semibold">Shipment Details</h3>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                            <span className="font-medium">Waybill:</span> {trackingData.WaybillNo}
+                            <span className="font-medium">Waybill:</span> <span className="font-bold text-[#7d4432]">{trackingData.WaybillNo}</span>
                         </div>
                         <div>
-                            <span className="font-medium">Status:</span> {trackingData.Status}
+                            <span className="font-medium">Status:</span> <span className="font-bold">{trackingData.Status}</span>
                         </div>
                         <div>
-                            <span className="font-medium">Origin:</span> {trackingData.Origin}
+                            <span className="font-medium">Origin:</span> <span className="font-bold">{trackingData.Origin}</span>
                         </div>
                         <div>
-                            <span className="font-medium">Destination:</span> {trackingData.Destination}
+                            <span className="font-medium">Destination:</span> <span className="font-bold">{trackingData.Destination}</span>
                         </div>
-                        <div>
-                            <span className="font-medium">Expected Delivery:</span> {trackingData.ExpectedDeliveryDate}
-                        </div>
-                        
                     </div>
                 </div>
 
@@ -46,7 +42,10 @@ const Steps = ({ current, items, trackingData, onTrackClick }) => {
                     <h4 className="text-md mb-3 font-semibold">Tracking History</h4>
                     <div className="space-y-3">
                         {trackingData.Scans?.map((scan, index) => {
-                            const isCurrentStatus = scan?.ScanDetail?.ScanType === trackingData?.StatusType && trackingData?.StatusDate === moment(scan?.ScanDetail?.ScanDate).format('DD MMMM YYYY') && scan?.ScanDetail?.ScanTime === trackingData?.StatusTime  ;
+                            const isCurrentStatus =
+                                scan?.ScanDetail?.ScanType === trackingData?.StatusType &&
+                                trackingData?.StatusDate === moment(scan?.ScanDetail?.ScanDate).format('DD MMMM YYYY') &&
+                                scan?.ScanDetail?.ScanTime === trackingData?.StatusTime;
 
                             return (
                                 <div

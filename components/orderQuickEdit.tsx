@@ -58,6 +58,7 @@ import {
     roundOff,
     sampleParams,
     showDeleteAlert,
+    useSetState,
     validateDateTime,
 } from '@/utils/functions';
 import Swal from 'sweetalert2';
@@ -174,6 +175,10 @@ const OrderQuickEdit = (props: any) => {
     const [shippingError, setShippingError] = useState(false);
     const [isGiftCart, setIsGiftCart] = useState(false);
 
+    const [state, setState] = useSetState({
+        hasPackingSlip: false,
+    });
+
     useEffect(() => {
         getOrderData();
     }, [id]);
@@ -213,8 +218,18 @@ const OrderQuickEdit = (props: any) => {
 
         //Payslip
         if (data?.order?.metadata?.length > 0) {
-            setSlipDate(dayjs(data?.order?.metadata[0]?.value).toISOString());
-            setSlipNumber(data?.order?.metadata[1]?.value);
+            // setSlipDate(dayjs(data?.order?.metadata[0]?.value).toISOString());
+            // setSlipNumber(data?.order?.metadata[1]?.value);
+
+            const hasPackingSlip = data?.order?.metadata?.some((item) => item.key === 'packing_slip_number:') && data?.order?.metadata?.some((item) => item.key === 'packing_slip_date:');
+            if (hasPackingSlip) {
+                const packingSlipNumber = data?.order?.metadata?.find((item) => item.key === 'packing_slip_number:');
+                const packingSlipDate = data?.order?.metadata?.find((item) => item.key === 'packing_slip_date:');
+                const packingSlipPath = data?.order?.metadata?.find((item) => item.key === 'packing_slip_path');
+
+                setState({ packingSlipNumber: packingSlipNumber?.value, packingSlipDate: packingSlipDate?.value, packingSlipPath: packingSlipPath?.value });
+            }
+            setState({ hasPackingSlip });
         }
 
         if (data?.order?.invoices?.length > 0) {
@@ -839,13 +854,13 @@ const OrderQuickEdit = (props: any) => {
                                         <div className=" flex items-center justify-between border-b border-gray-200 pb-2 ">
                                             <h3 className="text-lg font-semibold">Payslip</h3>
 
-                                            {orderData?.metadata?.length > 0 && (
+                                            {orderData?.metadata?.length > 0 &&  state.hasPackingSlip && (
                                                 <button
                                                     type="submit"
                                                     // className="btn btn-outline-primary"
                                                     onClick={() => {
-                                                        setSlipDate(mintDateTime(slipDate));
-                                                        setSlipNumber(slipNumber);
+                                                        setSlipDate(mintDateTime(state.packingSlipDate));
+                                                        setSlipNumber(state.packingSlipNumber);
                                                         setIsOpenPayslip(true);
                                                     }}
                                                 >
@@ -853,23 +868,23 @@ const OrderQuickEdit = (props: any) => {
                                                 </button>
                                             )}
                                         </div>
-                                        {orderData?.metadata?.length > 0 ? (
+                                        {orderData?.metadata?.length > 0 && state.hasPackingSlip ? (
                                             <div className="pt-4">
                                                 <div className="flex justify-between">
                                                     <p>Number</p>
-                                                    <p>{orderData?.metadata[1]?.value}</p>
+                                                    <p>{state.packingSlipNumber}</p>
                                                 </div>
                                                 {orderData?.metadata[0]?.value && (
                                                     <div className="flex justify-between">
                                                         <p>Date</p>
-                                                        <p>{moment(orderData?.metadata[0]?.value).format('DD/MM/YYYY')}</p>
+                                                        <p>{moment(state.packingSlipDate).format('DD/MM/YYYY')}</p>
                                                     </div>
                                                 )}
                                                 <div className="flex justify-between pt-3">
                                                     <button type="submit" className="btn btn-primary" onClick={() => payslipSend()}>
                                                         {sendPayslipLoading ? <IconLoader /> : 'Send'}
                                                     </button>
-                                                    <button type="submit" className="btn btn-outline-primary" onClick={() => window.open(SERVER_URL + orderData?.metadata[2]?.value, '_blank')}>
+                                                    <button type="submit" className="btn btn-outline-primary" onClick={() => window.open(SERVER_URL + state.packingSlipPath, '_blank')}>
                                                         <IconDownload />
                                                     </button>
                                                 </div>

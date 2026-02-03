@@ -175,7 +175,7 @@ const Editorder = () => {
         shippingStatus: 'placed',
         currentStep: 0,
         orderCancel: false,
-
+        hasPackingSlip: false,
     });
 
     // updateFullfillStatus
@@ -347,7 +347,6 @@ const Editorder = () => {
                         console.log('✌️waybillData --->', waybillData);
                         setState({ waybillData: waybillData?.GenerateWayBillResult });
                         trackShipment(waybillData?.GenerateWayBillResult, orderDetails?.order?.shippingAddress);
-
                     }
 
                     const cancelReason = orderDetails?.order?.metadata?.find((item) => item.key === 'cancel_reason');
@@ -356,6 +355,17 @@ const Editorder = () => {
                     if (cancelReason) {
                         setViewCancelReason(cancelReason?.value);
                     }
+
+                    const hasPackingSlip =
+                        orderDetails?.order?.metadata?.some((item) => item.key === 'packing_slip_number:') && orderDetails?.order?.metadata?.some((item) => item.key === 'packing_slip_date:');
+                    if (hasPackingSlip) {
+                        const packingSlipNumber = orderDetails?.order?.metadata?.find((item) => item.key === 'packing_slip_number:');
+                        const packingSlipDate = orderDetails?.order?.metadata?.find((item) => item.key === 'packing_slip_date:');
+                        const packingSlipPath = orderDetails?.order?.metadata?.find((item) => item.key === 'packing_slip_path');
+
+                        setState({ packingSlipNumber: packingSlipNumber?.value, packingSlipDate: packingSlipDate?.value, packingSlipPath: packingSlipPath?.value });
+                    }
+                    setState({ hasPackingSlip });
                 }
                 //Invoice
                 getRefundData();
@@ -491,7 +501,7 @@ const Editorder = () => {
                 }
                 const billing = orderDetails?.order?.billingAddress;
                 const shipping = orderDetails?.order?.shippingAddress;
-               
+
                 if (orderDetails?.order?.discounts?.length > 0) {
                     setDiscount(orderDetails?.order?.discounts[0]?.amount?.amount);
                 } else {
@@ -751,38 +761,37 @@ const Editorder = () => {
                     ExpectedDateDelivery: hasCancelledScan?.ScanDetail?.ScanDate,
                 });
             } else {
-            const jwtToken = await axios.get(BLUE_DART_LIVE.TokenUrl);
+                const jwtToken = await axios.get(BLUE_DART_LIVE.TokenUrl);
 
-            const res = await axios.post(
-                `${BLUE_DART_LIVE.BaseUrl}/transit/v1/GetDomesticTransitTimeForPinCodeandProduct`,
-                {
-                    pPinCodeFrom: '400012',
-                    pPinCodeTo: shipping_pincode?.postalCode,
+                const res = await axios.post(
+                    `${BLUE_DART_LIVE.BaseUrl}/transit/v1/GetDomesticTransitTimeForPinCodeandProduct`,
+                    {
+                        pPinCodeFrom: '400012',
+                        pPinCodeTo: shipping_pincode?.postalCode,
 
+                        // pPinCodeTo: Data?.shippingAddress?.postalCode,
 
-                    // pPinCodeTo: Data?.shippingAddress?.postalCode,
-
-                    pProductCode: 'A',
-                    pSubProductCode: 'P',
-                    pPudate: `/Date(${Date.now()})/`, // Blue Dart format
-                    pPickupTime: '16:00',
-                    profile: {
-                        Api_type: BLUE_DART_LIVE.Api_type,
-                        LicenceKey: BLUE_DART_LIVE.LicenceKey,
-                        LoginID: BLUE_DART_LIVE.LoginID,
+                        pProductCode: 'A',
+                        pSubProductCode: 'P',
+                        pPudate: `/Date(${Date.now()})/`, // Blue Dart format
+                        pPickupTime: '16:00',
+                        profile: {
+                            Api_type: BLUE_DART_LIVE.Api_type,
+                            LicenceKey: BLUE_DART_LIVE.LicenceKey,
+                            LoginID: BLUE_DART_LIVE.LoginID,
+                        },
                     },
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        accept: 'application/json',
-                        JWTToken: jwtToken?.data?.JWTToken,
-                    },
-                }
-            );
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            accept: 'application/json',
+                            JWTToken: jwtToken?.data?.JWTToken,
+                        },
+                    }
+                );
 
-            setExpectedDate(res.data?.GetDomesticTransitTimeForPinCodeandProductResult);
-        }
+                setExpectedDate(res.data?.GetDomesticTransitTimeForPinCodeandProductResult);
+            }
             setLoading(false);
         } catch (error) {
             console.error('❌ Transit Time Error:', error);
@@ -1057,7 +1066,7 @@ const Editorder = () => {
                     Failure(res?.data?.orderMarkAsPaid?.errors[0]?.message);
                     setIsPaymentOpen(false);
                     setTransactionLoading(false);
-                    trackShipment(state.waybillData)
+                    trackShipment(state.waybillData);
                 } else {
                     getOrderDetails();
                     setIsPaymentOpen(false);
@@ -2900,14 +2909,14 @@ const Editorder = () => {
                                     <h3 className="text-lg font-semibold">Payslip </h3>
                                     <IconDownload />
                                 </div>
-                                {orderData?.metadata?.length > 0 && (
+                                {orderData?.metadata?.length > 0 && state.hasPackingSlip && (
                                     <button
                                         type="submit"
                                         // className="btn btn-outline-primary"
                                         onClick={() => {
                                             if (orderDetails?.order?.metadata?.length > 0) {
-                                                setSlipDate(mintDateTime(orderDetails?.order?.metadata[0]?.value));
-                                                setSlipNumber(orderDetails?.order?.metadata[1]?.value);
+                                                setSlipDate(mintDateTime(state.packingSlipDate));
+                                                setSlipNumber(state.packingSlipNumber);
                                                 setIsOpenPayslip(true);
                                             }
                                         }}
@@ -2916,21 +2925,21 @@ const Editorder = () => {
                                     </button>
                                 )}
                             </div>
-                            {orderData?.metadata?.length > 0 ? (
+                            {orderData?.metadata?.length > 0 && state.hasPackingSlip ? (
                                 <div className="pt-4">
                                     <div className="flex justify-between">
                                         <p>Number</p>
-                                        <p>{orderData?.metadata[1]?.value}</p>
+                                        <p>{state.packingSlipNumber}</p>
                                     </div>
                                     <div className="flex justify-between">
                                         <p>Date</p>
-                                        <p>{moment(orderData?.metadata[0]?.value).format('DD/MM/YYYY')}</p>
+                                        <p>{moment(state.packingSlipDate).format('DD/MM/YYYY')}</p>
                                     </div>
                                     <div className="flex justify-between pt-3">
                                         <button type="submit" className="btn btn-primary" onClick={() => payslipSend()}>
                                             {sendPayslipLoading ? <IconLoader /> : 'Send'}
                                         </button>
-                                        <button type="submit" className="btn btn-outline-primary" onClick={() => window.open(SERVER_URL + orderData?.metadata[2]?.value, '_blank')}>
+                                        <button type="submit" className="btn btn-outline-primary" onClick={() => window.open(SERVER_URL + state.packingSlipPath, '_blank')}>
                                             <IconDownload />
                                         </button>
                                     </div>

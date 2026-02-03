@@ -343,6 +343,7 @@ const Editorder = () => {
                         setAwbData(waybillItem);
                         const waybillData = JSON.parse(toValidJSON(waybillItem.value));
                         console.log('✌️waybillData --->', waybillData);
+                        setState({ waybillData: waybillData?.GenerateWayBillResult });
                         trackShipment(waybillData?.GenerateWayBillResult);
                     }
 
@@ -1038,6 +1039,7 @@ const Editorder = () => {
                     Failure(res?.data?.orderMarkAsPaid?.errors[0]?.message);
                     setIsPaymentOpen(false);
                     setTransactionLoading(false);
+                    trackShipment(state.waybillData)
                 } else {
                     getOrderDetails();
                     setIsPaymentOpen(false);
@@ -1198,6 +1200,7 @@ const Editorder = () => {
                 Failure('Counld not change status');
             }
         }
+        trackShipment(state.waybillData);
     };
 
     const orderCancelDraft = async () => {
@@ -1726,7 +1729,6 @@ const Editorder = () => {
     const calculateDiscount = () => {
         return formatAsINRWithDecimal(orderData?.discount?.amount);
     };
-
 
     const isTerminal = state.shippingStatus === 'returned' || state.shippingStatus === 'cancelled';
 

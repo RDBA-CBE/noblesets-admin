@@ -2824,7 +2824,7 @@ const Editorder = () => {
                             </>
                         )}
                         {awbData && (
-                            <div className="panel p-5">
+                            <div className="panel p-5 mb-5">
                                 <h3 className="border-b pb-2 text-lg font-semibold">Order Tracking</h3>
 
                                 {loading && <p className="mt-4">Loading tracking...</p>}

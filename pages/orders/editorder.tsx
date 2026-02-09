@@ -719,7 +719,7 @@ const Editorder = () => {
                 steps = ['Order Placed', 'Confirmed', 'Shipped', 'Delivered'];
                 currentStep = 1;
             } else {
-                steps = ['Order Placed'];
+                steps = ['Order Placed','Confirmed', 'Shipped', 'Delivered'];
                 currentStep = 0;
             }
 

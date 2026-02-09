@@ -111,7 +111,6 @@ const Header = () => {
     //     checkValidToken();
     // }, [router]);
 
-
     const checkValidToken = async () => {
         try {
             const res = await userRefetch();
@@ -119,18 +118,19 @@ const Header = () => {
             if (error?.length > 0) {
                 localStorage.clear();
                 router.replace('/auth/signin');
-            }else{
+            } else {
                 const res = await tokenDeactiveRefetch();
-                signOutClick();  
+                signOutClick();
             }
         } catch (error) {
             console.log('error: ', error.message);
             if (error.message == 'Invalid token. Create new one by using tokenCreate mutation.') {
                 localStorage.clear();
                 router.replace('/auth/signin');
-            }else{
-                router.replace('/auth/signin');
+            } else {
+                localStorage.clear();
 
+                router.replace('/auth/signin');
             }
         }
     };
@@ -472,13 +472,13 @@ const Header = () => {
                                 offset={[0, 8]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
                                 btnClassName="relative group block"
-                                button={<IconUser className="h-10 w-10 rounded-[50px] object-cover bg-[#f5f5f5] p-2 "/>}
+                                button={<IconUser className="h-10 w-10 rounded-[50px] bg-[#f5f5f5] object-cover p-2 " />}
                             >
                                 <ul className="w-[230px] !py-0 font-semibold text-dark dark:text-white-dark dark:text-white-light/90">
                                     <li>
                                         <div className="flex items-center px-4 py-4">
                                             {/* <img className="h-10 w-10 rounded-md object-cover" src="/assets/images/logo.png" alt="userProfile" /> */}
-                                            <IconUser className="h-10 w-10 rounded-[50px] object-cover bg-[#f5f5f5] p-2 "/>
+                                            <IconUser className="h-10 w-10 rounded-[50px] bg-[#f5f5f5] object-cover p-2 " />
 
                                             {token ? (
                                                 <div className="truncate ltr:pl-4 rtl:pr-4">

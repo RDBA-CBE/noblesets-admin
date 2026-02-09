@@ -128,6 +128,9 @@ const Header = () => {
             if (error.message == 'Invalid token. Create new one by using tokenCreate mutation.') {
                 localStorage.clear();
                 router.replace('/auth/signin');
+            }else{
+                router.replace('/auth/signin');
+
             }
         }
     };

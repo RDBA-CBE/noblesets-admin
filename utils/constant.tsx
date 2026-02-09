@@ -266,7 +266,7 @@ export const BLUE_DART = {
     Api_type: 'S',
     LicenceKey: 'evgkukoko6p3iosfktj76klhrvkgmqol',
     LoginID: 'TRP46786',
-    TokenUrl: 'https://noble.irepute.in/api/bluedart-token',
+    TokenUrl: 'https://nobledemo.irepute.co.in/api/bluedart-token',
     JWTToken:
         'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJqZWN0LXN1YmplY3QiLCJhdWQiOlsiYXVkaWVuY2UxIiwiYXVkaWVuY2UyIl0sImlzcyI6InVybjovL2FwaWdlZS1lZGdlLUpXVC1wb2xpY3ktdGVzdCIsImV4cCI6MTc2OTkxODgyOSwiaWF0IjoxNzY5ODMyNDI5LCJqdGkiOiI0YWQ4NWExMi05NzBiLTQxMGMtODFmMi05ODljMWY2NDA4ZTAifQ.s96XU7l6KcNbxC75UgGdhgJ7ewpShOkNv63nNJ-yn3U',
 };
@@ -291,7 +291,7 @@ export const BLUE_DART_LIVE = {
     LicenceKey: 'evgkukoko6p3iosfktj76klhrvkgmqol',
     TrackingLicKey: 'hisihnfjlq70qiqkhhkkqtjvqulmhqkt',
     LoginID: 'TRP67122',
-    TokenUrl: 'https://noble.irepute.in/api/bluedart-token',
+    TokenUrl: 'https://nobledemo.irepute.co.in/api/bluedart-token',
     JWTToken:
         'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJqZWN0LXN1YmplY3QiLCJhdWQiOlsiYXVkaWVuY2UxIiwiYXVkaWVuY2UyIl0sImlzcyI6InVybjovL2FwaWdlZS1lZGdlLUpXVC1wb2xpY3ktdGVzdCIsImV4cCI6MTc2OTg0Mzc0NSwiaWF0IjoxNzY5NzU3MzQ1LCJqdGkiOiI0ZTNiYWIyMi0zMzE2LTRlMjgtOWM0OS1lNDljODEzNDRlNTQifQ.XgFMU_5ZTUhsKjqjRQK39QPyvUnVtclwt4m7aCEYfcQ', // 🔴 IMPORTANT
 };

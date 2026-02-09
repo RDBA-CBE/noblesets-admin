@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Modal from './Modal';
 import moment from 'moment';
 
-const Steps = ({ current, items, trackingData, onTrackClick }) => {
-    console.log('✌️trackingData --->', trackingData);
+const Steps = ({ current, items, trackingData, onTrackClick,waybillData }) => {
+    console.log('✌️trackingData --->', waybillData);
     console.log('✌️current step --->', current);
     console.log('✌️items --->', items);
     const [showTrackingModal, setShowTrackingModal] = useState(false);
@@ -26,6 +26,14 @@ const Steps = ({ current, items, trackingData, onTrackClick }) => {
                         <div>
                             <span className="font-medium">Waybill:</span> <span className="font-bold text-[#7d4432]">{trackingData.WaybillNo}</span>
                         </div>
+                        <div>
+                            <span className="font-medium">CCRCRDREF:</span> <span className="font-bold text-[#7d4432]">{waybillData?.CCRCRDREF}</span>
+                        </div>
+                        <div>
+                            <span className="font-medium">Cluster Code:</span> <span className="font-bold text-[#7d4432]">{waybillData?.ClusterCode}</span>
+                        </div>
+
+                        
                         <div>
                             <span className="font-medium">Status:</span> <span className="font-bold">{trackingData.Status}</span>
                         </div>

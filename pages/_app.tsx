@@ -32,8 +32,8 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
 
     const client = useMemo(() => {
         const httpLink = createHttpLink({
-            // uri: 'https://nobledemo.irepute.co.in/graphql/',
-            uri: 'https://noble.irepute.in/graphql/',
+            uri: 'https://nobledemo.irepute.co.in/graphql/',
+            // uri: 'https://noble.irepute.in/graphql/',
             
 
 

@@ -22,7 +22,7 @@ export const PRODUCT_TYPE = 'UHJvZHVjdFR5cGU6Mw==';
 
 export const TAX_CLASS = 'VGF4Q2xhc3M6NQ==';
 
-export const SERVER_URL = 'https://noble.irepute.in/';
+export const SERVER_URL = 'https://nobledemo.irepute.co.in/';
 
 export const FRONTEND_URL = 'https://file.noblesets.com/';
 

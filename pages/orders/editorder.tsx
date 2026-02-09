@@ -2831,6 +2831,7 @@ const Editorder = () => {
 
                                 {/* NORMAL FLOW */}
                                 <Steps
+                                    waybillData={state.waybillData}
                                     current={state.currentStep}
                                     items={state.steps?.map((title) => ({ title })) || ['Order Placed', 'Confirmed', 'Shipped', 'Delivered'].map((title) => ({ title }))}
                                     trackingData={state.trackingData}
